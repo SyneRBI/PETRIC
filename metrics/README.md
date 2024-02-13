@@ -4,10 +4,13 @@
 
 - CIL with callbacks https://github.com/TomographicImaging/CIL/pull/1659
 - metrics from Stochastic Hackathon Quality Metrics, branch [`cil_callback`](https://github.com/TomographicImaging/Hackathon-000-Stochastic-QualityMetrics/tree/cil_callback)
+- SIRF master
 
 ### Installation
 
 Currently building from this SuperBuild branch https://github.com/SyneRBI/SIRF-SuperBuild/pull/718
+
+Notice that a fairly recent version of docker is required. Install it following the instructions [here](https://docs.docker.com/engine/install/ubuntu/).
 
 ```bash
 
