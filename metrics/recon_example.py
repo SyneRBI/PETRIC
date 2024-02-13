@@ -74,7 +74,6 @@ roi_image_dict = {
     'bottom' : bottom
 }
 
-from cil.utilities.quality_measures import mae, mse, psnr
 
 def MSE(x,y):
     """ mean squared error between two numpy arrays
@@ -110,9 +109,13 @@ img_qual_callback = imgq.ImageQualityCallback(ground_truth, tb_summary_writer,
                                                                  'STDDEV': (lambda x: x.std()),
                                                                  'MAX': (lambda x: x.max()),
                                                                  'COM': (lambda x: np.array([3,2,1]))},
-                                            #   post_smoothing_fwhms_mm_list = [5., 8.]
                                               )
+sigmas_mm = [5.0, 8.0]
+filters = {}
+for sigma in sigmas_mm:
+    filters[f"Gaussian_{sigma}"] = imgq.image_quality_callback.GaussianFilter(post_smoothing_fwhm_mm=sigma, voxel_size_mm=img_qual_callback.voxel_size_mm)
 
+img_qual_callback.set_filters(filters)
 
 #%%
 algo.run(100, callbacks=[callbacks.ProgressCallback(), 
