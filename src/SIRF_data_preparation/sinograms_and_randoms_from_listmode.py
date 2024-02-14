@@ -10,6 +10,7 @@ Options:
   -s <sino>, --sino=<sino>     sinograms file prefix [default: sinograms]
   -r <rand>, --rand=<rand>     randoms file name [default: randoms]
   -t <tmpl>, --tmpl=<tmpl>     raw data template [default: mMR_template_span11.hs]
+  -T <tmpf>, --tmpf=<tmpf>     path to template folder
   -i <int>, --interval=<int>   scanning time interval to convert as string '(a,b)'
                                [default: (0,10)]
   -E <engn>, --engine=<engn>   reconstruction engine [default: STIR]
@@ -58,8 +59,16 @@ list_file = args['--list']
 sino_file = args['--sino']
 rand_file = args['--rand']
 tmpl_file = args['--tmpl']
+tmpl_fold = args['--tmpf']
+if tmpl_fold is None:
+    # default to data/examples/PET/mMR
+    # Note: seem to need / even on Windows
+    #data_path = os.path.join(examples_data_path('PET'), 'mMR')
+    tmpl_fold = os.path.join(examples_data_path('PET'), 'mMR')
+
 list_file = existing_filepath(data_path, list_file)
-tmpl_file = existing_filepath(data_path, tmpl_file)
+tmpl_file = existing_filepath(tmpl_fold, tmpl_file)
+#tmpl_file = existing_filepath(data_path, tmpl_file)
 interval = literal_eval(args['--interval'])
 storage = args['--storage']
 show_plot = not args['--non-interactive']

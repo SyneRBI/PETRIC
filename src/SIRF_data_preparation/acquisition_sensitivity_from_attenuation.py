@@ -4,15 +4,18 @@ Usage:
   acquisition_sensitivity_from_attenuation [--help | options]
 
 Options:
+  -p <path>, --path=<path>     subfolder of SIRF-Exercises/data/PET containing the input data [default: mMR/NEMA_IQ] 
   -t <temp>, --temp=<temp>     raw data template [default: mMR_template_span11.hs]
+  -T <tmpf>, --tmpf=<tmpf>     path to template folder
   -a <attn>, --attn=<attn>     attenuation image file file [default: mu_map.hv]
-  -p <path>, --path=<path>     path to data files, defaults to data/examples/PET/mMR
-                               subfolder of SIRF root folder
   -e <engn>, --engine=<engn>   reconstruction engine [default: STIR]
   -s <stsc>, --storage=<stsc>  acquisition data storage scheme [default: file]
   -o <file>, --output=<file>   output attenuation factors sinogram [default: acf.hs]
   --non-interactive            do not show plots
 '''
+
+#  -p <path>, --path=<path>     path to data files, defaults to data/examples/PET/mMR
+#                               subfolder of SIRF root folder
 
 ## SyneRBI Synergistic Image Reconstruction Framework (SIRF)
 ## Copyright 2015 - 2019 Rutherford Appleton Laboratory STFC
@@ -37,6 +40,7 @@ from docopt import docopt
 args = docopt(__doc__, version=__version__)
 
 import math
+import os
 
 from sirf.Utilities import error, examples_data_path, existing_filepath
 from sirf.Utilities import show_2D_array
@@ -49,14 +53,21 @@ pet = importlib.import_module('sirf.' + engine)
 
 # process command-line options
 temp_file = args['--temp']
-attn_file = args['--attn']
-data_path = args['--path']
-if data_path is None:
+tmpl_fold = args['--tmpf']
+if tmpl_fold is None:
     # default to data/examples/PET/mMR
     # Note: seem to need / even on Windows
     #data_path = os.path.join(examples_data_path('PET'), 'mMR')
-    data_path = examples_data_path('PET') + '/mMR'
-temp_file = existing_filepath(data_path, temp_file)
+    tmpl_fold = os.path.join(examples_data_path('PET'), 'mMR')
+temp_file = existing_filepath(tmpl_fold, temp_file)
+attn_file = args['--attn']
+#data_path = args['--path']
+data_path = os.path.join('/home/sirfuser/devel/SIRF-Exercises/data/PET', args['--path'])
+#if data_path is None:
+    # default to data/examples/PET/mMR
+    # Note: seem to need / even on Windows
+#    data_path = os.path.join(examples_data_path('PET'), 'mMR')
+    #data_path = examples_data_path('PET') + '/mMR'
 attn_file = existing_filepath(data_path, attn_file)
 storage = args['--storage']
 show_plot = not args['--non-interactive']
