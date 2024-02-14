@@ -1,0 +1,323 @@
+sirfuser@vagrant:sirfuser@vagrant:~/devel/SIRF-Exercises/data/PET/mMR/NEMA_IQ$ python3 sinograms_and_randoms_from_listmode.py 
+
+INFO: Setting energy window keys as in STIR3.0
+
+WARNING: read_data: error after reading from stream.
+
+
+ERROR: ProjDataFromStream: error reading data
+
+INFO: CListModeDataECAT8_32bit: opening file /home/sirfuser/devel/SIRF-Exercises/data/PET/mMR/NEMA_IQ/20170809_NEMA_60min_UCL.l
+
+Processing time frame 1
+500000 events stored
+Number of prompts stored in this time period : 655357
+Number of delayeds stored in this time period: 0
+Last stored event was recorded before time-tick at 10 secs
+Total number of counts (either prompts/trues/delayeds) stored: 655357
+
+This took 0.45s CPU time.
+writing sinograms to ./sinograms...
+acquisition data dimensions: 1x837x252x344
+You may need to close Figure 1 window to continue...
+estimating randoms, please wait...
+estimate_randoms: trying GEHDF5...
+not a GE HDF5 file. Using ML estimate from delayeds
+processed frame 1
+Last stored event was recorded after time-tick at 9.999 secs
+Total number of prompts/trues/delayed stored: 72174
+
+This took 0.11s CPU time.
+Starting iteration 1	KL 37.1304
+Starting iteration 2	KL 2.70756
+Starting iteration 3	KL 0.0987901
+Starting iteration 4	KL 0.00413396
+Starting iteration 5	KL 0.000196984
+Starting iteration 6	KL 7.90699e-06
+Starting iteration 7	KL 4.47602e-07
+Starting iteration 8	KL 6.0318e-09
+Starting iteration 9	KL 1.79446e-10
+Starting iteration 10	KL 7.91553e-11
+CPU time 34.53 secs
+writing randoms to ./randoms...
+You may need to close Figure 1 window to continue...
+
+=== done with /home/sirfuser/devel/SIRF-Exercises/data/PET/mMR/NEMA_IQ/sinograms_and_randoms_from_listmode.py
+sirfuser@vagrant:~/devel/SIRF-Exercises/data/PET/mMR/NEMA_IQ$ convertSiemensInterfileToSTIR.sh 20170809_NEMA_MUMAP_UCL.v.hdr 20170809_NEMA_MUMAP_UCL.hv
+sirfuser@vagrant:~/devel/SIRF-Exercises/data/PET/mMR/NEMA_IQ$ python3 acquisition_sensitivity_from_attenuation.py -p . -a 20170809_NEMA_MUMAP_UCL.hv
+creating uniform acquisition data...
+
+WARNING: KeyParser warning: unrecognized keyword: %comment
+
+
+WARNING: KeyParser warning: unrecognized keyword: %sms-mi header name space
+
+
+WARNING: KeyParser warning: unrecognized keyword: %sinogram data file
+
+
+WARNING: KeyParser warning: unrecognized keyword: %sinogram header file
+
+
+WARNING: KeyParser warning: unrecognized keyword: %study date (yyyy:mm:dd)
+
+
+WARNING: KeyParser warning: unrecognized keyword: %study time (hh:mm:ss gmt+00:00)
+
+
+WARNING: KeyParser warning: unrecognized keyword: %patient orientation
+
+
+WARNING: KeyParser warning: unrecognized keyword: end horizontal bed position (mm)
+
+
+WARNING: KeyParser warning: unrecognized keyword: total number of data sets
+
+
+WARNING: KeyParser warning: unrecognized keyword: %supplementary attributes
+
+
+WARNING: KeyParser warning: unrecognized keyword: isotope gamma halflife (sec)
+
+
+WARNING: KeyParser warning: unrecognized keyword: %supplementary attributes
+
+
+WARNING: KeyParser warning: unrecognized keyword: %reconstruction diameter (mm)
+
+
+WARNING: KeyParser warning: unrecognized keyword: %scanner quantification factor (bq*s/ecat counts)
+
+
+WARNING: KeyParser warning: unrecognized keyword: %decay correction
+
+
+WARNING: KeyParser warning: unrecognized keyword: %decay correction reference date (yyyy:mm:dd)
+
+
+WARNING: KeyParser warning: unrecognized keyword: %decay correction reference time (hh:mm:ss gmt+00:00)
+
+
+WARNING: KeyParser warning: unrecognized keyword: %number of reconstructed beds
+
+
+WARNING: KeyParser warning: unrecognized keyword: %decay correction factor range
+
+
+WARNING: KeyParser warning: unrecognized keyword: %scatter fraction range (%)
+
+
+WARNING: KeyParser warning: unrecognized keyword: %acquisition start time range (sec)
+
+
+WARNING: KeyParser warning: unrecognized keyword: %slice duration range (sec)
+
+
+WARNING: KeyParser warning: unrecognized keyword: slice orientation
+
+
+WARNING: KeyParser warning: unrecognized keyword: method of reconstruction
+
+
+WARNING: KeyParser warning: unrecognized keyword: number of iterations
+
+
+WARNING: KeyParser warning: unrecognized keyword: %number of subsets
+
+
+WARNING: KeyParser warning: unrecognized keyword: filter name
+
+
+WARNING: KeyParser warning: unrecognized keyword: %xy-filter (mm)
+
+
+WARNING: KeyParser warning: unrecognized keyword: %z-filter (mm)
+
+
+WARNING: KeyParser warning: unrecognized keyword: %filter order
+
+
+WARNING: KeyParser warning: unrecognized keyword: %image zoom
+
+
+WARNING: KeyParser warning: unrecognized keyword: %x-offset (mm)
+
+
+WARNING: KeyParser warning: unrecognized keyword: %y-offset (mm)
+
+
+WARNING: KeyParser warning: unrecognized keyword: applied corrections
+
+
+WARNING: KeyParser warning: unrecognized keyword: method of attenuation correction
+
+
+WARNING: KeyParser warning: unrecognized keyword: method of scatter correction
+
+
+WARNING: KeyParser warning: unrecognized keyword: %method of random correction
+
+
+WARNING: KeyParser warning: unrecognized keyword: %total uncorrected singles rate
+
+
+WARNING: KeyParser warning: unrecognized keyword: %image slope
+
+
+WARNING: KeyParser warning: unrecognized keyword: %image intercept
+
+
+WARNING: KeyParser warning: unrecognized keyword: %supplementary attributes
+
+
+WARNING: KeyParser warning: unrecognized keyword: %axial compression
+
+
+WARNING: RadioNuclideDB::get_radionuclide: unknown modality. Returning "unknown" radionuclide.
+You may need to close Figure 1 window to continue...
+creating acquisition sensitivity model...
+applying attenuation (please wait, may take a while)...
+You may need to close Figure 1 window to continue...
+
+=== done with /home/sirfuser/devel/SIRF-Exercises/data/PET/mMR/NEMA_IQ/acquisition_sensitivity_from_attenuation.py
+sirfuser@vagrant:~/devel/SIRF-Exercises/data/PET/mMR/NEMA_IQ$ python3 scatter_estimation.py 
+
+WARNING: DiscretisedDensity does not contain any time frames. This might cause an error.
+Reading manufacturer PET normalisation file from /home/sirfuser/devel/install/share/SIRF-3.5/data/examples/PET/mMR/norm.n.hdr
+trying GEHDF5...
+not a GE HDF5 file
+number of scatter iterations that will be used: 1
+85680 bins in mask for sinogram at segment 0, axial_pos 0
+85680 bins in mask for sinogram at segment 0, axial_pos 1
+82657 bins in mask for sinogram at segment 0, axial_pos 2
+63125 bins in mask for sinogram at segment 0, axial_pos 3
+62135 bins in mask for sinogram at segment 0, axial_pos 4
+55708 bins in mask for sinogram at segment 0, axial_pos 5
+54133 bins in mask for sinogram at segment 0, axial_pos 6
+52594 bins in mask for sinogram at segment 0, axial_pos 7
+52074 bins in mask for sinogram at segment 0, axial_pos 8
+50555 bins in mask for sinogram at segment 0, axial_pos 9
+49510 bins in mask for sinogram at segment 0, axial_pos 10
+48472 bins in mask for sinogram at segment 0, axial_pos 11
+47661 bins in mask for sinogram at segment 0, axial_pos 12
+47005 bins in mask for sinogram at segment 0, axial_pos 13
+46618 bins in mask for sinogram at segment 0, axial_pos 14
+46043 bins in mask for sinogram at segment 0, axial_pos 15
+45725 bins in mask for sinogram at segment 0, axial_pos 16
+45561 bins in mask for sinogram at segment 0, axial_pos 17
+45251 bins in mask for sinogram at segment 0, axial_pos 18
+45166 bins in mask for sinogram at segment 0, axial_pos 19
+45166 bins in mask for sinogram at segment 0, axial_pos 20
+45095 bins in mask for sinogram at segment 0, axial_pos 21
+44881 bins in mask for sinogram at segment 0, axial_pos 22
+44833 bins in mask for sinogram at segment 0, axial_pos 23
+44759 bins in mask for sinogram at segment 0, axial_pos 24
+44759 bins in mask for sinogram at segment 0, axial_pos 25
+44759 bins in mask for sinogram at segment 0, axial_pos 26
+44856 bins in mask for sinogram at segment 0, axial_pos 27
+44856 bins in mask for sinogram at segment 0, axial_pos 28
+44856 bins in mask for sinogram at segment 0, axial_pos 29
+44856 bins in mask for sinogram at segment 0, axial_pos 30
+44856 bins in mask for sinogram at segment 0, axial_pos 31
+44856 bins in mask for sinogram at segment 0, axial_pos 32
+44856 bins in mask for sinogram at segment 0, axial_pos 33
+44856 bins in mask for sinogram at segment 0, axial_pos 34
+45010 bins in mask for sinogram at segment 0, axial_pos 35
+45010 bins in mask for sinogram at segment 0, axial_pos 36
+45010 bins in mask for sinogram at segment 0, axial_pos 37
+45010 bins in mask for sinogram at segment 0, axial_pos 38
+45010 bins in mask for sinogram at segment 0, axial_pos 39
+45010 bins in mask for sinogram at segment 0, axial_pos 40
+45010 bins in mask for sinogram at segment 0, axial_pos 41
+45010 bins in mask for sinogram at segment 0, axial_pos 42
+45010 bins in mask for sinogram at segment 0, axial_pos 43
+45010 bins in mask for sinogram at segment 0, axial_pos 44
+45010 bins in mask for sinogram at segment 0, axial_pos 45
+45010 bins in mask for sinogram at segment 0, axial_pos 46
+45010 bins in mask for sinogram at segment 0, axial_pos 47
+45010 bins in mask for sinogram at segment 0, axial_pos 48
+45010 bins in mask for sinogram at segment 0, axial_pos 49
+45010 bins in mask for sinogram at segment 0, axial_pos 50
+45010 bins in mask for sinogram at segment 0, axial_pos 51
+45010 bins in mask for sinogram at segment 0, axial_pos 52
+45010 bins in mask for sinogram at segment 0, axial_pos 53
+44937 bins in mask for sinogram at segment 0, axial_pos 54
+44937 bins in mask for sinogram at segment 0, axial_pos 55
+44937 bins in mask for sinogram at segment 0, axial_pos 56
+44937 bins in mask for sinogram at segment 0, axial_pos 57
+44937 bins in mask for sinogram at segment 0, axial_pos 58
+44937 bins in mask for sinogram at segment 0, axial_pos 59
+44937 bins in mask for sinogram at segment 0, axial_pos 60
+44937 bins in mask for sinogram at segment 0, axial_pos 61
+44937 bins in mask for sinogram at segment 0, axial_pos 62
+44937 bins in mask for sinogram at segment 0, axial_pos 63
+44937 bins in mask for sinogram at segment 0, axial_pos 64
+44937 bins in mask for sinogram at segment 0, axial_pos 65
+44937 bins in mask for sinogram at segment 0, axial_pos 66
+44937 bins in mask for sinogram at segment 0, axial_pos 67
+44937 bins in mask for sinogram at segment 0, axial_pos 68
+44979 bins in mask for sinogram at segment 0, axial_pos 69
+44979 bins in mask for sinogram at segment 0, axial_pos 70
+44979 bins in mask for sinogram at segment 0, axial_pos 71
+44979 bins in mask for sinogram at segment 0, axial_pos 72
+44979 bins in mask for sinogram at segment 0, axial_pos 73
+44979 bins in mask for sinogram at segment 0, axial_pos 74
+44979 bins in mask for sinogram at segment 0, axial_pos 75
+44979 bins in mask for sinogram at segment 0, axial_pos 76
+44979 bins in mask for sinogram at segment 0, axial_pos 77
+44979 bins in mask for sinogram at segment 0, axial_pos 78
+44979 bins in mask for sinogram at segment 0, axial_pos 79
+44979 bins in mask for sinogram at segment 0, axial_pos 80
+44979 bins in mask for sinogram at segment 0, axial_pos 81
+44979 bins in mask for sinogram at segment 0, axial_pos 82
+44979 bins in mask for sinogram at segment 0, axial_pos 83
+44979 bins in mask for sinogram at segment 0, axial_pos 84
+44979 bins in mask for sinogram at segment 0, axial_pos 85
+44979 bins in mask for sinogram at segment 0, axial_pos 86
+44979 bins in mask for sinogram at segment 0, axial_pos 87
+44979 bins in mask for sinogram at segment 0, axial_pos 88
+44979 bins in mask for sinogram at segment 0, axial_pos 89
+44979 bins in mask for sinogram at segment 0, axial_pos 90
+44979 bins in mask for sinogram at segment 0, axial_pos 91
+44979 bins in mask for sinogram at segment 0, axial_pos 92
+44979 bins in mask for sinogram at segment 0, axial_pos 93
+44979 bins in mask for sinogram at segment 0, axial_pos 94
+44979 bins in mask for sinogram at segment 0, axial_pos 95
+44979 bins in mask for sinogram at segment 0, axial_pos 96
+44951 bins in mask for sinogram at segment 0, axial_pos 97
+44951 bins in mask for sinogram at segment 0, axial_pos 98
+44951 bins in mask for sinogram at segment 0, axial_pos 99
+44951 bins in mask for sinogram at segment 0, axial_pos 100
+44951 bins in mask for sinogram at segment 0, axial_pos 101
+44951 bins in mask for sinogram at segment 0, axial_pos 102
+44951 bins in mask for sinogram at segment 0, axial_pos 103
+44951 bins in mask for sinogram at segment 0, axial_pos 104
+44951 bins in mask for sinogram at segment 0, axial_pos 105
+44951 bins in mask for sinogram at segment 0, axial_pos 106
+44951 bins in mask for sinogram at segment 0, axial_pos 107
+44951 bins in mask for sinogram at segment 0, axial_pos 108
+44951 bins in mask for sinogram at segment 0, axial_pos 109
+44951 bins in mask for sinogram at segment 0, axial_pos 110
+44951 bins in mask for sinogram at segment 0, axial_pos 111
+44951 bins in mask for sinogram at segment 0, axial_pos 112
+45057 bins in mask for sinogram at segment 0, axial_pos 113
+45057 bins in mask for sinogram at segment 0, axial_pos 114
+45057 bins in mask for sinogram at segment 0, axial_pos 115
+45057 bins in mask for sinogram at segment 0, axial_pos 116
+45181 bins in mask for sinogram at segment 0, axial_pos 117
+45533 bins in mask for sinogram at segment 0, axial_pos 118
+45618 bins in mask for sinogram at segment 0, axial_pos 119
+45725 bins in mask for sinogram at segment 0, axial_pos 120
+45895 bins in mask for sinogram at segment 0, axial_pos 121
+46218 bins in mask for sinogram at segment 0, axial_pos 122
+47242 bins in mask for sinogram at segment 0, axial_pos 123
+47567 bins in mask for sinogram at segment 0, axial_pos 124
+48366 bins in mask for sinogram at segment 0, axial_pos 125
+49160 bins in mask for sinogram at segment 0, axial_pos 126
+ScatterEstimator:: Waiting for the scatter estimation to finish ...
+ScatterEstimator:: estimation finished.
+You may need to close Figure 1 window to continue...
+done
+sirfuser@vagrant:~/devel/SIRF-Exercises/data/PET/mMR/NEMA_IQ$ 
+
+
