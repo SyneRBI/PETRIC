@@ -60,3 +60,52 @@ output_path, sinograms_filename, randoms_filename):
     show_2D_array('Randoms', rnd_array[0,z,:,:])
     print('writing randoms to %s...' % rand_file)
     randoms.write(rand_file)
+
+def acquisition_sensitivity_from_attenuation(siemens_attn_interfile, template_filename, attn_image_file, acq_sens_filename):
+
+    os.system('convertSiemensInterfileToSTIR.sh ' + siemens_attn_interfile + ' ' + attn_image_file)
+
+    # direct all engine's messages to files
+    _ = pet.MessageRedirector('info.txt', 'warn.txt', 'errr.txt')
+
+    # select acquisition data storage scheme
+    #pet.AcquisitionData.set_storage_scheme(storage)
+
+    # obtain an acquisition data template
+    template = pet.AcquisitionData(template_filename)
+
+    # create uniform acquisition data from template
+    print('creating uniform acquisition data...')
+    acq_data = pet.AcquisitionData(template)
+    acq_data.fill(1.0)
+
+    # read attenuation image
+    attn_image = pet.ImageData(attn_image_file)
+    attn_image_as_array = attn_image.as_array()
+    z = attn_image_as_array.shape[0]//2
+    show_2D_array('Attenuation image', attn_image_as_array[z,:,:])
+
+    # create acquisition model
+    am = pet.AcquisitionModelUsingRayTracingMatrix()
+    am.set_up(template, attn_image)
+
+    # create acquisition sensitivity model from attenuation image
+    print('creating acquisition sensitivity model...')
+    asm = pet.AcquisitionSensitivityModel(attn_image, am)
+    asm.set_up(template)
+    am.set_acquisition_sensitivity(asm)
+##    print('projecting (please wait, may take a while)...')
+##    simulated_data = am.forward(attn_image)
+
+    # apply attenuation to the uniform acquisition data to obtain
+    # 'bin efficiencies'
+    print('applying attenuation (please wait, may take a while)...')
+    asm.unnormalise(acq_data)
+
+    acq_data.write(acq_sens_filename)
+
+    # show 'bin efficiencies'
+    acq_array = acq_data.as_array()
+    acq_dim = acq_array.shape
+    z = acq_dim[1]//2
+    show_2D_array('Bin efficiencies', acq_array[0,z,:,:])

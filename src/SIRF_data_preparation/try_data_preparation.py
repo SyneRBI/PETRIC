@@ -2,6 +2,7 @@ import os
 import data_preparation_setup
 from data_preparation_setup import repo_directory
 from data_preparation_setup import sinograms_and_randoms_from_listmode
+from data_preparation_setup import acquisition_sensitivity_from_attenuation
 from sirf_exercises import exercises_data_path
 from sirf.Utilities import examples_data_path
 
@@ -15,3 +16,10 @@ sinograms_filename = 'sinograms'
 randoms_filename = 'randoms'
 sinograms_and_randoms_from_listmode(listmode_filename, (0, 10), template_filename, \
 challenge_data_path, sinograms_filename, randoms_filename)
+
+siemens_attn_header = os.path.join(data_path, '20170809_NEMA_MUMAP_UCL.v.hdr')
+siemens_attn_image = os.path.join(data_path, '20170809_NEMA_MUMAP_UCL.v')
+stir_attn_header = os.path.join(challenge_data_path, '20170809_NEMA_MUMAP_UCL.hv')
+acq_sens_filename = os.path.join(challenge_data_path, 'acf.hs')
+os.system('cp ' + siemens_attn_image + ' ' + challenge_data_path)
+acquisition_sensitivity_from_attenuation(siemens_attn_header, template_filename, stir_attn_header, acq_sens_filename)
