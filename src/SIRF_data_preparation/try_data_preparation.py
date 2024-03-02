@@ -6,10 +6,10 @@ from data_preparation_setup import acquisition_sensitivity_from_attenuation
 from sirf_exercises import exercises_data_path
 from sirf.Utilities import examples_data_path
 
-data_path = exercises_data_path('PET', 'mMR', 'NEMA_IQ')
+data_path = '.'
 # challenge_data_path = os.path.join(repo_directory, 'data')
 # for debugging purposes using tmp1 subfolder instead of data
-challenge_data_path = os.path.join(repo_directory, 'tmp1')
+challenge_data_path = './tmpl'
 
 listmode_filename = os.path.join(data_path, '20170809_NEMA_60min_UCL.l.hdr')
 template_filename = os.path.join(examples_data_path('PET'), 'mMR', 'mMR_template_span11_small.hs')

@@ -1,6 +1,0 @@
-python3 sinograms_and_randoms_from_listmode.py
-cd /home/sirfuser/devel/SIRF-Exercises/data/PET/mMR/NEMA_IQ
-convertSiemensInterfileToSTIR.sh 20170809_NEMA_MUMAP_UCL.v.hdr 20170809_NEMA_MUMAP_UCL.hv
-cd /home/sirfuser/devel/SyneRBI-Challenge/src/SIRF_data_preparation
-python3 acquisition_sensitivity_from_attenuation.py -a 20170809_NEMA_MUMAP_UCL.hv
-python3 scatter_estimation.py
