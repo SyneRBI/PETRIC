@@ -10,6 +10,15 @@ this_directory = os.path.dirname(__file__)
 repo_directory = os.path.dirname(os.path.dirname(this_directory))
 sys.path.append(os.path.join(repo_directory, 'lib'))
 
+def fix_siemens_norm_EOL(in_filename, out_filename):
+    with open(in_filename, mode="rb") as f:
+        data = bytearray(f.read())
+    for i in range(len(data)):
+        if data[i] == 13: #'\r'
+            data[i] = 10 # \n
+    with open(out_filename, mode="wb") as f:
+        f.write(data)
+
 def sinograms_and_randoms_from_listmode(listmode_filename, duration, template_filename, \
 output_path, sinograms_filename, randoms_filename):
 
@@ -39,7 +48,6 @@ output_path, sinograms_filename, randoms_filename):
 
     # set up the converter
     lm2sino.set_up()
-
     # convert
     lm2sino.process()
 
@@ -61,7 +69,7 @@ output_path, sinograms_filename, randoms_filename):
     print('writing randoms to %s...' % rand_file)
     randoms.write(rand_file)
 
-def acquisition_sensitivity_from_attenuation(siemens_attn_interfile, template_filename, attn_image_file, acq_sens_filename):
+def acquisition_sensitivity_from_attenuation(siemens_attn_interfile, template_filename, attn_image_file, ac_sens_filename):
 
     os.system('convertSiemensInterfileToSTIR.sh ' + siemens_attn_interfile + ' ' + attn_image_file)
 
@@ -81,9 +89,6 @@ def acquisition_sensitivity_from_attenuation(siemens_attn_interfile, template_fi
 
     # read attenuation image
     attn_image = pet.ImageData(attn_image_file)
-    attn_image_as_array = attn_image.as_array()
-    z = attn_image_as_array.shape[0]//2
-    show_2D_array('Attenuation image', attn_image_as_array[z,:,:])
 
     # create acquisition model
     am = pet.AcquisitionModelUsingRayTracingMatrix()
@@ -93,7 +98,6 @@ def acquisition_sensitivity_from_attenuation(siemens_attn_interfile, template_fi
     print('creating acquisition sensitivity model...')
     asm = pet.AcquisitionSensitivityModel(attn_image, am)
     asm.set_up(template)
-    am.set_acquisition_sensitivity(asm)
 ##    print('projecting (please wait, may take a while)...')
 ##    simulated_data = am.forward(attn_image)
 
@@ -102,10 +106,26 @@ def acquisition_sensitivity_from_attenuation(siemens_attn_interfile, template_fi
     print('applying attenuation (please wait, may take a while)...')
     asm.unnormalise(acq_data)
 
-    acq_data.write(acq_sens_filename)
+    acq_data.write(ac_sens_filename)
 
-    # show 'bin efficiencies'
+    # show 'AC factors'
     acq_array = acq_data.as_array()
     acq_dim = acq_array.shape
     z = acq_dim[1]//2
-    show_2D_array('Bin efficiencies', acq_array[0,z,:,:])
+    show_2D_array('Attenuation factors', acq_array[0,z,:,:])
+
+    return acq_data
+
+def create_multfactors(norm_file, ac_sens, mult_factors_filename):
+    asm_norm = pet.AcquisitionSensitivityModel(norm_file)
+    asm_norm.set_up(ac_sens)
+    mult_factors = ac_sens.clone()
+    asm_norm.unnormalise(mult_factors)
+    mult_factors.write(mult_factors_filename)
+
+    # show 
+    acq_array = mult_factors.as_array()
+    acq_dim = acq_array.shape
+    z = acq_dim[1]//2
+    show_2D_array('mult factors', acq_array[0,z,:,:])
+
