@@ -8,11 +8,10 @@ from data_preparation_setup import estimate_scatter
 from data_preparation_setup import create_multfactors
 from data_preparation_setup import create_background_and_additive
 from sirf.Utilities import examples_data_path
+from sirf_exercises import exercises_data_path
 
-data_path = '.'
-# challenge_data_path = os.path.join(repo_directory, 'data')
-# for debugging purposes using tmp1 subfolder instead of data
-challenge_data_path = './tmpl'
+data_path = exercises_data_path('PET', 'mMR', 'NEMA_IQ')
+challenge_data_path = os.path.join(repo_directory, 'data')
 os.makedirs(challenge_data_path, exist_ok = True)
 
 listmode_filename = os.path.join(data_path, '20170809_NEMA_60min_UCL.l.hdr')
