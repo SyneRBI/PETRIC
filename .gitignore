@@ -4,4 +4,6 @@ errr.txt
 info.txt
 warn.txt
 __pycache__
+*.s
+*.hs
 
