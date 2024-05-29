@@ -1,6 +1,8 @@
 import os
-import data_preparation_setup
-from data_preparation_setup import repo_directory
+import sys
+this_directory = os.path.dirname(__file__)
+repo_directory = os.path.dirname(os.path.dirname(this_directory))
+sys.path.append(os.path.join(repo_directory, 'lib'))
 
 import importlib
 pet = importlib.import_module('sirf.STIR')
@@ -22,10 +24,6 @@ data_path = exercises_data_path('PET', 'mMR', 'NEMA_IQ')
 sirf_data_path = os.path.join(examples_data_path('PET'), 'mMR')
 challenge_data_path = os.path.join(repo_directory, 'data')
 os.makedirs(challenge_data_path, exist_ok=True)
-
-print(data_path)
-print(sirf_data_path)
-print(challenge_data_path)
 
 f_template = os.path.join(sirf_data_path, 'mMR_template_span11_small.hs')
 
