@@ -67,7 +67,7 @@ prompts.write(f_prompts)
 randoms.write(f_randoms)
 
 attn_image = pet.ImageData(stir_attn_header)
-attn, af, acf = pet.AcquisitionSensitivityModel.compute_attenuation_factors(prompts, attn_image)
+af, acf = pet.AcquisitionSensitivityModel.compute_attenuation_factors(prompts, attn_image)
 print('norm of the attenuation factor: %f' % af.norm())
 print('norm of the attenuation correction factor: %f' % acf.norm())
 
