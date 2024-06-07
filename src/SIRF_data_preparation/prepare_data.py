@@ -11,6 +11,14 @@ from sirf.Utilities import examples_data_path
 from sirf_exercises import exercises_data_path
 from sirf_exercises import prepare_challenge_data
 
+# brutal support to add some parameters to the script
+start = 0
+end = 600
+if len(sys.argv) > 1:
+    start = float(sys.argv[1])
+if len(sys.argv) > 2:
+    end = float(sys.argv[2])
+
 data_path = exercises_data_path('PET', 'mMR', 'NEMA_IQ')
 sirf_data_path = os.path.join(examples_data_path('PET'), 'mMR')
 challenge_data_path = os.path.join(repo_directory, 'data')
@@ -22,5 +30,5 @@ os.makedirs(intermediate_data_path, exist_ok=True)
 prepare_challenge_data(data_path, sirf_data_path, challenge_data_path, intermediate_data_path, '20170809_NEMA_',
     '60min_UCL.l.hdr', 'MUMAP_UCL.v', 'MUMAP_UCL.hv', 'UCL.n', 'norm.n.hdr', 'mMR_template_span11_small.hs',
     'prompts', 'multfactors', 'additive', 'randoms',
-    'attenuation_factor', 'attenuation_correction_factor', 'scatter')
+    'attenuation_factor', 'attenuation_correction_factor', 'scatter', start, end)
 
