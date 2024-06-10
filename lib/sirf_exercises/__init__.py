@@ -91,6 +91,9 @@ def prepare_challenge_data(data_path, sirf_data_path, challenge_data_path, inter
     f_acf = os.path.join(intermediate_data_path, f_acf)
     f_scatter = os.path.join(intermediate_data_path, f_scatter)
 
+    start = 0
+    stop = 10
+
     os.system('cp ' + f_siemens_attn_image + ' ' + challenge_data_path)
     os.system('convertSiemensInterfileToSTIR.sh ' + f_siemens_attn_header + ' ' + f_stir_attn_header)
     os.system('cp ' + f_siemens_norm + ' ' + challenge_data_path)
@@ -112,7 +115,15 @@ def prepare_challenge_data(data_path, sirf_data_path, challenge_data_path, inter
     # create listmode-to-sinograms converter object
     lm2sino = pet.ListmodeToSinograms()
 
-    prompts, randoms = lm2sino.prompts_and_randoms_from_listmode(listmode_data, 0, 10, acq_data_template)
+    #prompts, randoms = lm2sino.prompts_and_randoms_from_listmode(listmode_data, 0, 10, acq_data_template)
+    lm2sino.set_input(listmode_data)
+    lm2sino.set_output_prefix('prompts')
+    lm2sino.set_template(acq_data_template)
+    lm2sino.set_time_interval(start, stop)
+    lm2sino.set_up()
+    lm2sino.process()
+    prompts = lm2sino.get_output()
+    randoms = lm2sino.estimate_randoms()
     print('data shape: %s' % repr(prompts.shape))
     print('prompts norm: %f' % prompts.norm())
     print('randoms norm: %f' % randoms.norm())
