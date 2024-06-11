@@ -16,6 +16,9 @@
 import os
 import importlib
 pet = importlib.import_module('sirf.STIR')
+import logging
+
+logger = logging.getLogger("sirf_exercises")
 
 
 def exercises_data_path(*data_type):
@@ -73,7 +76,7 @@ def fix_siemens_norm_EOL(in_filename, out_filename):
 
 def prepare_challenge_data(data_path, sirf_data_path, challenge_data_path, intermediate_data_path, 
     f_root, f_listmode, f_mumap, f_attn, f_norm, f_stir_norm, f_templ,
-    f_prompts, f_multfactors, f_additive, f_randoms, f_af, f_acf, f_scatter):
+    f_prompts, f_multfactors, f_additive, f_randoms, f_af, f_acf, f_scatter, start, stop):
 
     f_listmode = os.path.join(data_path, f_root + f_listmode)
     f_siemens_attn_image = os.path.join(data_path, f_root + f_mumap)
@@ -108,32 +111,40 @@ def prepare_challenge_data(data_path, sirf_data_path, challenge_data_path, inter
 
     # read acquisition data template
     acq_data_template = pet.AcquisitionData(f_template)
-    print(acq_data_template.norm())
+    logger.info(acq_data_template.norm())
+
+    output_prefix = "prompts"
 
     listmode_data = pet.ListmodeData(f_listmode)
 
+    logger.info("Processing listmode data...")
+    logger.info(f"Start time: {start} sec. End time: {stop} sec.")
+    logger.info(f"Output prefix: {output_prefix}")
     # create listmode-to-sinograms converter object
     lm2sino = pet.ListmodeToSinograms()
-
-    #prompts, randoms = lm2sino.prompts_and_randoms_from_listmode(listmode_data, 0, 10, acq_data_template)
     lm2sino.set_input(listmode_data)
-    lm2sino.set_output_prefix('prompts')
+    lm2sino.set_output_prefix(output_prefix)
     lm2sino.set_template(acq_data_template)
     lm2sino.set_time_interval(start, stop)
     lm2sino.set_up()
     lm2sino.process()
+
     prompts = lm2sino.get_output()
     randoms = lm2sino.estimate_randoms()
-    print('data shape: %s' % repr(prompts.shape))
-    print('prompts norm: %f' % prompts.norm())
-    print('randoms norm: %f' % randoms.norm())
+    logger.info('data shape: %s' % repr(prompts.shape))
+    logger.info('prompts norm: %f' % prompts.norm())
+    logger.info('randoms norm: %f' % randoms.norm())
+    
+    logger.info(f'writing prompts to {f_prompts} and randoms to {f_randoms}')
     prompts.write(f_prompts)
     randoms.write(f_randoms)
 
     attn_image = pet.ImageData(f_stir_attn_header)
     af, acf = pet.AcquisitionSensitivityModel.compute_attenuation_factors(prompts, attn_image)
-    print('norm of the attenuation factor: %f' % af.norm())
-    print('norm of the attenuation correction factor: %f' % acf.norm())
+    logger.info('norm of the attenuation factor: %f' % af.norm())
+    logger.info('norm of the attenuation correction factor: %f' % acf.norm())
+    logger.info(f'writing intermediate attenuation factors to {f_af}')
+    logger.info(f'writing intermediate attenuation coefficient factors to {f_acf}')
     af.write(f_af)
     acf.write(f_acf)
 
@@ -150,21 +161,24 @@ def prepare_challenge_data(data_path, sirf_data_path, challenge_data_path, inter
     se.set_up()
     se.process()
     scatter = se.get_output()
-    print('norm of the scatter estimate: %f' % scatter.norm())
+    logger.info('norm of the scatter estimate: %f' % scatter.norm())
 
     multfact = af.clone()
     asm.set_up(af)
     asm.unnormalise(multfact)
-    print(multfact.norm())
+    logger.info(multfact.norm())
+    logger.info(f'writing multiplicative factors to {f_multfactors}')
     multfact.write(f_multfactors)
 
     background = randoms + scatter
-    print('norm of the backgrount term: %f' % background.norm())
+    logger.info('norm of the backgrount term: %f' % background.norm())
 
     asm_mf = pet.AcquisitionSensitivityModel(multfact)
     asm_mf.set_up(background)
     asm_mf.normalise(background)
-    print('norm of the additive term: %f' % background.norm())
+    logger.info('norm of the additive term: %f' % background.norm())
+    logger.info(f'writing additive term to {f_additive}')
+    
     background.write(f_additive)
 
     return
