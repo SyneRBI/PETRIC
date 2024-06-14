@@ -1,0 +1,42 @@
+name: run
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+    paths-ignore: ['LICENSE*', 'LICENCE*', 'README.md']
+jobs:
+  check:
+    defaults: {run: {shell: 'bash -el {0}'}}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: conda-incubator/setup-miniconda@v3
+      with: {mamba-version: "*", channels: conda-forge}
+    - name: Install dependencies
+      run: |
+        conda activate test
+        if test -f apt.txt; then
+          sudo apt-get update
+          xargs -a apt.txt sudo apt-get install -y
+        fi
+        if test -f environment.yml; then
+          conda install --file environment.yml
+        fi
+        if test -f requirements.txt; then
+          pip install -r requirements.txt
+        fi
+    - name: Test imports
+      run: |
+        conda activate test
+        python <<EOF
+        from main import Submission
+        from cil.optimisation.algorithms import Algorithm
+        assert issubclass(Submission, Algorithm)
+        EOF
+  full:
+    if: startsWith(github.ref, 'refs/tags')
+    runs-on: [self-hosted, docker, cuda]
+    steps:
+    - uses: actions/checkout@v4
+      with: {fetch-depth: 0, submodules: recursive}
+    - run: petric

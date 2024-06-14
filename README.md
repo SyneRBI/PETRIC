@@ -1,40 +1,30 @@
 # SyneRBI Challenge
 
+## TL;DR
+
 The organisers will execute:
 
 ```python
-test = main.Test("/some/private/input_patients_dir")
+from main import Submission
+assert issubclass(Submission, cil.optimisation.algorithms.Algorithm)
 with Timeout(minutes=5):
-    test.run_all_patients("/some/private/output_patients_dir")
-evaluate_metrics("/some/private/output_patients_dir")
+    Submission(data).run(np.inf, callbacks=metrics)
 ```
 
-To avoid timing out, please disable any debugging/plotting code before submitting!
+> [!WARNING]
+> To avoid timing out, please disable any debugging/plotting code before submitting!
 
-Layout:
+The organisers will have private versions of `data` and `metrics`.
+Smaller test (public) versions of `data` and `metrics` are defined in the [`notebook.ipynb`](notebook.ipynb).
 
-- /challenge/
-  - input_patients_dir/
-    - patient_01/
-      - sinogram.npy
-      - reference.npy
-    - patient_02/
-    - ...
-  - output_patients_dir/
-    - patient_01/
-      - 000.npy
-      - 001.npy
-      - ...
+## Layout
 
-Private (organiser) test machine:
+Only [`main.py`](main.py) is required.
+[SIRF](https://github.com/SyneRBI/SIRF), [CIL](https://github.com/TomographicImaging/CIL), and CUDA are already installed.
+Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/or `requirements.txt`.
 
-- /$JOB_ID/
-  - input_patients_dir/
-    - patient_01/
-      - sinogram.npy
-  - output_patients_dir/
-    - patient_01/
-      - 000.npy
-- /hidden/patients/reference/dir/
-  - patient_01/
-    - reference.npy
+- (required) `main.py`: must define a `class Submission(cil.optimisation.algorithms.Algorithm)`
+- `notebook.ipynb`: can be used for experimenting. Runs `main.Submission()` on test `data` with basic `metrics`
+- `apt.txt`: passed to `apt install`
+- `environment.yml`: passed to `conda install`
+- `requirements.txt`: passed to `pip install`
