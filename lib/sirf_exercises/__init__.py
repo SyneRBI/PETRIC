@@ -94,9 +94,6 @@ def prepare_challenge_data(data_path, sirf_data_path, challenge_data_path, inter
     f_acf = os.path.join(intermediate_data_path, f_acf)
     f_scatter = os.path.join(intermediate_data_path, f_scatter)
 
-    start = 0
-    stop = 10
-
     os.system('cp ' + f_siemens_attn_image + ' ' + challenge_data_path)
     os.system('convertSiemensInterfileToSTIR.sh ' + f_siemens_attn_header + ' ' + f_stir_attn_header)
     os.system('cp ' + f_siemens_norm + ' ' + challenge_data_path)
