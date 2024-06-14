@@ -8,8 +8,8 @@ import importlib
 pet = importlib.import_module('sirf.STIR')
 
 from sirf.Utilities import examples_data_path
-from sirf_exercises import exercises_data_path
-from sirf_exercises import prepare_challenge_data
+from data_utilities import the_data_path
+from data_utilities import prepare_challenge_data
 
 import logging
 import argparse
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     logging.info(f"End time for data: {end} sec")
     
     if args.raw_data_path is None:
-        data_path = exercises_data_path('PET', 'mMR', 'NEMA_IQ')
+        data_path = the_data_path('PET', 'mMR', 'NEMA_IQ')
     else:
         data_path = args.raw_data_path
     
@@ -52,7 +52,11 @@ if __name__ == '__main__':
     os.chdir(challenge_data_path)
     os.makedirs(intermediate_data_path, exist_ok=True)
 
-    prepare_challenge_data(data_path, sirf_data_path, challenge_data_path, intermediate_data_path, '20170809_NEMA_',
+    f_template = os.path.join(sirf_data_path, 'mMR_template_span11_small')
+    os.system('cp ' + f_template + '* ' + challenge_data_path)
+#    exit()
+
+    prepare_challenge_data(data_path, challenge_data_path, intermediate_data_path, '20170809_NEMA_',
         '60min_UCL.l.hdr', 'MUMAP_UCL.v', 'MUMAP_UCL.hv', 'UCL.n', 'norm.n.hdr', 'mMR_template_span11_small.hs',
         'prompts', 'multfactors', 'additive', 'randoms',
         'attenuation_factor', 'attenuation_correction_factor', 'scatter', start, end)

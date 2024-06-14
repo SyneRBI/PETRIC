@@ -21,7 +21,7 @@ import logging
 logger = logging.getLogger("sirf_exercises")
 
 
-def exercises_data_path(*data_type):
+def the_data_path(*data_type):
     '''
     Returns the path to data used by SIRF-exercises.
 
@@ -42,28 +42,6 @@ def exercises_data_path(*data_type):
 
     return os.path.join(data_path, *data_type)
 
-
-def cd_to_working_dir(*subfolders):
-    '''
-    Creates and changes the current directory to a working directory for the
-    current exercise, based on the argument(s). If multiple
-    strings are given, they will be treated as subdirectories.
-
-    Implementation detail: this is defined as
-    {exercises_data_path()}/working_folder/{subfolders[0]}/{subfolders[1]}/...
-
-    subfolders: the path will include this.
-    Multiple arguments can be given for nested subdirectories.
-    '''
-    try:
-        from .working_path import working_dir
-        working_dir = os.path.join(working_dir, *subfolders)
-    except ImportError:
-        working_dir = exercises_data_path('working_folder', *subfolders)
-    os.makedirs(working_dir, exist_ok=True)
-    os.chdir(working_dir)
-
-
 def fix_siemens_norm_EOL(in_filename, out_filename):
     with open(in_filename, mode="rb") as f:
         data = bytearray(f.read())
@@ -74,8 +52,8 @@ def fix_siemens_norm_EOL(in_filename, out_filename):
         f.write(data)
 
 
-def prepare_challenge_data(data_path, sirf_data_path, challenge_data_path, intermediate_data_path, 
-    f_root, f_listmode, f_mumap, f_attn, f_norm, f_stir_norm, f_templ,
+def prepare_challenge_data(data_path, challenge_data_path, intermediate_data_path, 
+    f_root, f_listmode, f_mumap, f_attn, f_norm, f_stir_norm, f_template,
     f_prompts, f_multfactors, f_additive, f_randoms, f_af, f_acf, f_scatter, start, stop):
 
     f_listmode = os.path.join(data_path, f_root + f_listmode)
@@ -85,7 +63,7 @@ def prepare_challenge_data(data_path, sirf_data_path, challenge_data_path, inter
     f_siemens_norm_header = f_siemens_norm + '.hdr'
     f_stir_norm_header = os.path.join(challenge_data_path, f_stir_norm)
     f_stir_attn_header = os.path.join(challenge_data_path, f_root + f_attn)
-    f_template = os.path.join(sirf_data_path, f_templ)
+    #f_template = os.path.join(sirf_data_path, f_templ)
     f_prompts = os.path.join(challenge_data_path, f_prompts)
     f_multfactors = os.path.join(challenge_data_path, f_multfactors)
     f_additive = os.path.join(challenge_data_path, f_additive)
