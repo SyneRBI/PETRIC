@@ -6,7 +6,6 @@ on:
     paths-ignore: ['LICENSE*', 'LICENCE*', 'README.md']
 jobs:
   check:
-    defaults: {run: {shell: 'bash -el {0}'}}
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/synerbi/sirf:latest
