@@ -8,13 +8,12 @@ jobs:
   check:
     defaults: {run: {shell: 'bash -el {0}'}}
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/synerbi/sirf:latest
     steps:
     - uses: actions/checkout@v4
-    - uses: conda-incubator/setup-miniconda@v3
-      with: {mamba-version: "*", channels: conda-forge}
     - name: Install dependencies
       run: |
-        conda activate test
         if test -f apt.txt; then
           sudo apt-get update
           xargs -a apt.txt sudo apt-get install -y
@@ -27,7 +26,6 @@ jobs:
         fi
     - name: Test imports
       run: |
-        conda activate test
         python <<EOF
         from main import Submission
         from cil.optimisation.algorithms import Algorithm
