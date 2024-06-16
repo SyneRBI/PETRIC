@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/synerbi/sirf:latest
+      options: --user root  # https://github.com/actions/checkout/issues/956
     steps:
     - uses: actions/checkout@v4
     - name: Install dependencies
