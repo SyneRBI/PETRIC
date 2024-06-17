@@ -5,10 +5,10 @@
 The organisers will execute:
 
 ```python
-from main import Submission
+from main import Submission, submission_callbacks
 assert issubclass(Submission, cil.optimisation.algorithms.Algorithm)
 with Timeout(minutes=5):
-    Submission(data).run(np.inf, callbacks=metrics)
+    Submission(data).run(np.inf, callbacks=metrics + submission_callbacks)
 ```
 
 > [!WARNING]

@@ -27,9 +27,11 @@ jobs:
     - name: Test imports
       run: |
         python <<EOF
-        from main import Submission
+        from main import Submission, submission_callbacks
         from cil.optimisation.algorithms import Algorithm
         assert issubclass(Submission, Algorithm)
+        assert isinstance(submission_callbacks, list)
+        assert all(callable(callback) for callback in submission_callbacks)
         EOF
   full:
     if: startsWith(github.ref, 'refs/tags')
