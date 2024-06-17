@@ -1,6 +1,24 @@
-# SyneRBI Challenge
+# PETRIC: PET Rapid Image reconstruction Challenge
 
-## TL;DR
+[![website](https://img.shields.io/badge/website-announcement-green)](https://www.ccpsynerbi.ac.uk/events/petric/) [![wiki](https://img.shields.io/badge/details-wiki-blue)](https://github.com/SyneRBI/PETRIC/wiki) [![Leaderboard](https://img.shields.io/badge/leaderboard-orange)](https://tomography.stfc.ac.uk)
+
+## Participating
+
+The organisers will provide GPU-enabled cloud runners which have access to larger private datasets for evaluation. To gain access, you must [register by opening an issue](https://github.com/SyneRBI/PETRIC/issues/new/choose). The organisers will then create a private team submission repository for you.
+
+## Layout
+
+Only [`main.py`](main.py) is required.
+[SIRF](https://github.com/SyneRBI/SIRF), [CIL](https://github.com/TomographicImaging/CIL), and CUDA are already installed (using [synerbi/sirf:latest-gpu](https://github.com/synerbi/SIRF-SuperBuild/pkgs/container/sirf)).
+Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/or `requirements.txt`.
+
+- (required) `main.py`: must define a `class Submission(cil.optimisation.algorithms.Algorithm)`
+- `notebook.ipynb`: can be used for experimenting. Runs `main.Submission()` on test `data` with basic `metrics`
+- `apt.txt`: passed to `apt install`
+- `environment.yml`: passed to `conda install`
+- `requirements.txt`: passed to `pip install`
+
+## Organiser setup
 
 The organisers will execute:
 
@@ -13,18 +31,7 @@ with Timeout(minutes=5):
 
 > [!WARNING]
 > To avoid timing out, please disable any debugging/plotting code before submitting!
+> This includes removing any progress/logging from `submission_callbacks`.
 
 The organisers will have private versions of `data` and `metrics`.
 Smaller test (public) versions of `data` and `metrics` are defined in the [`notebook.ipynb`](notebook.ipynb).
-
-## Layout
-
-Only [`main.py`](main.py) is required.
-[SIRF](https://github.com/SyneRBI/SIRF), [CIL](https://github.com/TomographicImaging/CIL), and CUDA are already installed.
-Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/or `requirements.txt`.
-
-- (required) `main.py`: must define a `class Submission(cil.optimisation.algorithms.Algorithm)`
-- `notebook.ipynb`: can be used for experimenting. Runs `main.Submission()` on test `data` with basic `metrics`
-- `apt.txt`: passed to `apt install`
-- `environment.yml`: passed to `conda install`
-- `requirements.txt`: passed to `pip install`
