@@ -1,0 +1,27 @@
+name: Participate
+description: Register to compete as a team or individual
+title: "new registration"
+labels: [participant]
+assignees: [casperdcl]
+body:
+- type: input
+  id: name
+  attributes:
+    label: Team Name
+    description: Under what name would you like to compete? Spaces not allowed.
+    placeholder: e.g. PETrified-Becquerels
+- type: input
+  id: users
+  attributes:
+    label: GitHub users
+    description: Any teammates who want read/write access to your team's repository.
+    placeholder: Optional
+- type: checkboxes
+  id: terms
+  attributes:
+    label: Terms
+    options:
+    - label: I want to be eligible for prizes, and will make my code public after the challenge ends & after any of my pending publications.
+      required: true
+    - label: I agree to play by the rules of the competition.
+      required: true
