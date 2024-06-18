@@ -34,8 +34,7 @@ def the_data_path(*data_type):
         from .data_path import data_path
     except ImportError:
         raise RuntimeError(
-            "Path to data not found. Please run ./download_data.sh -p in "
-            "SyneRBI-Challenge/data (use its -h option to get help)")
+            "Path to data not found.")
 
     return os.path.join(data_path, *data_type)
 
