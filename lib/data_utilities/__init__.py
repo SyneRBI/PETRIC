@@ -20,7 +20,7 @@ import importlib
 pet = importlib.import_module('sirf.STIR')
 import logging
 
-logger = logging.getLogger("sirf_exercises")
+logger = logging.getLogger("PETRIC")
 
 
 def the_data_path(*data_type):
