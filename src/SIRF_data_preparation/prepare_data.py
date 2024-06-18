@@ -9,7 +9,7 @@ pet = importlib.import_module('sirf.STIR')
 
 from sirf.Utilities import examples_data_path
 from data_utilities import the_data_path
-from data_utilities import prepare_challenge_data
+from data_utilities import prepare_challenge_Siemens_data
 
 import logging
 import argparse
@@ -28,13 +28,8 @@ if __name__ == '__main__':
         logging.basicConfig(level=level)
         logging.info(f"Setting logging level to {args.log.upper()}")
 
-    logging.debug(f"Start time for data: {args.start} sec")
-    logging.debug(f"End time for data: {args.end} sec")
-
     start = args.start
     end = args.end
-    logging.info(f"Start time for data: {start} sec")
-    logging.info(f"End time for data: {end} sec")
     
     if args.raw_data_path is None:
         data_path = the_data_path('PET', 'mMR', 'NEMA_IQ')
@@ -52,12 +47,11 @@ if __name__ == '__main__':
     os.chdir(challenge_data_path)
     os.makedirs(intermediate_data_path, exist_ok=True)
 
-    f_template = os.path.join(sirf_data_path, 'mMR_template_span11_small')
+    f_template = os.path.join(sirf_data_path, 'mMR_template_span11')
     os.system('cp ' + f_template + '* ' + challenge_data_path)
-#    exit()
 
-    prepare_challenge_data(data_path, challenge_data_path, intermediate_data_path, '20170809_NEMA_',
-        '60min_UCL.l.hdr', 'MUMAP_UCL.v', 'MUMAP_UCL.hv', 'UCL.n', 'norm.n.hdr', 'mMR_template_span11_small.hs',
+    prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_data_path, '20170809_NEMA_',
+        '60min_UCL.l.hdr', 'MUMAP_UCL.v', 'MUMAP_UCL.hv', 'UCL.n', 'norm.n.hdr', 'mMR_template_span11.hs',
         'prompts', 'multfactors', 'additive', 'randoms',
         'attenuation_factor', 'attenuation_correction_factor', 'scatter', start, end)
 

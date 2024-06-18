@@ -1,7 +1,9 @@
-'''Library of common utilities shared between notebooks in SIRF-Exercises.'''
+'''Library of Siemens data preparation utilities.'''
 
-# Author: Ashley Gillman
-# Copyright 2021 Commonwealth Scientific and Industrial Research Organisation
+# Author: Ashley Gillman, Kris Thielemans, Evgueni Ovtchinnikov
+# Copyright (C) 2021 Commonwealth Scientific and Industrial Research Organisation
+# Copyright (C) 2024 University College London
+# Copyright (C) 2024 STFC, UK Research and Innovation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -23,24 +25,20 @@ logger = logging.getLogger("sirf_exercises")
 
 def the_data_path(*data_type):
     '''
-    Returns the path to data used by SIRF-exercises.
+    Returns the path to data.
 
     data_type: either 'PET', 'MR' or 'Synergistic', or use multiple arguments for
-    subdirectories like exercises_data_path('PET', 'mMR', 'NEMA_IQ').
+    subdirectories like the_data_path('PET', 'mMR', 'NEMA_IQ').
     '''
     try:
-        # from installer?
         from .data_path import data_path
     except ImportError:
-        # from ENV variable?
-        data_path = os.environ.get('SIRF_EXERCISES_DATA_PATH')
-
-    if data_path is None or not os.path.exists(data_path):
         raise RuntimeError(
-            "Exercises data weren't found. Please run download_data.sh in the "
+            "Path to data not found. Please run download_data.sh in the "
             "scripts directory (use its -h option to get help)")
 
     return os.path.join(data_path, *data_type)
+
 
 def fix_siemens_norm_EOL(in_filename, out_filename):
     with open(in_filename, mode="rb") as f:
@@ -52,9 +50,34 @@ def fix_siemens_norm_EOL(in_filename, out_filename):
         f.write(data)
 
 
-def prepare_challenge_data(data_path, challenge_data_path, intermediate_data_path, 
+def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_data_path,
     f_root, f_listmode, f_mumap, f_attn, f_norm, f_stir_norm, f_template,
     f_prompts, f_multfactors, f_additive, f_randoms, f_af, f_acf, f_scatter, start, stop):
+    '''Prepares data for SyneRBI Challenge24
+
+    data_path: path to Siemens data
+    challenge_data_path: path to prepared data
+    data_path: path to intermediate data
+    f_root: common prefix for some data files' names (list-mode data, mu-maps etc.)
+    f_listmode: list-mode data file suffix
+    f_numap: mu-map file suffix
+    f_attn: mu-map header suffix
+    f_norm: Siemens normalisation data file suffix
+    f_stir_norm: STIR normalisation data file name
+    f_template: template for prompts file name
+    f_prompts: prompts file name
+    f_multfactors: multfactors file name
+    f_additive: additive term file name
+    f_randoms: estimated randoms file name
+    f_af: attenuation factor file name
+    f_acf: attenuation correction factor file name
+    f_scatter: scatter estimate file name
+    start: start time for data acquisition
+    stop: end time for data acquisition
+    '''
+
+    logging.info(f"Start time for data: {start} sec")
+    logging.info(f"End time for data: {stop} sec")
 
     f_listmode = os.path.join(data_path, f_root + f_listmode)
     f_siemens_attn_image = os.path.join(data_path, f_root + f_mumap)
@@ -63,7 +86,6 @@ def prepare_challenge_data(data_path, challenge_data_path, intermediate_data_pat
     f_siemens_norm_header = f_siemens_norm + '.hdr'
     f_stir_norm_header = os.path.join(challenge_data_path, f_stir_norm)
     f_stir_attn_header = os.path.join(challenge_data_path, f_root + f_attn)
-    #f_template = os.path.join(sirf_data_path, f_templ)
     f_prompts = os.path.join(challenge_data_path, f_prompts)
     f_multfactors = os.path.join(challenge_data_path, f_multfactors)
     f_additive = os.path.join(challenge_data_path, f_additive)
@@ -71,6 +93,8 @@ def prepare_challenge_data(data_path, challenge_data_path, intermediate_data_pat
     f_af = os.path.join(intermediate_data_path, f_af)
     f_acf = os.path.join(intermediate_data_path, f_acf)
     f_scatter = os.path.join(intermediate_data_path, f_scatter)
+    f_info = os.path.join(intermediate_data_path, 'info.txt')
+    f_warn = os.path.join(intermediate_data_path, 'warn.txt')
 
     os.system('cp ' + f_siemens_attn_image + ' ' + challenge_data_path)
     os.system('convertSiemensInterfileToSTIR.sh ' + f_siemens_attn_header + ' ' + f_stir_attn_header)
@@ -79,7 +103,7 @@ def prepare_challenge_data(data_path, challenge_data_path, intermediate_data_pat
     fix_siemens_norm_EOL(f_siemens_norm_header, f_stir_norm_header)
 
     # engine's messages go to files, except error messages, which go to stdout
-    _ = pet.MessageRedirector('info.txt', 'warn.txt')
+    _ = pet.MessageRedirector(f_info, f_warn)
 
     # select acquisition data storage scheme
     pet.AcquisitionData.set_storage_scheme('memory')
@@ -88,7 +112,7 @@ def prepare_challenge_data(data_path, challenge_data_path, intermediate_data_pat
     acq_data_template = pet.AcquisitionData(f_template)
     logger.info(acq_data_template.norm())
 
-    output_prefix = "prompts"
+    output_prefix = os.path.join(challenge_data_path, "prompts")
 
     listmode_data = pet.ListmodeData(f_listmode)
 
