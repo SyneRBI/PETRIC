@@ -1,8 +1,9 @@
 import os
 import sys
 this_directory = os.path.dirname(__file__)
-repo_directory = os.path.dirname(os.path.dirname(this_directory))
-sys.path.append(os.path.join(repo_directory, 'lib'))
+sys.path.append(this_directory)
+repo_directory = os.path.dirname(this_directory)
+challenge_data_path = os.path.join(repo_directory, 'data')
 
 import importlib
 pet = importlib.import_module('sirf.STIR')
@@ -13,6 +14,7 @@ from data_utilities import prepare_challenge_Siemens_data
 
 import logging
 import argparse
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='SyneRBI Challenge 2024 data preparation script.')
@@ -30,18 +32,17 @@ if __name__ == '__main__':
 
     start = args.start
     end = args.end
-    
+
     if args.raw_data_path is None:
         data_path = the_data_path('PET', 'mMR', 'NEMA_IQ')
     else:
         data_path = args.raw_data_path
-    
+
     data_path = os.path.abspath(data_path)
     logging.debug(f"Raw data path: {data_path}")
 
 
     sirf_data_path = os.path.join(examples_data_path('PET'), 'mMR')
-    challenge_data_path = os.path.join(repo_directory, 'data')
     intermediate_data_path = os.path.join(challenge_data_path, 'intermediate')
     os.makedirs(challenge_data_path, exist_ok=True)
     os.chdir(challenge_data_path)
@@ -54,4 +55,3 @@ if __name__ == '__main__':
         '60min_UCL.l.hdr', 'MUMAP_UCL.v', 'MUMAP_UCL.hv', 'UCL.n', 'norm.n.hdr', f_template + '.hs',
         'prompts', 'multfactors', 'additive', 'randoms',
         'attenuation_factor', 'attenuation_correction_factor', 'scatter', start, end)
-

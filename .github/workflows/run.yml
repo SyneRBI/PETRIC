@@ -3,7 +3,7 @@ on:
   push:
     branches: ['**']
     tags: ['**']
-    paths-ignore: ['LICENSE*', 'LICENCE*', 'README.md']
+    paths-ignore: ['.gitignore', 'LICENSE*', 'LICENCE*', 'README.md', 'SIRF_data_preparation/*']
 jobs:
   check:
     runs-on: ubuntu-latest

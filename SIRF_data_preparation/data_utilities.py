@@ -1,26 +1,16 @@
 '''Library of Siemens data preparation utilities.'''
-
-# Author: Ashley Gillman, Kris Thielemans, Evgueni Ovtchinnikov
+# Authors: Ashley Gillman, Kris Thielemans, Evgueni Ovtchinnikov
+# Licence: Apache-2.0
 # Copyright (C) 2021 Commonwealth Scientific and Industrial Research Organisation
 # Copyright (C) 2024 University College London
 # Copyright (C) 2024 STFC, UK Research and Innovation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#       http://www.apache.org/licenses/LICENSE-2.0
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
 import os
 import importlib
 pet = importlib.import_module('sirf.STIR')
 import logging
 
 logger = logging.getLogger("PETRIC")
+DATA_PATH = '/home/sirfuser/devel/SyneRBI-Challenge/data'
 
 
 def the_data_path(*data_type):
@@ -30,13 +20,7 @@ def the_data_path(*data_type):
     data_type: either 'PET', 'MR' or 'Synergistic', or use multiple arguments for
     subdirectories like the_data_path('PET', 'mMR', 'NEMA_IQ').
     '''
-    try:
-        from .data_path import data_path
-    except ImportError:
-        raise RuntimeError(
-            "Path to data not found.")
-
-    return os.path.join(data_path, *data_type)
+    return os.path.join(DATA_PATH, *data_type)
 
 
 def fix_siemens_norm_EOL(in_filename, out_filename):
@@ -132,7 +116,7 @@ def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_
     logger.info('data shape: %s' % repr(prompts.shape))
     logger.info('prompts norm: %f' % prompts.norm())
     logger.info('randoms norm: %f' % randoms.norm())
-    
+
     logger.info(f'writing prompts to {f_prompts} and randoms to {f_randoms}')
     prompts.write(f_prompts)
     randoms.write(f_randoms)
@@ -176,8 +160,7 @@ def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_
     asm_mf.normalise(background)
     logger.info('norm of the additive term: %f' % background.norm())
     logger.info(f'writing additive term to {f_additive}')
-    
+
     background.write(f_additive)
 
     return
-

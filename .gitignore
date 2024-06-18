@@ -3,7 +3,6 @@ tmp*/
 errr.txt
 info.txt
 warn.txt
-__pycache__
+__pycache__/
 *.s
 *.hs
-
