@@ -34,8 +34,8 @@ def the_data_path(*data_type):
         from .data_path import data_path
     except ImportError:
         raise RuntimeError(
-            "Path to data not found. Please run download_data.sh in the "
-            "scripts directory (use its -h option to get help)")
+            "Path to data not found. Please run ./download_data.sh -p in "
+            "SyneRBI-Challenge/data (use its -h option to get help)")
 
     return os.path.join(data_path, *data_type)
 
@@ -170,7 +170,7 @@ def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_
     multfact.write(f_multfactors)
 
     background = randoms + scatter
-    logger.info('norm of the backgrount term: %f' % background.norm())
+    logger.info('norm of the background term: %f' % background.norm())
 
     asm_mf = pet.AcquisitionSensitivityModel(multfact)
     asm_mf.set_up(background)

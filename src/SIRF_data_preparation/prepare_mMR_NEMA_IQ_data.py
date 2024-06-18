@@ -47,11 +47,11 @@ if __name__ == '__main__':
     os.chdir(challenge_data_path)
     os.makedirs(intermediate_data_path, exist_ok=True)
 
-    f_template = os.path.join(sirf_data_path, 'mMR_template_span11.hs')
+    f_template = os.path.join(sirf_data_path, 'mMR_template_span11')
     os.system('cp ' + f_template + '* ' + challenge_data_path)
 
     prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_data_path, '20170809_NEMA_',
-        '60min_UCL.l.hdr', 'MUMAP_UCL.v', 'MUMAP_UCL.hv', 'UCL.n', 'norm.n.hdr', f_template,
+        '60min_UCL.l.hdr', 'MUMAP_UCL.v', 'MUMAP_UCL.hv', 'UCL.n', 'norm.n.hdr', f_template + '.hs',
         'prompts', 'multfactors', 'additive', 'randoms',
         'attenuation_factor', 'attenuation_correction_factor', 'scatter', start, end)
 
