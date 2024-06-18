@@ -1,10 +1,14 @@
 # PETRIC: PET Rapid Image reconstruction Challenge
 
-[![website](https://img.shields.io/badge/website-announcement-green)](https://www.ccpsynerbi.ac.uk/events/petric/) [![wiki](https://img.shields.io/badge/details-wiki-blue)](https://github.com/SyneRBI/PETRIC/wiki) [![Leaderboard](https://img.shields.io/badge/leaderboard-orange)](https://tomography.stfc.ac.uk)
+[![website](https://img.shields.io/badge/announcement-website-purple?logo=workplace&logoColor=white)](https://www.ccpsynerbi.ac.uk/events/petric/)
+[![wiki](https://img.shields.io/badge/details-wiki-blue?logo=googledocs&logoColor=white)](https://github.com/SyneRBI/PETRIC/wiki)
+[![register](https://img.shields.io/badge/participate-register-green?logo=ticktick&logoColor=white)](https://github.com/SyneRBI/PETRIC/issues/new/choose)
+[![leaderboard](https://img.shields.io/badge/rankings-leaderboard-orange?logo=tensorflow&logoColor=white)](https://tomography.stfc.ac.uk)
+[![discord](https://img.shields.io/badge/chat-discord-blue?logo=discord&logoColor=white)](https://discord.gg/Ayd72Aa4ry)
 
 ## Participating
 
-The organisers will provide GPU-enabled cloud runners which have access to larger private datasets for evaluation. To gain access, you must [register by opening an issue](https://github.com/SyneRBI/PETRIC/issues/new/choose). The organisers will then create a private team submission repository for you.
+The organisers will provide GPU-enabled cloud runners which have access to larger private datasets for evaluation. To gain access, you must [register](https://github.com/SyneRBI/PETRIC/issues/new/choose). The organisers will then create a private team submission repository for you.
 
 ## Layout
 

@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+- name: Announcement
+  url: https://www.ccpsynerbi.ac.uk/events/petric/
+  about: CCP SyneRBI website Challenge announcement
+- name: Wiki
+  url: https://github.com/SyneRBI/PETRIC/wiki
+  about: Participation details
+- name: Leaderboard
+  url: https://tomography.stfc.ac.uk
+  about: Current rankings
+- name: Discord
+  url: https://discord.gg/Ayd72Aa4ry
+  about: Responsive chat with the organisers and other participants

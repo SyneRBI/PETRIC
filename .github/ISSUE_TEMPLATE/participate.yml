@@ -21,7 +21,7 @@ body:
   attributes:
     label: Terms
     options:
-    - label: I want to be eligible for prizes, and will make my code public after the challenge ends & after any of my pending publications.
-      required: true
-    - label: I agree to play by the rules of the competition.
+    - label: (Optional) I want to be eligible for prizes, and will make my code public after the challenge ends.
+      required: false
+    - label: I agree to abide by the [rules](https://github.com/SyneRBI/PETRIC/wiki).
       required: true
