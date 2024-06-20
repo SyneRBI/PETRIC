@@ -78,8 +78,8 @@ def compute_kappa_image(obj_fun, initial_image):
     return (-1*Hessian_row_sum).power(.5)
 
 
-def main():
-    args = docopt(__doc__, version=__version__)
+def main(argv=None):
+    args = docopt(__doc__, argv=argv, version=__version__)
     logging.basicConfig(level=logging.INFO)
 
     data_path = args['<data_path>']
