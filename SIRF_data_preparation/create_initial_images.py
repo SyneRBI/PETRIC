@@ -32,13 +32,15 @@ Options:
 
 __version__ = '0.1.0'
 
-from docopt import docopt
 import os
+import logging
+
 import sirf.STIR as STIR
+from docopt import docopt
 from sirf.contrib.partitioner import partitioner
 from sirf.Utilities import error
 
-# function definitions
+log = logging.getLogger('create_initial_images')
 
 def create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, template_image):
     '''
@@ -91,9 +93,10 @@ def compute_kappa_image(obj_fun, initial_image):
 
 def main():
     args = docopt(__doc__, version=__version__)
+    logging.basicConfig(level=logging.INFO)
 
     data_path = args['<data_path>']
-    print('Finding files in %s' % data_path)
+    log.info("Finding files in %s", data_path)
     subs = int(args['--subsets'])
     siters = int(args['--subiterations'])
     template_image_filename = args['--template_image']
@@ -118,7 +121,7 @@ def main():
         kappa.write('kappa.hv')
     finally:
         os.chdir(previous_dir)
-    print('\n=== done with %s for %s' % __file__ % data_path)
+    log.info("done with %s", data_path)
 
 
 if __name__ == '__main__':
