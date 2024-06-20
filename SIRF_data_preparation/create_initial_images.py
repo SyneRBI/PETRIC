@@ -35,7 +35,7 @@ def create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, tem
     return (acq_models[0], obj_funs[0])
 
 
-def scale_initial_image(acquired_data, additive_term, mult_factor, template_image, obj_fun):
+def scale_initial_image(acquired_data, additive_term, mult_factors, template_image, obj_fun):
     """
     Return a uniform image that has a reasonable "scale" (i.e. image values) for the data given.
 
