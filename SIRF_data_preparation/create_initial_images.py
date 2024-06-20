@@ -100,21 +100,24 @@ def main():
     # engine's messages go to files, except error messages, which go to stdout
     _ = STIR.MessageRedirector('info.txt', 'warnings.txt')
 
+    previous_dir = os.getcwd()
     os.chdir(data_path)
+    try:
+        acquired_data = STIR.AcquisitionData('prompts.hs')
+        additive_term = STIR.AcquisitionData('additive_term.hs')
+        mult_factors = STIR.AcquisitionData('mult_factors.hs')
+        template_image = STIR.ImageData(template_image_filename)
 
-    acquired_data = STIR.AcquisitionData('prompts.hs')
-    additive_term = STIR.AcquisitionData('additive_term.hs')
-    mult_factors = STIR.AcquisitionData('mult_factors.hs')
-    template_image = STIR.ImageData(template_image_filename)
+        acq_model, obj_fun = create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, template_image)
 
-    acq_model, obj_fun = create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, template_image)
+        initial_image = scale_initial_image(acquired_data, additive_term, mult_factors, template_image, obj_fun)
+        OSEM_image = OSEM(obj_fun, initial_image, num_updates=siters, num_subsets=subs)
+        OSEM_image.write('OSEM_image.hv')
 
-    initial_image = scale_initial_image(acquired_data, additive_term, mult_factors, template_image, obj_fun)
-    OSEM_image = OSEM(obj_fun, initial_image, num_updates=siters, num_subsets=subs)
-    OSEM_image.write('OSEM_image.hv')
-    
-    kappa = compute_kappa_image(obj_fun, OSEM_image)
-    kappa.write('kappa.hv')
+        kappa = compute_kappa_image(obj_fun, OSEM_image)
+        kappa.write('kappa.hv')
+    finally:
+        os.chdir(previous_dir)
     print('\n=== done with %s for %s' % __file__ % data_path)
 
 
