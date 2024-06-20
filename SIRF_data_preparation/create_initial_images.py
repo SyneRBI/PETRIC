@@ -22,7 +22,6 @@ import logging
 import sirf.STIR as STIR
 from docopt import docopt
 from sirf.contrib.partitioner import partitioner
-from sirf.Utilities import error
 
 log = logging.getLogger('create_initial_images')
 
