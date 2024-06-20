@@ -32,18 +32,7 @@ Options:
 
 __version__ = '0.1.0'
 
-# argument parsing
 from docopt import docopt
-args = docopt(__doc__, version=__version__)
-
-data_path = args['<data_path>']
-print('Finding files in %s' % data_path)
-subs = int(args['--subsets'])
-siters = int(args['--subiterations'])
-
-template_image_filename = args['--template_image']
-
-# imports
 import os
 import sirf.STIR as STIR
 from sirf.contrib.partitioner import partitioner
@@ -101,7 +90,13 @@ def compute_kappa_image(obj_fun, initial_image):
     return (-1*Hessian_row_sum).power(.5)
 
 def main():
+    args = docopt(__doc__, version=__version__)
 
+    data_path = args['<data_path>']
+    print('Finding files in %s' % data_path)
+    subs = int(args['--subsets'])
+    siters = int(args['--subiterations'])
+    template_image_filename = args['--template_image']
     # engine's messages go to files, except error messages, which go to stdout
     _ = STIR.MessageRedirector('info.txt', 'warnings.txt')
 
@@ -120,12 +115,8 @@ def main():
     
     kappa = compute_kappa_image(obj_fun, OSEM_image)
     kappa.write('kappa.hv')
+    print('\n=== done with %s for %s' % __file__ % data_path)
 
-
-# execute!
 
 if __name__ == '__main__':
     main()
-    print('\n=== done with %s for %s' % __file__ % data_path)
-
-    

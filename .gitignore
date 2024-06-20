@@ -6,7 +6,5 @@ warn.txt
 __pycache__/
 *.s
 *.hs
-
 *~
 *.bak
-
