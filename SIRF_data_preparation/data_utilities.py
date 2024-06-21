@@ -10,7 +10,7 @@ pet = importlib.import_module('sirf.STIR')
 import logging
 
 logger = logging.getLogger("PETRIC")
-DATA_PATH = '/home/sirfuser/devel/SyneRBI-Challenge/data'
+DATA_PATH = '/home/sirfuser/devel/PETRIC/data'
 
 
 def the_data_path(*data_type):

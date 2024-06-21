@@ -34,7 +34,7 @@ if __name__ == '__main__':
     end = args.end
 
     if args.raw_data_path is None:
-        data_path = the_data_path('PET', 'mMR', 'NEMA_IQ')
+        data_path = the_data_path('NEMA_IQ')
     else:
         data_path = args.raw_data_path
 
