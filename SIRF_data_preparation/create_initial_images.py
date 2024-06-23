@@ -8,6 +8,7 @@ Arguments:
 
 Options:
   -t <template_image>, --template_image=<template_image>  filename of image to use for data sizes [default: VOI.hv]
+  -s <xy-size>, --xy-size=<xy-size>                       force xy-size (do not use when using VOIs as init) [default: -1]
   -S <subsets>, --subsets=<subsets>                       number of subsets [default: 2]
   -i <subiterations>, --subiterations=<subiterations>     number of sub-iterations [default: 14]
 """
@@ -85,6 +86,7 @@ def main(argv=None):
 
     data_path = args['<data_path>']
     log.info("Finding files in %s", data_path)
+    xy_size = int(args['--xy-size'])
     subs = int(args['--subsets'])
     siters = int(args['--subiterations'])
     template_image_filename = args['--template_image']
@@ -98,7 +100,8 @@ def main(argv=None):
         additive_term = STIR.AcquisitionData('additive_term.hs')
         mult_factors = STIR.AcquisitionData('mult_factors.hs')
         template_image = STIR.ImageData(template_image_filename)
-
+        if xy_size > 0:
+            template_image=template_image.zoom_image(zooms=(1,1,1), offsets_in_mm=(0,0,0), size=(-1, xy_size, xy_size))
         acq_model, obj_fun = create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, template_image)
 
         initial_image = scale_initial_image(acquired_data, additive_term, mult_factors, template_image, obj_fun)
