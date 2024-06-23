@@ -19,13 +19,14 @@ __version__ = '0.1.0'
 
 import os
 import logging
+import math
 
 import sirf.STIR as STIR
 from docopt import docopt
 from sirf.contrib.partitioner import partitioner
 
 log = logging.getLogger('create_initial_images')
-
+STIR.AcquisitionData.set_storage_scheme('memory')
 
 def create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, template_image):
     """Create an acquisition model and objective function, corresponding to the given data"""
@@ -46,7 +47,7 @@ def scale_initial_image(acquired_data, additive_term, mult_factors, template_ima
     WARNING: assumes that obj_fun has been set_up already
     """
     data_sum = (acquired_data.sum() - (additive_term * mult_factors).sum())
-    if data_sum <= 0:
+    if data_sum <= 0 or math.isinf(data_sum) or math.isnan(data_sum):
         raise ValueError(f'Something wrong with input data. Sum of (prompts-background) is negative: sum prompts: {acquired_data.sum()}, sum corrected: {data_sum}')
     ratio = data_sum / (obj_fun.get_subset_sensitivity(0).sum() * obj_fun.get_num_subsets())
     return template_image.allocate(ratio)
@@ -56,7 +57,7 @@ def OSEM(obj_fun, initial_image, num_updates=14, num_subsets=2):
     """
     run OSEM
 
-    WARNING: this modified the `obj_fun` by setting its number of subsets. This is unfortunate of course.
+    WARNING: this modifies the `obj_fun` by setting its number of subsets. This is unfortunate of course.
     """
     recon = STIR.OSMAPOSLReconstructor()
     recon.set_objective_function(obj_fun)
