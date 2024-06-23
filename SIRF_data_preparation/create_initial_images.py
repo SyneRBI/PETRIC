@@ -45,6 +45,8 @@ def scale_initial_image(acquired_data, additive_term, mult_factors, template_ima
     WARNING: assumes that obj_fun has been set_up already
     """
     data_sum = (acquired_data.sum() - (additive_term * mult_factors).sum())
+    if data_sum <= 0:
+        raise ValueError(f'Something wrong with input data. Sum of (prompts-background) is negative: sum prompts: {acquired_data.sum()}, sum corrected: {data_sum}')
     ratio = data_sum / (obj_fun.get_subset_sensitivity(0).sum() * obj_fun.get_num_subsets())
     return template_image.allocate(ratio)
 
@@ -100,7 +102,9 @@ def main(argv=None):
         acq_model, obj_fun = create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, template_image)
 
         initial_image = scale_initial_image(acquired_data, additive_term, mult_factors, template_image, obj_fun)
+        print(f'Initial_image max: {initial_image.max()}')
         OSEM_image = OSEM(obj_fun, initial_image, num_updates=siters, num_subsets=subs)
+        print(f'OSEM_image max: {OSEM_image.max()}')
         OSEM_image.write('OSEM_image.hv')
 
         kappa = compute_kappa_image(obj_fun, OSEM_image)
