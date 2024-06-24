@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--log', type=str, default='warning')
     parser.add_argument('--start', type=float, default=0)
-    parser.add_argument('--end', type=float, default=600)
+    parser.add_argument('--end', type=float, default=500)
     parser.add_argument('--raw_data_path', type=str, default=None)
     args = parser.parse_args()
 
