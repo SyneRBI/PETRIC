@@ -8,10 +8,13 @@ import os
 import importlib
 pet = importlib.import_module('sirf.STIR')
 import logging
+pet.AcquisitionData.set_storage_scheme('memory')
 
 logger = logging.getLogger("PETRIC")
-DATA_PATH = '/home/sirfuser/devel/PETRIC/data'
-
+#DATA_PATH = '/home/KrisThielemans/devel/PETRIC/data'
+this_directory = os.path.dirname(__file__)
+repo_directory = os.path.dirname(this_directory)
+DATA_PATH = os.path.join(repo_directory, 'data')
 
 def the_data_path(*data_type):
     '''
@@ -39,8 +42,8 @@ def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_
     '''Prepares data for SyneRBI Challenge24
 
     data_path: path to Siemens data
-    challenge_data_path: path to prepared data
-    data_path: path to intermediate data
+    challenge_data_path: path to final prepared data
+    intermediate_data_path: path to folder for temporary data
     f_root: common prefix for some data files' names (list-mode data, mu-maps etc.)
     f_listmode: list-mode data file suffix
     f_numap: mu-map file suffix
@@ -67,8 +70,8 @@ def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_
     f_siemens_attn_header = f_siemens_attn_image + '.hdr'
     f_siemens_norm = os.path.join(data_path, f_root + f_norm)
     f_siemens_norm_header = f_siemens_norm + '.hdr'
-    f_stir_norm_header = os.path.join(challenge_data_path, f_stir_norm)
-    f_stir_attn_header = os.path.join(challenge_data_path, f_root + f_attn)
+    f_stir_norm_header = os.path.join(intermediate_data_path, f_stir_norm)
+    f_stir_attn_header = os.path.join(intermediate_data_path, f_root + f_attn)
     f_prompts = os.path.join(challenge_data_path, f_prompts)
     f_multfactors = os.path.join(challenge_data_path, f_multfactors)
     f_additive = os.path.join(challenge_data_path, f_additive)
@@ -79,9 +82,9 @@ def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_
     f_info = os.path.join(intermediate_data_path, 'info.txt')
     f_warn = os.path.join(intermediate_data_path, 'warn.txt')
 
-    os.system('cp ' + f_siemens_attn_image + ' ' + challenge_data_path)
+    os.system('cp ' + f_siemens_attn_image + ' ' + intermediate_data_path)
     os.system('convertSiemensInterfileToSTIR.sh ' + f_siemens_attn_header + ' ' + f_stir_attn_header)
-    os.system('cp ' + f_siemens_norm + ' ' + challenge_data_path)
+    os.system('cp ' + f_siemens_norm + ' ' + intermediate_data_path)
 
     fix_siemens_norm_EOL(f_siemens_norm_header, f_stir_norm_header)
 
@@ -95,7 +98,7 @@ def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_
     acq_data_template = pet.AcquisitionData(f_template)
     logger.info(acq_data_template.norm())
 
-    output_prefix = os.path.join(challenge_data_path, "prompts")
+    output_prefix = os.path.join(intermediate_data_path, "prompts")
 
     listmode_data = pet.ListmodeData(f_listmode)
 

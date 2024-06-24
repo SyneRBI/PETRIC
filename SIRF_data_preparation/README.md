@@ -4,4 +4,8 @@
   and handle Siemens data
 - `PET_plot_functions.py`: plotting helpers
 - `create_initial_images.py`: functions+script to run OSEM and compute the "kappa" image from existing data
-- `prepare_mMR_NEMA_IQ_data.py`: prepare the data from the mMR NEMA IQ phantom (data on Zenodo)
+- `data_QC.py`: generates plots for QC
+- Siemens mMR NEMA IQ data (on Zenodo)
+  - `download_Siemens_mMR_NEMA_IQ.py`: download and extract
+  - `prepare_mMR_NEMA_IQ_data.py`: prepare the data (prompts etc)
+
