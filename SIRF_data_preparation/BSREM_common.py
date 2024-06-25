@@ -54,14 +54,15 @@ class TensorBoardCallback(callbacks.Callback):
 
     def __call__(self, algo: Algorithm):
         if algo.iteration in self.ITERS:
-            # algo.x.write(f'BSREM_{algo.iteration}.hv')
+            algo.x.write(f'{self.tb.logdir}/iter_{algo.iteration:04d}.hv')
             self.im[algo.iteration] = algo.x.clone()
             self.dims = self.dims or algo.x.dimensions()
             im_slice = self.dims[0] // 2 if self.slice is None else self.slice
             cor_slice = self.dims[1] // 2
             self.tb.add_image("transverse", algo.x.as_array()[im_slice:im_slice+1], algo.iteration)
             self.tb.add_image("coronal", algo.x.as_array()[:, cor_slice:cor_slice+1], algo.iteration)
-            self.tb.add_scalar("objective", algo.get_last_loss())
+        if algo.iteration % algo.update_objective_interval == 0:
+            self.tb.add_scalar("objective", algo.get_last_loss(), algo.iteration)
         if algo.iteration != self.ITERS[-1]:
             return
 
