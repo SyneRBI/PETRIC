@@ -6,6 +6,7 @@
 
 from numpy import clip
 from tensorboardX import SummaryWriter
+import os
 
 import sirf.STIR as STIR
 from cil.optimisation.algorithms import Algorithm
@@ -54,13 +55,14 @@ class SaveCallback(callbacks.Callback):
         self.savedir = savedir
 
     def __call__(self, algo: Algorithm):
+        os.makedirs(self.savedir, exist_ok=True)
         if algo.iteration % algo.update_objective_interval == 0:
-            algo.x.write(f'{self.savedir}/BSREM_{algo.iteration:04d}.hv')
+            algo.x.write(os.path.join(self.savedir, f'BSREM_{algo.iteration:04d}.hv'))
         if algo.iteration == algo.max_iteration:
-            algo.x.write(f'{self.savedir}/BSREM_final.hv')
+            algo.x.write(os.path.join(self.savedir,f'BSREM_final.hv'))
 
         import csv
-        with open('BSREM_obj_fun.csv', 'w', newline='') as file:
+        with open(os.path.join('BSREM_obj_fun.csv'), 'w', newline='') as file:
             writer = csv.writer(file)
             # Write each row of the list to the CSV
             writer.writerows(zip(algo.iterations, algo.loss))
