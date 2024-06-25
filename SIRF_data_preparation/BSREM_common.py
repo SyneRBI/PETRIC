@@ -45,11 +45,19 @@ def add_prior_to_obj_funs(obj_funs, prior, initial_image):
         f.set_prior(prior)
 
 
+class SaveCallback(callbacks.Callback):
+
+    def __init__(self, verbose=1):
+        super().__init__(verbose)
+
+    def __call__(self, algo: Algorithm):
+        if algo.iteration % algo.update_objective_interval == 0 or algo.iteration == algo.max_iteration:
+            algo.x.write(f'{self.tb.logdir}/BSREM_{algo.iteration:04d}.hv')
+
 class TensorBoardCallback(callbacks.Callback):
 
     def __init__(self, verbose=1, transverse_slice=None, coronal_slice=None, vmax=None, logdir=None):
         super().__init__(verbose)
-        self.im = {}
         self.transverse_slice = transverse_slice
         self.coronal_slice = coronal_slice
         self.dims = None
@@ -65,8 +73,6 @@ class TensorBoardCallback(callbacks.Callback):
                 normalised_change = (algo.x - self.prev).norm() / algo.x.norm()
                 self.tb.add_scalar("normalised_change", normalised_change, algo.iteration)
                 
-            algo.x.write(f'{self.tb.logdir}/BSREM_{algo.iteration:04d}.hv')
-            self.im[algo.iteration] = algo.x.clone()
             self.dims = self.dims or algo.x.dimensions()
             self.vmax = self.vmax or algo.x.max()
             transverse_slice = self.dims[0] // 2 if self.transverse_slice is None else self.transverse_slice
@@ -76,6 +82,9 @@ class TensorBoardCallback(callbacks.Callback):
             self.tb.add_image("coronal", algo.x.as_array()[:, cor_slice][None, :] / self.vmax, algo.iteration)
 
             self.prev = algo.x.clone()
+
+        if algo.iteration < algo.max_iteration:
+            return
 
         # final iteration
         if not self.matplotlib:
@@ -149,5 +158,6 @@ def run(num_subsets: int = 7, num_updates: int = 5000, save_interval:int = 10, t
                     update_objective_interval=save_interval)
     bsrem1.run(iterations=num_updates, callbacks=[
         callbacks.ProgressCallback(),
+        SaveCallback(),
         TensorBoardCallback(transverse_slice=transverse_slice, coronal_slice=coronal_slice) # WARNING: should specify logdir here to avoid writing to data source dir
     ])
