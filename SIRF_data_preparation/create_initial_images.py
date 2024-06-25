@@ -17,9 +17,9 @@ Options:
 # Licence: Apache-2.0
 __version__ = '0.1.0'
 
-import os
 import logging
 import math
+import os
 
 import sirf.STIR as STIR
 from docopt import docopt
@@ -28,12 +28,15 @@ from sirf.contrib.partitioner import partitioner
 log = logging.getLogger('create_initial_images')
 STIR.AcquisitionData.set_storage_scheme('memory')
 
+
 def create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, template_image):
     """Create an acquisition model and objective function, corresponding to the given data"""
     # We could construct this by hand here, but instead will just use `partitioner.data_partition`
     # with 1 subset, which will then do the work for us.
     num_subsets = 1
-    _, acq_models, obj_funs = partitioner.data_partition(acquired_data, additive_term, mult_factors, num_subsets, initial_image=template_image)
+    _, acq_models, obj_funs = partitioner.data_partition(acquired_data, additive_term,
+                                                         mult_factors, num_subsets,
+                                                         initial_image=template_image)
     return (acq_models[0], obj_funs[0])
 
 
@@ -48,7 +51,9 @@ def scale_initial_image(acquired_data, additive_term, mult_factors, template_ima
     """
     data_sum = (acquired_data.sum() - (additive_term * mult_factors).sum())
     if data_sum <= 0 or math.isinf(data_sum) or math.isnan(data_sum):
-        raise ValueError(f'Something wrong with input data. Sum of (prompts-background) is negative: sum prompts: {acquired_data.sum()}, sum corrected: {data_sum}')
+        raise ValueError(
+            f'Something wrong with input data. Sum of (prompts-background) is negative: sum prompts: {acquired_data.sum()}, sum corrected: {data_sum}'
+        )
     ratio = data_sum / (obj_fun.get_subset_sensitivity(0).sum() * obj_fun.get_num_subsets())
     return template_image.allocate(ratio)
 
@@ -62,7 +67,7 @@ def OSEM(obj_fun, initial_image, num_updates=14, num_subsets=2):
     recon = STIR.OSMAPOSLReconstructor()
     recon.set_objective_function(obj_fun)
     recon.set_current_estimate(initial_image)
-    recon.set_num_subsets(num_subsets )
+    recon.set_num_subsets(num_subsets)
     recon.set_num_subiterations(num_updates)
     recon.set_up(initial_image)
     recon.process()
@@ -78,7 +83,7 @@ def compute_kappa_image(obj_fun, initial_image):
     """
     # This needs SIRF 3.7. If you don't have that yet, you should probably upgrade anyway!
     Hessian_row_sum = obj_fun.multiply_with_Hessian(initial_image, initial_image.allocate(1))
-    return (-1*Hessian_row_sum).power(.5)
+    return (-1 * Hessian_row_sum).power(.5)
 
 
 def main(argv=None):
@@ -102,10 +107,13 @@ def main(argv=None):
         mult_factors = STIR.AcquisitionData('mult_factors.hs')
         template_image = STIR.ImageData(template_image_filename)
         if xy_size > 0:
-            template_image=template_image.zoom_image(zooms=(1,1,1), offsets_in_mm=(0,0,0), size=(-1, xy_size, xy_size))
-        acq_model, obj_fun = create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, template_image)
+            template_image = template_image.zoom_image(zooms=(1, 1, 1), offsets_in_mm=(0, 0, 0),
+                                                       size=(-1, xy_size, xy_size))
+        acq_model, obj_fun = create_acq_model_and_obj_fun(acquired_data, additive_term,
+                                                          mult_factors, template_image)
 
-        initial_image = scale_initial_image(acquired_data, additive_term, mult_factors, template_image, obj_fun)
+        initial_image = scale_initial_image(acquired_data, additive_term, mult_factors,
+                                            template_image, obj_fun)
         print(f'Initial_image max: {initial_image.max()}')
         OSEM_image = OSEM(obj_fun, initial_image, num_updates=siters, num_subsets=subs)
         print(f'OSEM_image max: {OSEM_image.max()}')
