@@ -1,26 +1,28 @@
-'''Functions to run BSREM with some monitoring via TensorBoard.'''
+"""Functions to run BSREM with some monitoring via TensorBoard."""
 # Authors: Kris Thielemans, Casper da Costa Luis
 # Licence: Apache-2.0
 # Copyright (C) 2024 University College London
 # Copyright (C) 2024 STFC, UK Research and Innovation
 
+from numpy import clip
+from tensorboardX import SummaryWriter
+
 import sirf.STIR as STIR
-from sirf.contrib.BSREM.BSREM import BSREM1  # , BSREM2
-from cil.optimisation.utilities import callbacks
 from cil.optimisation.algorithms import Algorithm
+from cil.optimisation.utilities import callbacks
 # Import functionality from the Python files in SIRF-Contribs
 from sirf.contrib.partitioner import partitioner
-from tensorboardX import SummaryWriter
+from sirf.contrib.BSREM.BSREM import BSREM1 # , BSREM2
 
 
 # do not modify this one!
 def construct_RDP(penalty_strength, initial_image, kappa, max_scaling=1e-3):
-    '''
+    """
     Construct a smoothed Relative Difference Prior (RDP)
 
-    `initial_image` is used to determine a smoothing factor (epsilon).
-    `kappa` is used to pass voxel-dependent weights.
-    '''
+    initial_image: used to determine a smoothing factor (epsilon).
+    kappa: used to pass voxel-dependent weights.
+    """
     prior = STIR.RelativeDifferencePrior()
     # need to make it differentiable
     epsilon = initial_image.max() * max_scaling
@@ -32,12 +34,12 @@ def construct_RDP(penalty_strength, initial_image, kappa, max_scaling=1e-3):
 
 
 def add_prior_to_obj_funs(obj_funs, prior, initial_image):
-    '''
+    """
     Add prior evenly to every objective function in the obj_funs list.
 
     WARNING: modifies prior strength with 1/num_subsets (as currently needed for BSREM implementations)
     WARNING: modifies elements of obj_funs
-    '''
+    """
     # evenly distribute prior over subsets
     prior.set_penalisation_factor(prior.get_penalisation_factor() / len(obj_funs))
     prior.set_up(initial_image)
@@ -47,12 +49,21 @@ def add_prior_to_obj_funs(obj_funs, prior, initial_image):
 
 class SaveCallback(callbacks.Callback):
 
-    def __init__(self, verbose=1):
+    def __init__(self, verbose=1, savedir='.'):
         super().__init__(verbose)
+        self.savedir = savedir
 
     def __call__(self, algo: Algorithm):
-        if algo.iteration % algo.update_objective_interval == 0 or algo.iteration == algo.max_iteration:
-            algo.x.write(f'{self.tb.logdir}/BSREM_{algo.iteration:04d}.hv')
+        if algo.iteration % algo.update_objective_interval == 0:
+            algo.x.write(f'{self.savedir}/BSREM_{algo.iteration:04d}.hv')
+        if algo.iteration == algo.max_iteration:
+            algo.x.write(f'{self.savedir}/BSREM_final.hv')
+
+        import csv
+        with open('BSREM_obj_fun.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            # Write each row of the list to the CSV
+            writer.writerows(zip(algo.iterations, algo.loss))
 
 class TensorBoardCallback(callbacks.Callback):
 
@@ -78,52 +89,10 @@ class TensorBoardCallback(callbacks.Callback):
             transverse_slice = self.dims[0] // 2 if self.transverse_slice is None else self.transverse_slice
             cor_slice = self.dims[1] // 2 if self.coronal_slice is None else self.coronal_slice
             
-            self.tb.add_image("transverse", algo.x.as_array()[transverse_slice:transverse_slice+1] / self.vmax, algo.iteration)
-            self.tb.add_image("coronal", algo.x.as_array()[:, cor_slice][None, :] / self.vmax, algo.iteration)
+            self.tb.add_image("transverse", clip(algo.x.as_array()[transverse_slice:transverse_slice + 1] / self.vmax, 0, 1), algo.iteration)
+            self.tb.add_image("coronal", clip(algo.x.as_array()[None, :, cor_slice] / self.vmax, 0, 1), algo.iteration)
 
             self.prev = algo.x.clone()
-
-        if algo.iteration < algo.max_iteration:
-            return
-
-        # final iteration
-        if not self.matplotlib:
-            return
-        cmax = self.im[80].max()
-        import matplotlib.pyplot as plt
-        plt.figure()
-        plt.subplot(141)
-        plt.imshow(self.im[80].as_array()[transverse_slice, :, :], vmax=cmax)
-        plt.subplot(142)
-        plt.imshow(self.im[600].as_array()[transverse_slice, :, :], vmax=cmax)
-        plt.subplot(143)
-        plt.imshow(self.im[660].as_array()[transverse_slice, :, :], vmax=cmax)
-        plt.subplot(144)
-        plt.imshow((self.im[600] - self.im[660]).as_array()[transverse_slice, :, :], vmin=-cmax / 20, vmax=cmax / 20)
-        plt.savefig('BSREM_transverse_images.png')
-        plt.figure()
-        plt.subplot(141)
-        plt.imshow(self.im[80].as_array()[:, cor_slice, :], vmax=cmax)
-        plt.subplot(142)
-        plt.imshow(self.im[600].as_array()[:, cor_slice, :], vmax=cmax)
-        plt.subplot(143)
-        plt.imshow(self.im[660].as_array()[:, cor_slice, :], vmax=cmax)
-        plt.subplot(144)
-        plt.imshow((self.im[600] - self.im[660]).as_array()[:, cor_slice, :], vmin=-cmax / 20, vmax=cmax / 20)
-        plt.savefig('BSREM_coronal_images.png')
-        #plt.show()
-        plt.figure()
-        plt.plot(algo.iterations, algo.loss)
-        plt.savefig('BSREM_obj_func.png')
-        #plt.show()
-        import csv
-        with open('BSREM_obj_fun.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
-            # Write each row of the list to the CSV
-            writer.writerows(zip(algo.iterations, algo.loss))
-
-        # stop algorithm
-        raise StopIteration
 
 
 def run(num_subsets: int = 7, num_updates: int = 5000, save_interval:int = 10, transverse_slice: int | None = None, coronal_slice: int | None = None):
