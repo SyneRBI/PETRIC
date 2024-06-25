@@ -60,7 +60,7 @@ class TensorBoardCallback(callbacks.Callback):
             im_slice = self.dims[0] // 2 if self.slice is None else self.slice
             cor_slice = self.dims[1] // 2
             self.tb.add_image("transverse", algo.x.as_array()[im_slice:im_slice+1], algo.iteration)
-            self.tb.add_image("coronal", algo.x.as_array()[:, cor_slice:cor_slice+1], algo.iteration)
+            self.tb.add_image("coronal", algo.x.as_array()[:, cor_slice][None, :], algo.iteration)
         if algo.iteration % algo.update_objective_interval == 0:
             self.tb.add_scalar("objective", algo.get_last_loss(), algo.iteration)
         if algo.iteration != self.ITERS[-1]:
@@ -136,5 +136,5 @@ def run(num_subsets: int = 7, im_slice: int | None = None):
                     update_objective_interval=10)
     bsrem1.run(iterations=661, callbacks=[
         callbacks.ProgressCallback(),
-        callbacks.TensorBoardCallback(im_slice=im_slice) # WARNING: should specify logdir here to avoid writing to data source dir
+        TensorBoardCallback(im_slice=im_slice) # WARNING: should specify logdir here to avoid writing to data source dir
     ])
