@@ -4,7 +4,7 @@
 # Copyright (C) 2024 University College London
 # Copyright (C) 2024 STFC, UK Research and Innovation
 
-from numpy import clip
+from numpy import clip, loadtxt
 from tensorboardX import SummaryWriter
 import os
 
@@ -111,14 +111,21 @@ def run(num_subsets: int = 7, num_updates: int = 5000, save_interval:int = 10, t
     # fewer messages from STIR and SIRF (set to higher value to diagnose have problems)
     STIR.set_verbosity(0)
 
-    # read
+    # read data
     acquired_data = STIR.AcquisitionData('prompts.hs')
     additive_term = STIR.AcquisitionData('additive_term.hs')
     mult_factors = STIR.AcquisitionData('mult_factors.hs')
-    OSEM_image = STIR.ImageData('OSEM_image.hv')
-    kappa = STIR.ImageData('kappa.hv')
-    penalty_strength = 1 / 700
 
+    # read initial image
+    OSEM_image = STIR.ImageData('OSEM_image.hv')
+
+    # read/construct RDP
+    kappa = STIR.ImageData('kappa.hv')    
+    if os.path.exists('penalisation_factor.txt'):
+        penalty_strength = float(loadtxt('penalisation_factor.txt'))
+    else:
+        # default choice
+        penalty_strength = 1 / 700
     prior = construct_RDP(penalty_strength, OSEM_image, kappa)
 
     data, acq_models, obj_funs = partitioner.data_partition(acquired_data, additive_term,
