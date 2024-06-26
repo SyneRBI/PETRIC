@@ -15,8 +15,9 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-import sirf.STIR as STIR
 from docopt import docopt
+
+import sirf.STIR as STIR
 
 
 def plot_sinogram_profile(prompts, background, sumaxis=(0, 1), select=0):

@@ -21,8 +21,9 @@ import logging
 import math
 import os
 
-import sirf.STIR as STIR
 from docopt import docopt
+
+import sirf.STIR as STIR
 from sirf.contrib.partitioner import partitioner
 
 log = logging.getLogger('create_initial_images')
@@ -34,8 +35,7 @@ def create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, tem
     # We could construct this by hand here, but instead will just use `partitioner.data_partition`
     # with 1 subset, which will then do the work for us.
     num_subsets = 1
-    _, acq_models, obj_funs = partitioner.data_partition(acquired_data, additive_term,
-                                                         mult_factors, num_subsets,
+    _, acq_models, obj_funs = partitioner.data_partition(acquired_data, additive_term, mult_factors, num_subsets,
                                                          initial_image=template_image)
     return (acq_models[0], obj_funs[0])
 
@@ -109,11 +109,9 @@ def main(argv=None):
         if xy_size > 0:
             template_image = template_image.zoom_image(zooms=(1, 1, 1), offsets_in_mm=(0, 0, 0),
                                                        size=(-1, xy_size, xy_size))
-        acq_model, obj_fun = create_acq_model_and_obj_fun(acquired_data, additive_term,
-                                                          mult_factors, template_image)
+        acq_model, obj_fun = create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, template_image)
 
-        initial_image = scale_initial_image(acquired_data, additive_term, mult_factors,
-                                            template_image, obj_fun)
+        initial_image = scale_initial_image(acquired_data, additive_term, mult_factors, template_image, obj_fun)
         print(f'Initial_image max: {initial_image.max()}')
         OSEM_image = OSEM(obj_fun, initial_image, num_updates=siters, num_subsets=subs)
         print(f'OSEM_image max: {OSEM_image.max()}')

@@ -2,8 +2,9 @@ import os
 import shutil
 from zipfile import ZipFile
 
-from sirf.Utilities import examples_data_path
 from zenodo_get import zenodo_get
+
+from sirf.Utilities import examples_data_path
 
 sirf_data_path = os.path.join(examples_data_path('PET'), 'mMR')
 this_directory = os.path.dirname(__file__)

@@ -12,8 +12,7 @@ import logging
 from data_utilities import prepare_challenge_Siemens_data, the_data_path
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='SyneRBI PETRIC Siemens mMR NEMA IQ data preparation script.')
+    parser = argparse.ArgumentParser(description='SyneRBI PETRIC Siemens mMR NEMA IQ data preparation script.')
 
     parser.add_argument('--log', type=str, default='warning')
     parser.add_argument('--start', type=float, default=0)
@@ -47,9 +46,7 @@ if __name__ == '__main__':
 
     f_template = os.path.join(data_path, 'mMR_template_span11.hs')
 
-    prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_data_path,
-                                   '20170809_NEMA_', '60min_UCL.l.hdr', 'MUMAP_UCL.v',
-                                   'MUMAP_UCL.hv', 'UCL.n', 'norm.n.hdr', f_template, 'prompts',
-                                   'mult_factors', 'additive_term', 'randoms',
-                                   'attenuation_factor', 'attenuation_correction_factor',
-                                   'scatter', start, end)
+    prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_data_path, '20170809_NEMA_',
+                                   '60min_UCL.l.hdr', 'MUMAP_UCL.v', 'MUMAP_UCL.hv', 'UCL.n', 'norm.n.hdr', f_template,
+                                   'prompts', 'mult_factors', 'additive_term', 'randoms', 'attenuation_factor',
+                                   'attenuation_correction_factor', 'scatter', start, end)

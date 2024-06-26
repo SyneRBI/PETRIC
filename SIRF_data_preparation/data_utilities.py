@@ -39,10 +39,9 @@ def fix_siemens_norm_EOL(in_filename, out_filename):
         f.write(data)
 
 
-def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_data_path, f_root,
-                                   f_listmode, f_mumap, f_attn, f_norm, f_stir_norm, f_template,
-                                   f_prompts, f_multfactors, f_additive, f_randoms, f_af, f_acf,
-                                   f_scatter, start, stop):
+def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_data_path, f_root, f_listmode, f_mumap,
+                                   f_attn, f_norm, f_stir_norm, f_template, f_prompts, f_multfactors, f_additive,
+                                   f_randoms, f_af, f_acf, f_scatter, start, stop):
     '''Prepares data for SyneRBI Challenge24
 
     data_path: path to Siemens data
@@ -87,8 +86,7 @@ def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_
     f_warn = os.path.join(intermediate_data_path, 'warn.txt')
 
     os.system('cp ' + f_siemens_attn_image + ' ' + intermediate_data_path)
-    os.system('convertSiemensInterfileToSTIR.sh ' + f_siemens_attn_header + ' ' +
-              f_stir_attn_header)
+    os.system('convertSiemensInterfileToSTIR.sh ' + f_siemens_attn_header + ' ' + f_stir_attn_header)
     os.system('cp ' + f_siemens_norm + ' ' + intermediate_data_path)
 
     fix_siemens_norm_EOL(f_siemens_norm_header, f_stir_norm_header)

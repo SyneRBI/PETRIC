@@ -3,6 +3,7 @@
 # Copyright 2020-2021 University College London
 import matplotlib.pyplot as plt
 import numpy as np
+
 import sirf.STIR as PET
 
 
@@ -30,8 +31,6 @@ def plot_sinogram_profile(prompts, randoms=None, scatter=None, sumaxis=(0, 1), s
         randoms_as_array = randoms.as_array()
         plt.plot(np.sum(randoms_as_array, axis=sumaxis)[select, :], label='randoms')
         if scatter is not None:
-            plt.plot(
-                np.sum(scatter.as_array() + randoms_as_array, axis=sumaxis)[select, :],
-                label='randoms+scatter')
+            plt.plot(np.sum(scatter.as_array() + randoms_as_array, axis=sumaxis)[select, :], label='randoms+scatter')
     ax.legend()
     plt.show()
