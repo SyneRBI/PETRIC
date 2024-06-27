@@ -8,12 +8,15 @@ jobs:
   check:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/synerbi/sirf:latest
+      image: ghcr.io/synerbi/sirf:edge
       options: --user root  # https://github.com/actions/checkout/issues/956
     steps:
     - uses: actions/checkout@v4
     - name: Install dependencies
+      shell: bash -el {0}
       run: |
+        source /opt/SIRF-SuperBuild/INSTALL/bin/env_sirf.sh
+        conda install -y tensorboard tensorboardx
         if test -f apt.txt; then
           sudo apt-get update
           xargs -a apt.txt sudo apt-get install -y
@@ -25,7 +28,9 @@ jobs:
           pip install -r requirements.txt
         fi
     - name: Test imports
+      shell: bash -el {0}
       run: |
+        source /opt/SIRF-SuperBuild/INSTALL/bin/env_sirf.sh
         python <<EOF
         from main import Submission, submission_callbacks
         from cil.optimisation.algorithms import Algorithm

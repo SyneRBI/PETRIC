@@ -13,21 +13,30 @@ The organisers will provide GPU-enabled cloud runners which have access to large
 ## Layout
 
 Only [`main.py`](main.py) is required.
-[SIRF](https://github.com/SyneRBI/SIRF), [CIL](https://github.com/TomographicImaging/CIL), and CUDA are already installed (using [synerbi/sirf:latest-gpu](https://github.com/synerbi/SIRF-SuperBuild/pkgs/container/sirf)).
+[SIRF](https://github.com/SyneRBI/SIRF), [CIL](https://github.com/TomographicImaging/CIL), and CUDA are already installed (using [synerbi/sirf](https://github.com/synerbi/SIRF-SuperBuild/pkgs/container/sirf)).
 Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/or `requirements.txt`.
 
 - (required) `main.py`: must define a `class Submission(cil.optimisation.algorithms.Algorithm)`
-- `notebook.ipynb`: can be used for experimenting. Runs `main.Submission()` on test `data` with basic `metrics`
 - `apt.txt`: passed to `apt install`
 - `environment.yml`: passed to `conda install`
 - `requirements.txt`: passed to `pip install`
 
+Some `example*.ipynb` notebooks are provided and can be used for experimenting.
+
 ## Organiser setup
 
-The organisers will execute:
+The organisers will effectively execute:
+
+```sh
+docker run --rm -it -v data:/mnt/share/petric:ro ghcr.io/synerbi/sirf:edge-gpu
+# or ideally ghcr.io/synerbi/sirf:latest-gpu after the next SIRF release!
+conda install tensorboard tensorboardx
+python
+```
 
 ```python
 from main import Submission, submission_callbacks
+from petric import data, metrics
 assert issubclass(Submission, cil.optimisation.algorithms.Algorithm)
 with Timeout(minutes=5):
     Submission(data).run(np.inf, callbacks=metrics + submission_callbacks)
@@ -37,5 +46,8 @@ with Timeout(minutes=5):
 > To avoid timing out, please disable any debugging/plotting code before submitting!
 > This includes removing any progress/logging from `submission_callbacks`.
 
-The organisers will have private versions of `data` and `metrics`.
-Smaller test (public) versions of `data` and `metrics` are defined in the [`notebook.ipynb`](notebook.ipynb).
+- `metrics` are described in the [wiki](https://github.com/SyneRBI/PETRIC/wiki), but are not yet part of this repository
+- `data` to test/train your `Algorithm`s is available at https://petric.tomography.stfc.ac.uk/data/ and is likely to grow (more info to follow soon)
+  + fewer datasets will be used by the organisers to provide a temporary leaderboard
+
+Any modifications to `petric.py` are ignored.

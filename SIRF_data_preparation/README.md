@@ -20,4 +20,3 @@ Participants should never have to use these (unless you want to create your own 
 ## Helpers
 
 - `PET_plot_functions.py`: plotting helpers
-
