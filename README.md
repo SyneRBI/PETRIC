@@ -17,17 +17,25 @@ Only [`main.py`](main.py) is required.
 Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/or `requirements.txt`.
 
 - (required) `main.py`: must define a `class Submission(cil.optimisation.algorithms.Algorithm)`
-- `notebook.ipynb`: can be used for experimenting. Runs `main.Submission()` on test `data` with basic `metrics`
 - `apt.txt`: passed to `apt install`
 - `environment.yml`: passed to `conda install`
 - `requirements.txt`: passed to `pip install`
 
+Some `example*.ipynb` notebooks are provided and can be used for experimenting.
+
 ## Organiser setup
 
-The organisers will execute:
+The organisers will effectively execute:
+
+```sh
+docker run --rm -it -v data:/mnt/share/petric:ro ghcr.io/synerbi/sirf:latest-gpu
+conda install tensorboard tensorboardx
+python
+```
 
 ```python
 from main import Submission, submission_callbacks
+from petric import data, metrics
 assert issubclass(Submission, cil.optimisation.algorithms.Algorithm)
 with Timeout(minutes=5):
     Submission(data).run(np.inf, callbacks=metrics + submission_callbacks)
@@ -38,4 +46,5 @@ with Timeout(minutes=5):
 > This includes removing any progress/logging from `submission_callbacks`.
 
 The organisers will have private versions of `data` and `metrics`.
-Smaller test (public) versions of `data` and `metrics` are defined in the [`notebook.ipynb`](notebook.ipynb).
+Smaller test (public) versions of `data` and `metrics` are defined in the [`petric.py`](petric.py).
+Any submission modifications to `petric.py` are ignored.
