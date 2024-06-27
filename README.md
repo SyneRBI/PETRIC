@@ -13,7 +13,7 @@ The organisers will provide GPU-enabled cloud runners which have access to large
 ## Layout
 
 Only [`main.py`](main.py) is required.
-[SIRF](https://github.com/SyneRBI/SIRF), [CIL](https://github.com/TomographicImaging/CIL), and CUDA are already installed (using [synerbi/sirf:latest-gpu](https://github.com/synerbi/SIRF-SuperBuild/pkgs/container/sirf)).
+[SIRF](https://github.com/SyneRBI/SIRF), [CIL](https://github.com/TomographicImaging/CIL), and CUDA are already installed (using [synerbi/sirf](https://github.com/synerbi/SIRF-SuperBuild/pkgs/container/sirf)).
 Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/or `requirements.txt`.
 
 - (required) `main.py`: must define a `class Submission(cil.optimisation.algorithms.Algorithm)`
@@ -28,7 +28,8 @@ Some `example*.ipynb` notebooks are provided and can be used for experimenting.
 The organisers will effectively execute:
 
 ```sh
-docker run --rm -it -v data:/mnt/share/petric:ro ghcr.io/synerbi/sirf:latest-gpu
+docker run --rm -it -v data:/mnt/share/petric:ro ghcr.io/synerbi/sirf:edge-gpu
+# or ideally ghcr.io/synerbi/sirf:latest-gpu after the next SIRF release!
 conda install tensorboard tensorboardx
 python
 ```
