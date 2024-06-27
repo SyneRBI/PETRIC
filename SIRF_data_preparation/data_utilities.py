@@ -4,10 +4,12 @@
 # Copyright (C) 2021 Commonwealth Scientific and Industrial Research Organisation
 # Copyright (C) 2024 University College London
 # Copyright (C) 2024 STFC, UK Research and Innovation
-import os
 import importlib
-pet = importlib.import_module('sirf.STIR')
 import logging
+import os
+
+pet = importlib.import_module('sirf.STIR')
+
 pet.AcquisitionData.set_storage_scheme('memory')
 
 logger = logging.getLogger("PETRIC")
@@ -15,6 +17,7 @@ logger = logging.getLogger("PETRIC")
 this_directory = os.path.dirname(__file__)
 repo_directory = os.path.dirname(this_directory)
 DATA_PATH = os.path.join(repo_directory, 'data')
+
 
 def the_data_path(*data_type):
     '''
@@ -31,14 +34,14 @@ def fix_siemens_norm_EOL(in_filename, out_filename):
         data = bytearray(f.read())
     for i in range(len(data)):
         if data[i] == 13: #'\r'
-            data[i] = 10 # \n
+            data[i] = 10  # \n
     with open(out_filename, mode="wb") as f:
         f.write(data)
 
 
-def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_data_path,
-    f_root, f_listmode, f_mumap, f_attn, f_norm, f_stir_norm, f_template,
-    f_prompts, f_multfactors, f_additive, f_randoms, f_af, f_acf, f_scatter, start, stop):
+def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_data_path, f_root, f_listmode, f_mumap,
+                                   f_attn, f_norm, f_stir_norm, f_template, f_prompts, f_multfactors, f_additive,
+                                   f_randoms, f_af, f_acf, f_scatter, start, stop):
     '''Prepares data for SyneRBI Challenge24
 
     data_path: path to Siemens data
