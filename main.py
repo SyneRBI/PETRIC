@@ -31,6 +31,11 @@ class MaxIteration(callbacks.Callback):
 class Submission(BSREM1):
     # note that `issubclass(BSREM1, Algorithm) == True`
     def __init__(self, data: Dataset, num_subsets: int = 7, update_objective_interval: int = 10):
+        """
+        Initialisation function, setting up data & (hyper)parameters.
+        NB: in practice, `num_subsets` should likely be determined from the data.
+        This is just an example. Try to modify and improve it!
+        """
         data_sub, acq_models, obj_funs = partitioner.data_partition(data.acquired_data, data.additive_term,
                                                                     data.mult_factors, num_subsets,
                                                                     initial_image=data.OSEM_image)

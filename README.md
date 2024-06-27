@@ -45,6 +45,8 @@ with Timeout(minutes=5):
 > To avoid timing out, please disable any debugging/plotting code before submitting!
 > This includes removing any progress/logging from `submission_callbacks`.
 
-The organisers will have private versions of `data` and `metrics`.
-Smaller test (public) versions of `data` and `metrics` are defined in the [`petric.py`](petric.py).
-Any submission modifications to `petric.py` are ignored.
+- `metrics` are described in the [wiki](https://github.com/SyneRBI/PETRIC/wiki), but are not yet part of this repository
+- `data` to test/train your `Algorithm`s is available at https://petric.tomography.stfc.ac.uk/data/ and is likely to grow (more info to follow soon)
+  + fewer datasets will be used by the organisers to provide a temporary leaderboard
+
+Any modifications to `petric.py` are ignored.
