@@ -7,7 +7,7 @@
 """
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.utilities import callbacks
-from petric import Dataset, MetricsWithTimeout
+from petric import Dataset
 from sirf.contrib.BSREM.BSREM import BSREM1
 from sirf.contrib.partitioner import partitioner
 
