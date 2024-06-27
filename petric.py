@@ -15,6 +15,7 @@ from sirf.contrib.partitioner import partitioner
 TEAM = os.getenv("GITHUB_REPOSITORY", "SyneRBI/PETRIC-").split("/PETRIC-", 1)[-1]
 VERSION = os.getenv("GITHUB_REF_NAME", "")
 OUTDIR = Path(f"/o/logs/{TEAM}/{VERSION}" if TEAM and VERSION else "./output")
+SRCDIR = Path("/mnt/share/petric")
 
 
 class SaveIters(cbks.Callback):
@@ -146,13 +147,16 @@ def get_data(num_subsets: int = 7, srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
                    acquired_data=acquired_data)
 
 
-metrics_data_pairs = [
-    ([MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", transverse_slice=72, coronal_slice=109)],
-     get_data(srcdir="/mnt/share/petric/Siemens_mMR_NEMA_IQ", outdir=OUTDIR / "mMR_NEMA", num_subsets=7)),
-    ([MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Hoffman", transverse_slice=72)],
-     get_data(srcdir="/mnt/share/petric/NeuroLF_Hoffman_Dataset", outdir=OUTDIR / "NeuroLF_Hoffman", num_subsets=16)),
-    ([MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")],
-     get_data(srcdir="/mnt/share/petric/Siemens_Vision600_thorax", outdir=OUTDIR / "Vision600_thorax", num_subsets=5))]
+if SRCDIR.is_dir():
+    metrics_data_pairs = [
+        ([MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", transverse_slice=72, coronal_slice=109)],
+         get_data(srcdir=SRCDIR / "Siemens_mMR_NEMA_IQ", outdir=OUTDIR / "mMR_NEMA", num_subsets=7)),
+        ([MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Hoffman", transverse_slice=72)],
+         get_data(srcdir=SRCDIR / "NeuroLF_Hoffman_Dataset", outdir=OUTDIR / "NeuroLF_Hoffman", num_subsets=16)),
+        ([MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")],
+         get_data(srcdir=SRCDIR / "Siemens_Vision600_thorax", outdir=OUTDIR / "Vision600_thorax", num_subsets=5))]
+else:
+    metrics_data_pairs = [(None, None)]
 # first dataset
 metrics, data = metrics_data_pairs[0]
 
