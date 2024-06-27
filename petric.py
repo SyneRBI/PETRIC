@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+"""ANY CHANGES TO THIS FILE ARE IGNORED BY THE ORGANISERS. Only the `main.py` file may be modified."""
 import csv
 import os
 from collections import namedtuple
