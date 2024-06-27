@@ -1,5 +1,12 @@
 #!/usr/bin/env python
-"""ANY CHANGES TO THIS FILE ARE IGNORED BY THE ORGANISERS. Only the `main.py` file may be modified."""
+"""
+ANY CHANGES TO THIS FILE ARE IGNORED BY THE ORGANISERS.
+Only the `main.py` file may be modified by participants.
+
+This file is not intended for participants to use.
+It is used by the organisers to run the submissions in a controlled way.
+It is included here purely in the interest of transparency.
+"""
 import csv
 import os
 from collections import namedtuple
@@ -12,7 +19,6 @@ from tensorboardX import SummaryWriter
 import sirf.STIR as STIR
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.utilities import callbacks as cbks
-from sirf.contrib.partitioner import partitioner
 
 TEAM = os.getenv("GITHUB_REPOSITORY", "SyneRBI/PETRIC-").split("/PETRIC-", 1)[-1]
 VERSION = os.getenv("GITHUB_REF_NAME", "")
@@ -102,26 +108,12 @@ def construct_RDP(penalty_strength, initial_image, kappa, max_scaling=1e-3):
     return prior
 
 
-def add_prior_to_obj_funs(obj_funs, prior, initial_image):
-    """
-    Add prior evenly to every objective function in the obj_funs list.
-
-    WARNING: modifies prior strength with 1/num_subsets (as currently needed for BSREM implementations)
-    WARNING: modifies elements of obj_funs
-    """
-    # evenly distribute prior over subsets
-    prior.set_penalisation_factor(prior.get_penalisation_factor() / len(obj_funs))
-    prior.set_up(initial_image)
-    for f in obj_funs:
-        f.set_prior(prior)
+Dataset = namedtuple(
+    'Dataset',
+    ['data', 'prior', 'penalty_strength', 'OSEM_image', 'kappa', 'mult_factors', 'additive_term', 'acquired_data'])
 
 
-Dataset = namedtuple('Dataset', [
-    'data', 'acq_models', 'obj_funs', 'prior', 'penalty_strength', 'OSEM_image', 'kappa', 'mult_factors',
-    'additive_term', 'acquired_data'])
-
-
-def get_data(num_subsets: int = 7, srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
+def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
     srcdir = Path(srcdir)
     outdir = Path(outdir)
     STIR.set_verbosity(sirf_verbosity)                # set to higher value to diagnose problems
@@ -140,25 +132,19 @@ def get_data(num_subsets: int = 7, srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
         penalty_strength = 1 / 700 # default choice
     prior = construct_RDP(penalty_strength, OSEM_image, kappa)
 
-    data, acq_models, obj_funs = partitioner.data_partition(acquired_data, additive_term, mult_factors, num_subsets,
-                                                            initial_image=OSEM_image)
-    add_prior_to_obj_funs(obj_funs, prior, OSEM_image)
-
-    return Dataset(data=data, acq_models=acq_models, obj_funs=obj_funs, prior=prior, penalty_strength=penalty_strength,
-                   OSEM_image=OSEM_image, kappa=kappa, mult_factors=mult_factors, additive_term=additive_term,
-                   acquired_data=acquired_data)
+    return Dataset(data=data, prior=prior, penalty_strength=penalty_strength, OSEM_image=OSEM_image, kappa=kappa,
+                   mult_factors=mult_factors, additive_term=additive_term, acquired_data=acquired_data)
 
 
 if SRCDIR.is_dir():
-    metrics_data_pairs = [
-        ([MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", transverse_slice=72, coronal_slice=109)],
-         get_data(srcdir=SRCDIR / "Siemens_mMR_NEMA_IQ", outdir=OUTDIR / "mMR_NEMA", num_subsets=7)),
-        ([MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Hoffman", transverse_slice=72)],
-         get_data(srcdir=SRCDIR / "NeuroLF_Hoffman_Dataset", outdir=OUTDIR / "NeuroLF_Hoffman", num_subsets=16)),
-        ([MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")],
-         get_data(srcdir=SRCDIR / "Siemens_Vision600_thorax", outdir=OUTDIR / "Vision600_thorax", num_subsets=5))]
+    metrics_data_pairs = [([MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", transverse_slice=72, coronal_slice=109)],
+                           get_data(srcdir=SRCDIR / "Siemens_mMR_NEMA_IQ", outdir=OUTDIR / "mMR_NEMA")),
+                          ([MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Hoffman", transverse_slice=72)],
+                           get_data(srcdir=SRCDIR / "NeuroLF_Hoffman_Dataset", outdir=OUTDIR / "NeuroLF_Hoffman")),
+                          ([MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")],
+                           get_data(srcdir=SRCDIR / "Siemens_Vision600_thorax", outdir=OUTDIR / "Vision600_thorax"))]
 else:
-    metrics_data_pairs = [(None, None)]
+    metrics_data_pairs = [([], None)]
 # first dataset
 metrics, data = metrics_data_pairs[0]
 
