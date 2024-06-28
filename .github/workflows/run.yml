@@ -16,6 +16,7 @@ jobs:
       shell: bash -el {0}
       run: |
         source /opt/SIRF-SuperBuild/INSTALL/bin/env_sirf.sh
+        pip install git+https://github.com/TomographicImaging/Hackathon-000-Stochastic-QualityMetrics
         if test -f apt.txt; then
           sudo apt-get update
           xargs -a apt.txt sudo apt-get install -y
