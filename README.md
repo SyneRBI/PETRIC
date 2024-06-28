@@ -33,7 +33,6 @@ The organisers will effectively execute:
 ```sh
 docker run --rm -it -v data:/mnt/share/petric:ro ghcr.io/synerbi/sirf:edge-gpu
 # or ideally ghcr.io/synerbi/sirf:latest-gpu after the next SIRF release!
-conda install tensorboard tensorboardx
 python
 ```
 
