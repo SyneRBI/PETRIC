@@ -13,12 +13,14 @@ from collections import namedtuple
 from pathlib import Path
 from time import time
 
-from numpy import clip, inf, loadtxt
+import numpy as np
+from skimage.metrics import mean_squared_error, peak_signal_noise_ratio
 from tensorboardX import SummaryWriter
 
 import sirf.STIR as STIR
 from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.utilities import callbacks as cbks
+from img_quality_cil_stir import ImageQualityCallback
 
 TEAM = os.getenv("GITHUB_REPOSITORY", "SyneRBI/PETRIC-").split("/PETRIC-", 1)[-1]
 VERSION = os.getenv("GITHUB_REF_NAME", "")
@@ -44,13 +46,14 @@ class SaveIters(cbks.Callback):
 
 
 class TensorBoard(cbks.Callback):
+    """Log image slices & objective value"""
     def __init__(self, verbose=1, transverse_slice=None, coronal_slice=None, vmax=None, logdir=OUTDIR):
         super().__init__(verbose)
         self.transverse_slice = transverse_slice
         self.coronal_slice = coronal_slice
         self.vmax = vmax
         self.x_prev = None
-        self.tb = SummaryWriter(logdir=str(logdir))
+        self.tb = logdir if isinstance(logdir, SummaryWriter) else SummaryWriter(logdir=str(logdir))
 
     def __call__(self, algo: Algorithm):
         if algo.iteration % algo.update_objective_interval != 0 and algo.iteration != algo.max_iteration:
@@ -66,20 +69,30 @@ class TensorBoard(cbks.Callback):
             self.tb.add_scalar("normalised_change", normalised_change, algo.iteration)
         self.x_prev = algo.x.clone()
         self.tb.add_image("transverse",
-                          clip(algo.x.as_array()[self.transverse_slice:self.transverse_slice + 1] / self.vmax, 0, 1),
+                          np.clip(algo.x.as_array()[self.transverse_slice:self.transverse_slice + 1] / self.vmax, 0, 1),
                           algo.iteration)
-        self.tb.add_image("coronal", clip(algo.x.as_array()[None, :, self.coronal_slice] / self.vmax, 0, 1),
+        self.tb.add_image("coronal", np.clip(algo.x.as_array()[None, :, self.coronal_slice] / self.vmax, 0, 1),
                           algo.iteration)
 
 
 class MetricsWithTimeout(cbks.Callback):
     """Stops the algorithm after `seconds`"""
-    def __init__(self, seconds=300, outdir=OUTDIR, transverse_slice=None, coronal_slice=None, verbose=1):
+    def __init__(self, seconds=300, outdir=OUTDIR, transverse_slice=None, coronal_slice=None, ground_truth=None,
+                 verbose=1):
         super().__init__(verbose)
         self.callbacks = [
             cbks.ProgressCallback(),
             SaveIters(outdir=outdir),
-            TensorBoard(logdir=outdir, transverse_slice=transverse_slice, coronal_slice=coronal_slice)]
+            (tb_cbk := TensorBoard(logdir=outdir, transverse_slice=transverse_slice, coronal_slice=coronal_slice))]
+
+        if ground_truth:
+            roi_image_dict = {f'S{i}': STIR.ImageData(f'S{i}.hv') for i in range(1, 8)}
+            self.callbacks.append(
+                ImageQualityCallback(
+                    ground_truth, tb_cbk.tb, roi_mask_dict=roi_image_dict, metrics_dict={
+                        'MSE': mean_squared_error, 'MAE': self.mean_absolute_error, 'PSNR': peak_signal_noise_ratio},
+                    statistics_dict={'MEAN': np.mean, 'STDDEV': np.std, 'MAX': np.max}))
+
         self.limit = time() + seconds
 
     def __call__(self, algorithm: Algorithm):
@@ -89,6 +102,10 @@ class MetricsWithTimeout(cbks.Callback):
             for c in self.callbacks:
                 c(algorithm)
             self.limit += time() - now
+
+    @staticmethod
+    def mean_absolute_error(y, x):
+        return np.mean(np.abs(y, x))
 
 
 def construct_RDP(penalty_strength, initial_image, kappa, max_scaling=1e-3):
@@ -125,7 +142,7 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
     OSEM_image = STIR.ImageData(str(srcdir / 'OSEM_image.hv'))
     kappa = STIR.ImageData(str(srcdir / 'kappa.hv'))
     if (penalty_strength_file := (srcdir / 'penalisation_factor.txt')).is_file():
-        penalty_strength = float(loadtxt(penalty_strength_file))
+        penalty_strength = float(np.loadtxt(penalty_strength_file))
     else:
         penalty_strength = 1 / 700 # default choice
     prior = construct_RDP(penalty_strength, OSEM_image, kappa)
@@ -134,20 +151,21 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
 
 
 if SRCDIR.is_dir():
-    metrics_data_pairs = [([MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", transverse_slice=72, coronal_slice=109)],
-                           get_data(srcdir=SRCDIR / "Siemens_mMR_NEMA_IQ", outdir=OUTDIR / "mMR_NEMA")),
-                          ([MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Hoffman", transverse_slice=72)],
-                           get_data(srcdir=SRCDIR / "NeuroLF_Hoffman_Dataset", outdir=OUTDIR / "NeuroLF_Hoffman")),
-                          ([MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")],
-                           get_data(srcdir=SRCDIR / "Siemens_Vision600_thorax", outdir=OUTDIR / "Vision600_thorax"))]
+    data_metrics_pairs = [
+        (get_data(srcdir=SRCDIR / "Siemens_mMR_NEMA_IQ", outdir=OUTDIR / "mMR_NEMA"),
+         [MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", transverse_slice=72, coronal_slice=109)]),
+        (get_data(srcdir=SRCDIR / "NeuroLF_Hoffman_Dataset", outdir=OUTDIR / "NeuroLF_Hoffman"),
+         [MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Hoffman", transverse_slice=72)]),
+        (get_data(srcdir=SRCDIR / "Siemens_Vision600_thorax",
+                  outdir=OUTDIR / "Vision600_thorax"), [MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")])]
 else:
-    metrics_data_pairs = [([], None)]
+    data_metrics_pairs = [(None, [])]
 # first dataset
-metrics, data = metrics_data_pairs[0]
+data, metrics = data_metrics_pairs[0]
 
 if __name__ == "__main__":
     from main import Submission, submission_callbacks
     assert issubclass(Submission, Algorithm)
-    for metrics, data in metrics_data_pairs:
+    for data, metrics in data_metrics_pairs:
         algo = Submission(data)
-        algo.run(inf, callbacks=metrics + submission_callbacks)
+        algo.run(np.inf, callbacks=metrics + submission_callbacks)

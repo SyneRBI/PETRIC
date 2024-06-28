@@ -31,8 +31,9 @@ You can also find some example notebooks here which should help you with your de
 The organisers will effectively execute:
 
 ```sh
-docker run --rm -it -v data:/mnt/share/petric:ro ghcr.io/synerbi/sirf:edge-gpu
-# or ideally ghcr.io/synerbi/sirf:latest-gpu after the next SIRF release!
+docker run --rm -it -v data:/mnt/share/petric:ro synerbi/sirf:edge-gpu
+# or ideally synerbi/sirf:latest-gpu after the next SIRF release!
+pip install git+https://github.com/TomographicImaging/Hackathon-000-Stochastic-QualityMetrics
 python
 ```
 
