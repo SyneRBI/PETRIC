@@ -12,12 +12,13 @@ The organisers will provide GPU-enabled cloud runners which have access to large
 
 ## Layout
 
-We will import your submitted algorithm from [`main.py`](main.py) and then run and evaluate it. Please have a look at our [`main.py`](main.py) example of what it needs to look like. 
+The organisers will import your submitted algorithm from [`main.py`](main.py) and then run & evaluate it.
+Please modify this file!
 
 [SIRF](https://github.com/SyneRBI/SIRF), [CIL](https://github.com/TomographicImaging/CIL), and CUDA are already installed (using [synerbi/sirf](https://github.com/synerbi/SIRF-SuperBuild/pkgs/container/sirf)).
 Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/or `requirements.txt`.
 
-- (required) `main.py`: must define a `class Submission(cil.optimisation.algorithms.Algorithm)`
+- (required) `main.py`: must define a `class Submission(cil.optimisation.algorithms.Algorithm)` and a list of `submission_callbacks`
 - `apt.txt`: passed to `apt install`
 - `environment.yml`: passed to `conda install`
 - `requirements.txt`: passed to `pip install`
@@ -37,8 +38,8 @@ python
 ```
 
 ```python
-from main import Submission, submission_callbacks
-from petric import data, metrics
+from main import Submission, submission_callbacks  # your submission
+from petric import data, metrics  # our data & evaluation
 assert issubclass(Submission, cil.optimisation.algorithms.Algorithm)
 with Timeout(minutes=5):
     Submission(data).run(np.inf, callbacks=metrics + submission_callbacks)
@@ -50,6 +51,6 @@ with Timeout(minutes=5):
 
 - `metrics` are described in the [wiki](https://github.com/SyneRBI/PETRIC/wiki), but are not yet part of this repository
 - `data` to test/train your `Algorithm`s is available at https://petric.tomography.stfc.ac.uk/data/ and is likely to grow (more info to follow soon)
-  + fewer datasets will be used by the organisers to provide a temporary leaderboard
+  + fewer datasets will be used by the organisers to provide a temporary [leaderboard](https://petric.tomography.stfc.ac.uk/leaderboard)
 
 Any modifications to `petric.py` are ignored.
