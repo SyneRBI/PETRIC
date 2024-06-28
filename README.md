@@ -28,25 +28,30 @@ You can also find some example notebooks here which should help you with your de
 
 ## Organiser setup
 
-The organisers will effectively execute:
+The organisers will execute (after downloading https://petric.tomography.stfc.ac.uk/data/ to `/path/to/data`):
 
 ```sh
-docker run --rm -it -v data:/mnt/share/petric:ro synerbi/sirf:edge-gpu
-# or ideally synerbi/sirf:latest-gpu after the next SIRF release!
+docker run --rm -it -v /path/to/data:/mnt/share/petric:ro -v .:/workdir -w /workdir synerbi/sirf:edge-gpu /bin/bash
+# ... or ideally synerbi/sirf:latest-gpu after the next SIRF release!
 pip install git+https://github.com/TomographicImaging/Hackathon-000-Stochastic-QualityMetrics
-python
+# ... conda/pip/apt install environment.yml/requirements.txt/apt.txt
+python petric.py
 ```
 
-```python
-from main import Submission, submission_callbacks  # your submission
-from petric import data, metrics  # our data & evaluation
-assert issubclass(Submission, cil.optimisation.algorithms.Algorithm)
-with Timeout(minutes=5):
-    Submission(data).run(np.inf, callbacks=metrics + submission_callbacks)
-```
+> [!TIP]
+> `petric.py` will effectively execute:
+>
+> ```python
+> from main import Submission, submission_callbacks  # your submission
+> from petric import data, metrics  # our data & evaluation
+> assert issubclass(Submission, cil.optimisation.algorithms.Algorithm)
+> Submission(data).run(numpy.inf, callbacks=metrics + submission_callbacks)
+> ```
+
+<!-- br -->
 
 > [!WARNING]
-> To avoid timing out, please disable any debugging/plotting code before submitting!
+> To avoid timing out (5 min runtime), please disable any debugging/plotting code before submitting!
 > This includes removing any progress/logging from `submission_callbacks`.
 
 - `metrics` are described in the [wiki](https://github.com/SyneRBI/PETRIC/wiki), but are not yet part of this repository
