@@ -77,7 +77,7 @@ class TensorBoard(cbks.Callback):
 
 class MetricsWithTimeout(cbks.Callback):
     """Stops the algorithm after `seconds`"""
-    def __init__(self, seconds=300, outdir=OUTDIR, transverse_slice=None, coronal_slice=None, ground_truth=None,
+    def __init__(self, seconds=300, outdir=OUTDIR, transverse_slice=None, coronal_slice=None, reference_image=None,
                  verbose=1):
         super().__init__(verbose)
         self.callbacks = [
@@ -85,11 +85,13 @@ class MetricsWithTimeout(cbks.Callback):
             SaveIters(outdir=outdir),
             (tb_cbk := TensorBoard(logdir=outdir, transverse_slice=transverse_slice, coronal_slice=coronal_slice))]
 
-        if ground_truth:
+        if reference_image:
             roi_image_dict = {f'S{i}': STIR.ImageData(f'S{i}.hv') for i in range(1, 8)}
+            # NB: these metrics are for testing only.
+            # The final evaluation will use metrics described in https://github.com/SyneRBI/PETRIC/wiki
             self.callbacks.append(
                 ImageQualityCallback(
-                    ground_truth, tb_cbk.tb, roi_mask_dict=roi_image_dict, metrics_dict={
+                    reference_image, tb_cbk.tb, roi_mask_dict=roi_image_dict, metrics_dict={
                         'MSE': mean_squared_error, 'MAE': self.mean_absolute_error, 'PSNR': peak_signal_noise_ratio},
                     statistics_dict={'MEAN': np.mean, 'STDDEV': np.std, 'MAX': np.max}))
 

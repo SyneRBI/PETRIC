@@ -35,6 +35,7 @@ class Submission(GD):
         """
         Initialisation function, setting up data & (hyper)parameters.
         NB: in practice, `num_subsets` should likely be determined from the data.
+        WARNING: we also currently ignore the non-negativity constraint here.
         This is just an example. Try to modify and improve it!
         """
         data_sub, acq_models, obj_funs = partitioner.data_partition(data.acquired_data, data.additive_term,
