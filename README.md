@@ -12,7 +12,8 @@ The organisers will provide GPU-enabled cloud runners which have access to large
 
 ## Layout
 
-Only [`main.py`](main.py) is required.
+We will import your submitted algorithm from [`main.py`](main.py) and then run and evaluate it. Please have a look at our [`main.py`](main.py) example of what it needs to look like. 
+
 [SIRF](https://github.com/SyneRBI/SIRF), [CIL](https://github.com/TomographicImaging/CIL), and CUDA are already installed (using [synerbi/sirf](https://github.com/synerbi/SIRF-SuperBuild/pkgs/container/sirf)).
 Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/or `requirements.txt`.
 
@@ -21,7 +22,8 @@ Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/o
 - `environment.yml`: passed to `conda install`
 - `requirements.txt`: passed to `pip install`
 
-Some `example*.ipynb` notebooks are provided and can be used for experimenting.
+You can also find some example notebooks here which should help you with your development:
+- https://github.com/SyneRBI/SIRF-Contribs/blob/master/src/notebooks/BSREM_illustration.ipynb
 
 ## Organiser setup
 
