@@ -16,7 +16,6 @@ jobs:
       shell: bash -el {0}
       run: |
         source /opt/SIRF-SuperBuild/INSTALL/bin/env_sirf.sh
-        conda install -y tensorboard tensorboardx
         if test -f apt.txt; then
           sudo apt-get update
           xargs -a apt.txt sudo apt-get install -y
@@ -27,6 +26,7 @@ jobs:
         if test -f requirements.txt; then
           pip install -r requirements.txt
         fi
+        conda list
     - name: Test imports
       shell: bash -el {0}
       run: |
