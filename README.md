@@ -31,7 +31,7 @@ You can also find some example notebooks here which should help you with your de
 The organisers will execute (after downloading https://petric.tomography.stfc.ac.uk/data/ to `/path/to/data`):
 
 ```sh
-docker run --rm -it -v /path/to/data:/mnt/share/petric:ro -v .:/workdir -w /workdir synerbi/sirf:edge-gpu /bin/bash
+docker run --rm -it -v /path/to/data:/mnt/share/petric:ro -v .:/workdir -w /workdir --gpus all synerbi/sirf:edge-gpu /bin/bash
 # ... or ideally synerbi/sirf:latest-gpu after the next SIRF release!
 pip install git+https://github.com/TomographicImaging/Hackathon-000-Stochastic-QualityMetrics
 # ... conda/pip/apt install environment.yml/requirements.txt/apt.txt
