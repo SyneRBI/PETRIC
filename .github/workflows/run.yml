@@ -32,6 +32,7 @@ jobs:
       shell: bash -el {0}
       run: |
         source /opt/SIRF-SuperBuild/INSTALL/bin/env_sirf.sh
+        curl -fsSL https://raw.githubusercontent.com/SyneRBI/PETRIC/main/petric.py > petric.py
         python <<EOF
         from main import Submission, submission_callbacks
         from cil.optimisation.algorithms import Algorithm
