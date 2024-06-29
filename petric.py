@@ -170,4 +170,7 @@ if __name__ == "__main__":
     assert issubclass(Submission, Algorithm)
     for data, metrics in data_metrics_pairs:
         algo = Submission(data)
-        algo.run(np.inf, callbacks=metrics + submission_callbacks)
+        try:
+            algo.run(np.inf, callbacks=metrics + submission_callbacks)
+        except Exception as exc:
+            print(exc)
