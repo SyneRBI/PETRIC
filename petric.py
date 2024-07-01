@@ -6,8 +6,15 @@ Only the `main.py` file may be modified by participants.
 This file is not intended for participants to use.
 It is used by the organisers to run the submissions in a controlled way.
 It is included here purely in the interest of transparency.
+
+Usage:
+  petric.py [options]
+
+Options:
+  --log LEVEL  : Set logging level (DEBUG, [default: INFO], WARNING, ERROR, CRITICAL)
 """
 import csv
+import logging
 import os
 from collections import namedtuple
 from pathlib import Path
@@ -22,6 +29,7 @@ from cil.optimisation.algorithms import Algorithm
 from cil.optimisation.utilities import callbacks as cbks
 from img_quality_cil_stir import ImageQualityCallback
 
+log = logging.getLogger('petric')
 TEAM = os.getenv("GITHUB_REPOSITORY", "SyneRBI/PETRIC-").split("/PETRIC-", 1)[-1]
 VERSION = os.getenv("GITHUB_REF_NAME", "")
 OUTDIR = Path(f"/o/logs/{TEAM}/{VERSION}" if TEAM and VERSION else "./output")
@@ -39,8 +47,10 @@ class SaveIters(cbks.Callback):
 
     def __call__(self, algo: Algorithm):
         if algo.iteration % algo.update_objective_interval == 0 or algo.iteration == algo.max_iteration:
+            log.debug("saving iter %d...", algo.iteration)
             algo.x.write(str(self.outdir / f'iter_{algo.iteration:04d}.hv'))
             self.csv.writerow((algo.iterations, algo.loss))
+            log.debug("...saved")
         if algo.iteration == algo.max_iteration:
             algo.x.write(str(self.outdir / 'iter_final.hv'))
 
@@ -58,6 +68,7 @@ class TensorBoard(cbks.Callback):
     def __call__(self, algo: Algorithm):
         if algo.iteration % algo.update_objective_interval != 0 and algo.iteration != algo.max_iteration:
             return
+        log.debug("logging iter %d...", algo.iteration)
         # initialise `None` values
         self.transverse_slice = algo.x.dimensions()[0] // 2 if self.transverse_slice is None else self.transverse_slice
         self.coronal_slice = algo.x.dimensions()[1] // 2 if self.coronal_slice is None else self.coronal_slice
@@ -73,6 +84,7 @@ class TensorBoard(cbks.Callback):
                           algo.iteration)
         self.tb.add_image("coronal", np.clip(algo.x.as_array()[None, :, self.coronal_slice] / self.vmax, 0, 1),
                           algo.iteration)
+        log.debug("...logged")
 
 
 class MetricsWithTimeout(cbks.Callback):
@@ -99,6 +111,7 @@ class MetricsWithTimeout(cbks.Callback):
 
     def __call__(self, algorithm: Algorithm):
         if (now := time()) > self.limit:
+            log.warning("Timeout reached. Stopping algorithm.")
             raise StopIteration
         if self.callbacks:
             for c in self.callbacks:
@@ -161,11 +174,15 @@ if SRCDIR.is_dir():
         (get_data(srcdir=SRCDIR / "Siemens_Vision600_thorax",
                   outdir=OUTDIR / "Vision600_thorax"), [MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")])]
 else:
+    log.warning("Source directory does not exist: %s", SRCDIR)
     data_metrics_pairs = [(None, [])]
 # first dataset
 data, metrics = data_metrics_pairs[0]
 
 if __name__ == "__main__":
+    from docopt import docopt
+    args = docopt(__doc__)
+    logging.basicConfig(level=getattr(logging, args["--log"].upper()))
     from main import Submission, submission_callbacks
     assert issubclass(Submission, Algorithm)
     for data, metrics in data_metrics_pairs:
@@ -174,3 +191,5 @@ if __name__ == "__main__":
             algo.run(np.inf, callbacks=metrics + submission_callbacks)
         except Exception as exc:
             print(exc)
+        finally:
+            del algo
