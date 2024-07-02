@@ -182,8 +182,11 @@ else:
 
 if __name__ != "__main__":
     srcdir, outdir, metrics = data_dirs_metrics[0]
-    data = get_data(srcdir=srcdir, outdir=outdir)
-    metrics[0].reset()
+    if srcdir is None:
+        data = None
+    else:
+        data = get_data(srcdir=srcdir, outdir=outdir)
+        metrics[0].reset()
 else:
     from docopt import docopt
     args = docopt(__doc__)
