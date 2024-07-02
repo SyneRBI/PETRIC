@@ -1,10 +1,14 @@
 data/
+output/
 tmp*/
-errr.txt
+err*.txt
 info.txt
-warn.txt
+warn*.txt
 __pycache__/
 *.s
 *.hs
 *~
 *.bak
+*.ahv
+*.hv
+*.v

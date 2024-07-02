@@ -152,8 +152,8 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
     STIR.set_verbosity(sirf_verbosity)                # set to higher value to diagnose problems
     STIR.AcquisitionData.set_storage_scheme('memory') # needed for get_subsets()
 
-    _ = STIR.MessageRedirector(str(outdir / 'BSREM_info.txt'), str(outdir / 'BSREM_warnings.txt'),
-                               str(outdir / 'BSREM_errors.txt'))
+    _ = STIR.MessageRedirector(str(outdir / 'info.txt'), str(outdir / 'warnings.txt'),
+                               str(outdir / 'errors.txt'))
     acquired_data = STIR.AcquisitionData(str(srcdir / 'prompts.hs'))
     additive_term = STIR.AcquisitionData(str(srcdir / 'additive_term.hs'))
     mult_factors = STIR.AcquisitionData(str(srcdir / 'mult_factors.hs'))
@@ -169,26 +169,29 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
 
 
 if SRCDIR.is_dir():
-    data_metrics_pairs = [
-        (get_data(srcdir=SRCDIR / "Siemens_mMR_NEMA_IQ", outdir=OUTDIR / "mMR_NEMA"),
+    data_dirs_metrics = [
+        (SRCDIR / "Siemens_mMR_NEMA_IQ", OUTDIR / "mMR_NEMA",
          [MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", transverse_slice=72, coronal_slice=109)]),
-        (get_data(srcdir=SRCDIR / "NeuroLF_Hoffman_Dataset", outdir=OUTDIR / "NeuroLF_Hoffman"),
+        (SRCDIR / "NeuroLF_Hoffman_Dataset", OUTDIR / "NeuroLF_Hoffman",
          [MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Hoffman", transverse_slice=72)]),
-        (get_data(srcdir=SRCDIR / "Siemens_Vision600_thorax",
-                  outdir=OUTDIR / "Vision600_thorax"), [MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")])]
+        (SRCDIR / "Siemens_Vision600_thorax", OUTDIR / "Vision600_thorax",
+         [MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")])]
 else:
     log.warning("Source directory does not exist: %s", SRCDIR)
-    data_metrics_pairs = [(None, [])]
-# first dataset
-data, metrics = data_metrics_pairs[0]
+    data_dirs_metrics = [(None, None, [])]
 
-if __name__ == "__main__":
+if __name__ != "__main__":
+    srcdir, outdir, metrics = data_dirs_metrics[0]
+    data = get_data(srcdir=srcdir, outdir=outdir)
+    metrics[0].reset()
+else:
     from docopt import docopt
     args = docopt(__doc__)
     logging.basicConfig(level=getattr(logging, args["--log"].upper()))
     from main import Submission, submission_callbacks
     assert issubclass(Submission, Algorithm)
-    for data, metrics in data_metrics_pairs:
+    for srcdir, outdir, metrics in data_dirs_metrics:
+        data = get_data(srcdir=srcdir, outdir=outdir)
         metrics[0].reset() # timeout from now
         algo = Submission(data)
         try:
