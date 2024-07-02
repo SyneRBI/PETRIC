@@ -178,15 +178,19 @@ if SRCDIR.is_dir():
          [MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")])]
 else:
     log.warning("Source directory does not exist: %s", SRCDIR)
-    data_dirs_metric = [(None, None, [])]
+    data_dirs_metrics = [(None, None, [])]
 
-if __name__ == "__main__":
+if __name__ != "__main__":
+    srcdir, outdir, metrics = data_dirs_metrics[0]
+    data = get_data(srcdir=srcdir, outdir=outdir)
+    metrics[0].reset()
+else:
     from docopt import docopt
     args = docopt(__doc__)
     logging.basicConfig(level=getattr(logging, args["--log"].upper()))
     from main import Submission, submission_callbacks
     assert issubclass(Submission, Algorithm)
-    for srcdir, outdir, metrics in data_dirs_metric:
+    for srcdir, outdir, metrics in data_dirs_metrics:
         data = get_data(srcdir=srcdir, outdir=outdir)
         metrics[0].reset() # timeout from now
         algo = Submission(data)
