@@ -49,7 +49,10 @@ class Submission(ISTA):
         step_size_rule = ConstantStepSize(step_size)    # ISTA default step_size is 0.99*2.0/F.L
         g = IndicatorBox(lower=1e-6, accelerated=False) # "non-negativity" constraint
 
-        super().__init__(initial=data.OSEM_image, f=F, g=g, step_size=step_size_rule,
+        g = IndicatorBox(lower=1e-5, accelerated=False)
+
+        super().__init__(initial=data.OSEM_image,
+                         f=F, g=g, step_size=step_size_rule,
                          update_objective_interval=update_objective_interval)
 
 
