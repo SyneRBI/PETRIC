@@ -48,7 +48,7 @@ class Submission(ISTA):
         F = -SGFunction(obj_funs, sampler=sampler)   # negative to turn minimiser into maximiser
         step_size_rule = ConstantStepSize(step_size) # ISTA default step_size is 0.99*2.0/F.L
 
-        g = IndicatorBox(lower=0)
+        g = IndicatorBox(lower=1e-5, accelerated=False)
 
         super().__init__(initial=data.OSEM_image.get_uniform_copy(1.),
                          f=F, g=g, step_size=step_size_rule,
