@@ -30,7 +30,7 @@ class MaxIteration(callbacks.Callback):
 
 class Submission(ISTA):
     # note that `issubclass(GD, Algorithm) == True`
-    def __init__(self, data: Dataset, num_subsets: int = 7, step_size: float = 1e-7,
+    def __init__(self, data: Dataset, num_subsets: int = 7, step_size: float = 1e-6,
                  update_objective_interval: int = 10):
         """
         Initialisation function, setting up data & (hyper)parameters.
@@ -50,7 +50,7 @@ class Submission(ISTA):
 
         g = IndicatorBox(lower=1e-5, accelerated=False)
 
-        super().__init__(initial=data.OSEM_image.get_uniform_copy(1.),
+        super().__init__(initial=data.OSEM_image.get_uniform_copy(1e-5),
                          f=F, g=g, step_size=step_size_rule,
                          update_objective_interval=update_objective_interval)
 
