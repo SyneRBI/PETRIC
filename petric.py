@@ -19,6 +19,7 @@ import os
 from collections import namedtuple
 from pathlib import Path
 from time import time
+from traceback import print_exc
 
 import numpy as np
 from skimage.metrics import mean_squared_error, peak_signal_noise_ratio
@@ -152,8 +153,7 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
     STIR.set_verbosity(sirf_verbosity)                # set to higher value to diagnose problems
     STIR.AcquisitionData.set_storage_scheme('memory') # needed for get_subsets()
 
-    _ = STIR.MessageRedirector(str(outdir / 'info.txt'), str(outdir / 'warnings.txt'),
-                               str(outdir / 'errors.txt'))
+    _ = STIR.MessageRedirector(str(outdir / 'info.txt'), str(outdir / 'warnings.txt'), str(outdir / 'errors.txt'))
     acquired_data = STIR.AcquisitionData(str(srcdir / 'prompts.hs'))
     additive_term = STIR.AcquisitionData(str(srcdir / 'additive_term.hs'))
     mult_factors = STIR.AcquisitionData(str(srcdir / 'mult_factors.hs'))
@@ -169,13 +169,12 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
 
 
 if SRCDIR.is_dir():
-    data_dirs_metrics = [
-        (SRCDIR / "Siemens_mMR_NEMA_IQ", OUTDIR / "mMR_NEMA",
-         [MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", transverse_slice=72, coronal_slice=109)]),
-        (SRCDIR / "NeuroLF_Hoffman_Dataset", OUTDIR / "NeuroLF_Hoffman",
-         [MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Hoffman", transverse_slice=72)]),
-        (SRCDIR / "Siemens_Vision600_thorax", OUTDIR / "Vision600_thorax",
-         [MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")])]
+    data_dirs_metrics = [(SRCDIR / "Siemens_mMR_NEMA_IQ", OUTDIR / "mMR_NEMA",
+                          [MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", transverse_slice=72, coronal_slice=109)]),
+                         (SRCDIR / "NeuroLF_Hoffman_Dataset", OUTDIR / "NeuroLF_Hoffman",
+                          [MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Hoffman", transverse_slice=72)]),
+                         (SRCDIR / "Siemens_Vision600_thorax", OUTDIR / "Vision600_thorax",
+                          [MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")])]
 else:
     log.warning("Source directory does not exist: %s", SRCDIR)
     data_dirs_metrics = [(None, None, [])]
@@ -199,7 +198,7 @@ else:
         algo = Submission(data)
         try:
             algo.run(np.inf, callbacks=metrics + submission_callbacks)
-        except Exception as exc:
-            print(exc)
+        except (AssertionError, Exception):
+            print_exc(limit=2)
         finally:
             del algo
