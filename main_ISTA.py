@@ -5,13 +5,13 @@
 >>> algorithm = Submission(data)
 >>> algorithm.run(np.inf, callbacks=metrics + submission_callbacks)
 """
-from cil.optimisation.algorithms import GD, Algorithm
-from cil.optimisation.functions import SGFunction
+from cil.optimisation.algorithms import ISTA, Algorithm
+from cil.optimisation.functions import IndicatorBox, SGFunction
 from cil.optimisation.utilities import ConstantStepSize, Sampler, callbacks
 from petric import Dataset
 from sirf.contrib.partitioner import partitioner
 
-assert issubclass(GD, Algorithm)
+assert issubclass(ISTA, Algorithm)
 
 
 class MaxIteration(callbacks.Callback):
@@ -28,9 +28,9 @@ class MaxIteration(callbacks.Callback):
             raise StopIteration
 
 
-class Submission(GD):
-    # note that `issubclass(GD, Algorithm) == True`
-    def __init__(self, data: Dataset, num_subsets: int = 7, step_size: float = 1e-10,
+class Submission(ISTA):
+    # note that `issubclass(ISTA, Algorithm) == True`
+    def __init__(self, data: Dataset, num_subsets: int = 7, step_size: float = 1e-6,
                  update_objective_interval: int = 10):
         """
         Initialisation function, setting up data & (hyper)parameters.
@@ -45,10 +45,11 @@ class Submission(GD):
             f.set_prior(data.prior)
 
         sampler = Sampler.random_without_replacement(len(obj_funs))
-        F = -SGFunction(obj_funs, sampler=sampler)   # negative to turn minimiser into maximiser
-        step_size_rule = ConstantStepSize(step_size) # ISTA default step_size is 0.99*2.0/F.L
+        F = -SGFunction(obj_funs, sampler=sampler)      # negative to turn minimiser into maximiser
+        step_size_rule = ConstantStepSize(step_size)    # ISTA default step_size is 0.99*2.0/F.L
+        g = IndicatorBox(lower=1e-6, accelerated=False) # "non-negativity" constraint
 
-        super().__init__(initial=data.OSEM_image, objective_function=F, step_size=step_size_rule,
+        super().__init__(initial=data.OSEM_image, f=F, g=g, step_size=step_size_rule,
                          update_objective_interval=update_objective_interval)
 
 
