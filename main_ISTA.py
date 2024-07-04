@@ -28,16 +28,17 @@ class MaxIteration(callbacks.Callback):
             raise StopIteration
 
 class MyPreconditioner(Preconditioner):
+    # Use a preconditioner based on the row-sum of the Hessian of the log-likelihood as an example
     # See:
     # Tsai, Y.-J., Bousse, A., Ehrhardt, M.J., Stearns, C.W., Ahn, S., Hutton, B., Arridge, S., Thielemans, K., 2017. 
     # Fast Quasi-Newton Algorithms for Penalized Reconstruction in Emission Tomography and Further Improvements via Preconditioning. 
     # IEEE Transactions on Medical Imaging 1. https://doi.org/10.1109/tmi.2017.2786865
     def __init__(self, kappa):
-        self.kappasq = kappa * kappa + 1e-5
+        # add an epsilon to avoid division by zero. This eps value probably should be made dependent on kappa though.
+        self.kappasq = kappa * kappa + 1e-6
         
-    def apply(self, algorithm, gradient, out):
-        out = gradient.divide(self.kappasq, out=out)
-        return out
+    def apply(self, algorithm, gradient, out=None):
+        return gradient.divide(self.kappasq, out=out)
         
 class Submission(ISTA):
     # note that `issubclass(ISTA, Algorithm) == True`
@@ -57,7 +58,7 @@ class Submission(ISTA):
         sampler = Sampler.random_without_replacement(len(obj_funs))
         F = -SGFunction(obj_funs, sampler=sampler)      # negative to turn minimiser into maximiser
         step_size_rule = ConstantStepSize(step_size)    # ISTA default step_size is 0.99*2.0/F.L
-        g = IndicatorBox(lower=1e-6, accelerated=False) # "non-negativity" constraint
+        g = IndicatorBox(lower=0, accelerated=False) # non-negativity constraint
 
         my_preconditioner = MyPreconditioner(data.kappa)
         super().__init__(initial=data.OSEM_image,
