@@ -7,7 +7,7 @@
 """
 from cil.optimisation.algorithms import ISTA, Algorithm
 from cil.optimisation.functions import IndicatorBox, SGFunction
-from cil.optimisation.utilities import ConstantStepSize, Sampler, callbacks
+from cil.optimisation.utilities import ConstantStepSize, Sampler, callbacks, Preconditioner
 from petric import Dataset
 from sirf.contrib.partitioner import partitioner
 
@@ -27,7 +27,18 @@ class MaxIteration(callbacks.Callback):
         if algorithm.iteration >= self.max_iteration:
             raise StopIteration
 
-
+class MyPreconditioner(Preconditioner):
+    # See:
+    # Tsai, Y.-J., Bousse, A., Ehrhardt, M.J., Stearns, C.W., Ahn, S., Hutton, B., Arridge, S., Thielemans, K., 2017. 
+    # Fast Quasi-Newton Algorithms for Penalized Reconstruction in Emission Tomography and Further Improvements via Preconditioning. 
+    # IEEE Transactions on Medical Imaging 1. https://doi.org/10.1109/tmi.2017.2786865
+    def __init__(self, kappa):
+        self.kappasq = kappa * kappa + 1e-5
+        
+    def apply(self, algorithm, gradient, out):
+        out = gradient.divide(self.kappasq, out=out)
+        return out
+        
 class Submission(ISTA):
     # note that `issubclass(ISTA, Algorithm) == True`
     def __init__(self, data: Dataset, num_subsets: int = 7, step_size: float = 1e-6,
@@ -35,7 +46,6 @@ class Submission(ISTA):
         """
         Initialisation function, setting up data & (hyper)parameters.
         NB: in practice, `num_subsets` should likely be determined from the data.
-        WARNING: we also currently ignore the non-negativity constraint here.
         This is just an example. Try to modify and improve it!
         """
         data_sub, acq_models, obj_funs = partitioner.data_partition(data.acquired_data, data.additive_term,
@@ -49,10 +59,10 @@ class Submission(ISTA):
         step_size_rule = ConstantStepSize(step_size)    # ISTA default step_size is 0.99*2.0/F.L
         g = IndicatorBox(lower=1e-6, accelerated=False) # "non-negativity" constraint
 
-        g = IndicatorBox(lower=1e-5, accelerated=False)
-
+        my_preconditioner = MyPreconditioner(data.kappa)
         super().__init__(initial=data.OSEM_image,
                          f=F, g=g, step_size=step_size_rule,
+                         preconditioner=my_preconditioner,
                          update_objective_interval=update_objective_interval)
 
 
