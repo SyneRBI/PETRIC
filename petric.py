@@ -198,7 +198,7 @@ else:
         algo = Submission(data)
         try:
             algo.run(np.inf, callbacks=metrics + submission_callbacks)
-        except (AssertionError, Exception):
+        except Exception:
             print_exc(limit=2)
         finally:
             del algo
