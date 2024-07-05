@@ -1,4 +1,6 @@
-"""Main file to modify for submissions. It is used by e.g. example.ipynb and petric.py as follows:
+"""Main file to modify for submissions.
+
+Once renamed or symlinked as `main.py`, it will be used by `petric.py` as follows:
 
 >>> from main import Submission, submission_callbacks
 >>> from petric import data, metrics
