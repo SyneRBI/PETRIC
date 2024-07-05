@@ -48,7 +48,7 @@ class Submission(ISTA):
     """Stochastic subset version of preconditioned ISTA"""
 
     # note that `issubclass(ISTA, Algorithm) == True`
-    def __init__(self, data: Dataset, num_subsets: int = 7, step_size: float = 1e-6,
+    def __init__(self, data: Dataset, num_subsets: int = 7, step_size: float = 0.1,
                  update_objective_interval: int = 10):
         """
         Initialisation function, setting up data & (hyper)parameters.
