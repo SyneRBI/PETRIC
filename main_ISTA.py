@@ -7,7 +7,7 @@
 """
 from cil.optimisation.algorithms import ISTA, Algorithm
 from cil.optimisation.functions import IndicatorBox, SGFunction
-from cil.optimisation.utilities import ConstantStepSize, Sampler, callbacks
+from cil.optimisation.utilities import ConstantStepSize, Preconditioner, Sampler, callbacks
 from petric import Dataset
 from sirf.contrib.partitioner import partitioner
 
@@ -28,14 +28,29 @@ class MaxIteration(callbacks.Callback):
             raise StopIteration
 
 
+class MyPreconditioner(Preconditioner):
+    """
+    Example based on the row-sum of the Hessian of the log-likelihood. See: Tsai et al. Fast Quasi-Newton Algorithms
+    for Penalized Reconstruction in Emission Tomography and Further Improvements via Preconditioning,
+    IEEE TMI https://doi.org/10.1109/tmi.2017.2786865
+    """
+    def __init__(self, kappa):
+        # add an epsilon to avoid division by zero (probably should make epsilon dependent on kappa)
+        self.kappasq = kappa*kappa + 1e-6
+
+    def apply(self, algorithm, gradient, out=None):
+        return gradient.divide(self.kappasq, out=out)
+
+
 class Submission(ISTA):
+    """Stochastic subset version of preconditioned ISTA"""
+
     # note that `issubclass(ISTA, Algorithm) == True`
     def __init__(self, data: Dataset, num_subsets: int = 7, step_size: float = 1e-6,
                  update_objective_interval: int = 10):
         """
         Initialisation function, setting up data & (hyper)parameters.
         NB: in practice, `num_subsets` should likely be determined from the data.
-        WARNING: we also currently ignore the non-negativity constraint here.
         This is just an example. Try to modify and improve it!
         """
         data_sub, acq_models, obj_funs = partitioner.data_partition(data.acquired_data, data.additive_term,
@@ -45,11 +60,12 @@ class Submission(ISTA):
             f.set_prior(data.prior)
 
         sampler = Sampler.random_without_replacement(len(obj_funs))
-        F = -SGFunction(obj_funs, sampler=sampler)      # negative to turn minimiser into maximiser
-        step_size_rule = ConstantStepSize(step_size)    # ISTA default step_size is 0.99*2.0/F.L
-        g = IndicatorBox(lower=1e-6, accelerated=False) # "non-negativity" constraint
+        f = -SGFunction(obj_funs, sampler=sampler)   # negative to turn minimiser into maximiser
+        step_size_rule = ConstantStepSize(step_size) # ISTA default step_size is 0.99*2.0/F.L
+        g = IndicatorBox(lower=0, accelerated=False) # non-negativity constraint
 
-        super().__init__(initial=data.OSEM_image, f=F, g=g, step_size=step_size_rule,
+        preconditioner = MyPreconditioner(data.kappa)
+        super().__init__(initial=data.OSEM_image, f=f, g=g, step_size=step_size_rule, preconditioner=preconditioner,
                          update_objective_interval=update_objective_interval)
 
 

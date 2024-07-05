@@ -144,7 +144,7 @@ def construct_RDP(penalty_strength, initial_image, kappa, max_scaling=1e-3):
     return prior
 
 
-Dataset = namedtuple('Dataset', ['acquired_data', 'additive_term', 'mult_factors', 'OSEM_image', 'prior'])
+Dataset = namedtuple('Dataset', ['acquired_data', 'additive_term', 'mult_factors', 'OSEM_image', 'prior', 'kappa'])
 
 
 def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
@@ -165,7 +165,7 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
         penalty_strength = 1 / 700 # default choice
     prior = construct_RDP(penalty_strength, OSEM_image, kappa)
 
-    return Dataset(acquired_data, additive_term, mult_factors, OSEM_image, prior)
+    return Dataset(acquired_data, additive_term, mult_factors, OSEM_image, prior, kappa)
 
 
 if SRCDIR.is_dir():
