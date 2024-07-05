@@ -7,9 +7,10 @@
 """
 from cil.optimisation.algorithms import ISTA, Algorithm
 from cil.optimisation.functions import IndicatorBox, SGFunction
-from cil.optimisation.utilities import ConstantStepSize, Sampler, callbacks, Preconditioner
+from cil.optimisation.utilities import ConstantStepSize, Sampler, callbacks, Preconditioner, StepSizeRule
 from petric import Dataset
 from sirf.contrib.partitioner import partitioner
+import numpy as np
 
 assert issubclass(ISTA, Algorithm)
 
@@ -38,7 +39,37 @@ class MyPreconditioner(Preconditioner):
     def apply(self, algorithm, gradient, out):
         out = gradient.divide(self.kappasq, out=out)
         return out
+    
+class OSEMStepSize(StepSizeRule):
+    '''Step size rule for OSEM algorithm.
+    
+    ::math::
+        x^+ = x + t \nabla \log L(y|x)
         
+    with :math:`t = x / s` where :math:`s` is the adjoint of the range geometry of the acquisition model.
+    '''
+    def __init__(self, acq_models):
+        self.reciproc_s = []
+
+        for i,el in enumerate(acq_models):
+            ones = el.range_geometry().allocate(1.)
+            s = el.adjoint(ones)
+            arr = s.as_array()
+            np.reciprocal(arr, out=arr)
+            np.nan_to_num(arr, copy=False, nan=0, posinf=0, neginf=0)
+            s.fill(arr)
+            self.reciproc_s.append(s)
+    
+    def get_step_size(self, algorithm):
+        """
+        Returns
+        --------
+        the calculated step size:float 
+        """
+        func_num = algorithm.f.function.function_num
+        t = algorithm.solution * self.reciproc_s[func_num]
+        return t
+
 class Submission(ISTA):
     # note that `issubclass(ISTA, Algorithm) == True`
     def __init__(self, data: Dataset, num_subsets: int = 7, step_size: float = 1e-6,
@@ -56,7 +87,11 @@ class Submission(ISTA):
 
         sampler = Sampler.random_without_replacement(len(obj_funs))
         F = -SGFunction(obj_funs, sampler=sampler)      # negative to turn minimiser into maximiser
-        step_size_rule = ConstantStepSize(step_size)    # ISTA default step_size is 0.99*2.0/F.L
+        # Uncomment the following for the constant step size rule
+        # step_size_rule = ConstantStepSize(0.1)    # ISTA default step_size is 0.99*2.0/F.L
+        # Uncomment the following for the OSEM step size rule
+        step_size_rule = OSEMStepSize(acq_models)
+        
         g = IndicatorBox(lower=1e-6, accelerated=False) # "non-negativity" constraint
 
         my_preconditioner = MyPreconditioner(data.kappa)
