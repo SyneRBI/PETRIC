@@ -95,32 +95,32 @@ class QualityMetrics(ImageQualityCallback):
         self.whole_object_indices = np.where(whole_object_mask == 1)
         self.background_indices = np.where(background_mask == 1)
         self.ref_im_arr = reference_image.as_array()
+        self.norm = self.ref_im_arr[self.background_indices].mean()
 
     def __call__(self, algorithm):
         iteration = algorithm.iteration
         if iteration % algorithm.update_objective_interval != 0 and iteration != algorithm.max_iteration:
             return
 
-        for filter_name, filter_func in self.filter.items():
-            if filter_func is None:
-                filter_func = lambda x: x
-            test_im, ref_im = (filter_func(img_data).as_array() for img_data in (algorithm.x, self.reference_image))
+        assert not any(self.filter.values()), "Filtering not implemented"
+        test_im_arr = algorithm.x.as_array()
 
-            # (1) global metrics & statistics
-            norm = ref_im[self.background_indices].mean()
-            self.tb_summary_writer.add_scalar(
-                f"RMSE_whole_object{filter_name}",
-                np.sqrt(mse(ref_im[self.whole_object_indices], test_im[self.whole_object_indices])) / norm, iteration)
-            self.tb_summary_writer.add_scalar(
-                f"RMSE_background{filter_name}",
-                np.sqrt(mse(ref_im[self.background_indices], test_im[self.background_indices])) / norm, iteration)
+        # (1) global metrics & statistics
+        self.tb_summary_writer.add_scalar(
+            "RMSE_whole_object",
+            np.sqrt(mse(self.ref_im_arr[self.whole_object_indices], test_im_arr[self.whole_object_indices])) /
+            self.norm, iteration)
+        self.tb_summary_writer.add_scalar(
+            "RMSE_background",
+            np.sqrt(mse(self.ref_im_arr[self.background_indices], test_im_arr[self.background_indices])) / self.norm,
+            iteration)
 
-            # (2) local metrics & statistics
-            for voi_name, voi_indices in self.voi_indices.items():
-                # AEM not to be confused with MAE
-                self.tb_summary_writer.add_scalar(
-                    f"AEM_VOI_{voi_name}{filter_name}",
-                    np.abs(test_im[voi_indices].mean() - ref_im[voi_indices].mean()) / norm, iteration)
+        # (2) local metrics & statistics
+        for voi_name, voi_indices in sorted(self.voi_indices.items()):
+            # AEM not to be confused with MAE
+            self.tb_summary_writer.add_scalar(
+                f"AEM_VOI_{voi_name}",
+                np.abs(test_im_arr[voi_indices].mean() - self.ref_im_arr[voi_indices].mean()) / self.norm, iteration)
 
 
 class MetricsWithTimeout(cbks.Callback):
