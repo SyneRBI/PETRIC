@@ -34,8 +34,7 @@ log = logging.getLogger('petric')
 TEAM = os.getenv("GITHUB_REPOSITORY", "SyneRBI/PETRIC-").split("/PETRIC-", 1)[-1]
 VERSION = os.getenv("GITHUB_REF_NAME", "")
 OUTDIR = Path(f"/o/logs/{TEAM}/{VERSION}" if TEAM and VERSION else "./output")
-SRCDIR = Path("/mnt/share/petric")
-if not SRCDIR.is_dir():
+if not (SRCDIR := Path("/mnt/share/petric")).is_dir():
     SRCDIR = Path("./data")
 
 
@@ -52,7 +51,7 @@ class SaveIters(cbks.Callback):
         if algo.iteration % algo.update_objective_interval == 0 or algo.iteration == algo.max_iteration:
             log.debug("saving iter %d...", algo.iteration)
             algo.x.write(str(self.outdir / f'iter_{algo.iteration:04d}.hv'))
-            self.csv.writerow((algo.iterations, algo.loss))
+            self.csv.writerow((algo.iteration, algo.get_last_loss()))
             log.debug("...saved")
         if algo.iteration == algo.max_iteration:
             algo.x.write(str(self.outdir / 'iter_final.hv'))
@@ -161,11 +160,7 @@ def construct_RDP(penalty_strength, initial_image, kappa, max_scaling=1e-3):
     initial_image: used to determine a smoothing factor (epsilon).
     kappa: used to pass voxel-dependent weights.
     """
-    try:
-        prior = STIR.CudaRelativeDifferencePrior()
-    except NameError:
-        prior = STIR.RelativeDifferencePrior()
-
+    prior = getattr(STIR, 'CudaRelativeDifferencePrior', STIR.RelativeDifferencePrior)()
     # need to make it differentiable
     epsilon = initial_image.max() * max_scaling
     prior.set_epsilon(epsilon)
@@ -229,7 +224,7 @@ if SRCDIR.is_dir():
                           [MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")])]
 else:
     log.warning("Source directory does not exist: %s", SRCDIR)
-    data_dirs_metrics = [(None, None, [])]
+    data_dirs_metrics = [(None, None, [])] # type: ignore
 
 if __name__ != "__main__":
     # load up first data-set for people to play with

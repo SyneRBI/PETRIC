@@ -19,16 +19,19 @@ Note that -1 one means to use middle of image
 __version__ = '0.2.0'
 
 import os
+import os.path
 import sys
+from ast import literal_eval
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 from docopt import docopt
-from ast import literal_eval
-from pathlib import Path
-import os.path
+
 import sirf.STIR as STIR
 
 STIR.AcquisitionData.set_storage_scheme('memory')
+
 
 def plot_sinogram_profile(prompts, background, sumaxis=(0, 1), select=0, srcdir='./'):
     """
@@ -43,14 +46,10 @@ def plot_sinogram_profile(prompts, background, sumaxis=(0, 1), select=0, srcdir=
     plt.plot(np.sum(prompts.as_array(), axis=sumaxis)[select, :], label='prompts')
     plt.plot(np.sum(background.as_array(), axis=sumaxis)[select, :], label='background')
     ax.legend()
-    plt.savefig(srcdir+'prompts_background_profiles.png')
+    plt.savefig(srcdir + 'prompts_background_profiles.png')
 
 
-def plot_image(image, save_name=None,
-               transverse_slice=-1,
-               coronal_slice=-1,
-               sagittal_slice=-1,
-               vmin=0, vmax=None):
+def plot_image(image, save_name=None, transverse_slice=-1, coronal_slice=-1, sagittal_slice=-1, vmin=0, vmax=None):
     """
     Plot a profile through sirf.STIR.ImageData
     """
@@ -70,7 +69,7 @@ def plot_image(image, save_name=None,
     plt.subplot(132)
     plt.imshow(arr[:, coronal_slice, :], vmin=vmin, vmax=vmax)
     plt.subplot(133)
-    plt.imshow(arr[:,:, sagittal_slice], vmin=vmin, vmax=vmax)
+    plt.imshow(arr[:, :, sagittal_slice], vmin=vmin, vmax=vmax)
     plt.colorbar(shrink=.6)
     if save_name is not None:
         plt.savefig(save_name + '_slices.png')
@@ -85,8 +84,10 @@ def plot_image_if_exists(prefix, **kwargs):
     else:
         return None
 
+
 def VOI_mean(image, VOI):
-    return float((image*VOI).sum() / VOI.sum())
+    return float((image * VOI).sum() / VOI.sum())
+
 
 def VOI_checks(allVOInames, OSEM_image, reference_image, srcdir='.'):
     if len(allVOInames) == 0:
@@ -94,7 +95,8 @@ def VOI_checks(allVOInames, OSEM_image, reference_image, srcdir='.'):
     OSEM_VOI_values = []
     ref_VOI_values = []
     for VOIname in allVOInames:
-        VOI = plot_image_if_exists(os.path.join(srcdir, VOIname), transverse_slice=transverse_slice, coronal_slice=coronal_slice, sagittal_slice=sagittal_slice)
+        VOI = plot_image_if_exists(os.path.join(srcdir, VOIname), transverse_slice=transverse_slice,
+                                   coronal_slice=coronal_slice, sagittal_slice=sagittal_slice)
         if OSEM_image:
             OSEM_VOI_values.append(VOI_mean(OSEM_image, VOI))
         if reference_image:
@@ -114,21 +116,24 @@ def main(argv=None):
     sagittal_slice = literal_eval(args['--sagittal_slice'])
 
     if not skip_sino_profiles:
-        acquired_data = STIR.AcquisitionData(srcdir+'prompts.hs')
-        additive_term = STIR.AcquisitionData(srcdir+'additive_term.hs')
-        mult_factors = STIR.AcquisitionData(srcdir+'mult_factors.hs')
+        acquired_data = STIR.AcquisitionData(srcdir + 'prompts.hs')
+        additive_term = STIR.AcquisitionData(srcdir + 'additive_term.hs')
+        mult_factors = STIR.AcquisitionData(srcdir + 'mult_factors.hs')
         background = additive_term * mult_factors
         plot_sinogram_profile(acquired_data, background, srcdir=srcdir)
 
-    OSEM_image = plot_image_if_exists('OSEM_image', transverse_slice=transverse_slice, coronal_slice=coronal_slice, sagittal_slice=sagittal_slice)
-    plot_image_if_exists('kappa', transverse_slice=transverse_slice, coronal_slice=coronal_slice, sagittal_slice=sagittal_slice)
-    reference_image = plot_image_if_exists(srcdir + 'PETRIC/reference_image', transverse_slice=transverse_slice, coronal_slice=coronal_slice, sagittal_slice=sagittal_slice)
+    OSEM_image = plot_image_if_exists('OSEM_image', transverse_slice=transverse_slice, coronal_slice=coronal_slice,
+                                      sagittal_slice=sagittal_slice)
+    plot_image_if_exists('kappa', transverse_slice=transverse_slice, coronal_slice=coronal_slice,
+                         sagittal_slice=sagittal_slice)
+    reference_image = plot_image_if_exists(srcdir + 'PETRIC/reference_image', transverse_slice=transverse_slice,
+                                           coronal_slice=coronal_slice, sagittal_slice=sagittal_slice)
 
     VOIdir = os.path.join(srcdir, srcdir + "PETRIC")
-    allVOInames = [ os.path.basename(str(voi)[:-3]) for voi in Path(VOIdir).glob("VOI_*.hv")]
+    allVOInames = [os.path.basename(str(voi)[:-3]) for voi in Path(VOIdir).glob("VOI_*.hv")]
     VOI_checks(allVOInames, OSEM_image, reference_image, srcdir=VOIdir)
     plt.show()
 
+
 if __name__ == '__main__':
     main()
-
