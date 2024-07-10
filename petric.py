@@ -35,6 +35,8 @@ TEAM = os.getenv("GITHUB_REPOSITORY", "SyneRBI/PETRIC-").split("/PETRIC-", 1)[-1
 VERSION = os.getenv("GITHUB_REF_NAME", "")
 OUTDIR = Path(f"/o/logs/{TEAM}/{VERSION}" if TEAM and VERSION else "./output")
 SRCDIR = Path("/mnt/share/petric")
+if not SRCDIR.is_dir():
+    SRCDIR = Path(f"{Path.cwd()}/data")
 
 
 class SaveIters(cbks.Callback):
@@ -148,6 +150,10 @@ Dataset = namedtuple('Dataset', ['acquired_data', 'additive_term', 'mult_factors
 
 
 def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
+    """
+    Load data from `srcdir`, constructs prior and return as a `Dataset`.
+    Also redirects sirf.STIR log output to `outdir`.
+    """
     srcdir = Path(srcdir)
     outdir = Path(outdir)
     STIR.set_verbosity(sirf_verbosity)                # set to higher value to diagnose problems
@@ -169,6 +175,8 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
 
 
 if SRCDIR.is_dir():
+    # create list of existing data
+    # Note: as MetricsWithTimeout initialises Tensorboard, this will currently create directories in OUTDIR accordingly
     data_dirs_metrics = [(SRCDIR / "Siemens_mMR_NEMA_IQ", OUTDIR / "mMR_NEMA",
                           [MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", transverse_slice=72, coronal_slice=109)]),
                          (SRCDIR / "NeuroLF_Hoffman_Dataset", OUTDIR / "NeuroLF_Hoffman",
@@ -180,6 +188,7 @@ else:
     data_dirs_metrics = [(None, None, [])]
 
 if __name__ != "__main__":
+    # load up first data-set for people to play with
     srcdir, outdir, metrics = data_dirs_metrics[0]
     if srcdir is None:
         data = None
