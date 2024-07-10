@@ -8,7 +8,7 @@ Options:
   -h, --help
   --srcdir=<path>        pathname (must have trailing slash!) [default: ./]
   --skip_sino_profiles   do not plot the sinogram profiles
-  --transverse_slice=<i> idx [default: -1]
+  --transverse_slice=<i>  idx [default: -1]
   --coronal_slice=<c>    idx [default: -1]
   --sagittal_slice=<s>   idx [default: -1]
 
