@@ -105,9 +105,8 @@ def VOI_checks(allVOInames, OSEM_image, reference_image, srcdir='.'):
     print(ref_VOI_values)
 
 
-def main(args=None):
-    if args is None:
-        args = docopt(__doc__, argv=[], version=__version__)
+def main(argv=None):
+    args = docopt(__doc__, argv=argv, version=__version__)
     srcdir = args['--srcdir']
     skip_sino_profiles = args['--skip_sino_profiles']
     transverse_slice = literal_eval(args['--transverse_slice'])
@@ -131,6 +130,5 @@ def main(args=None):
     plt.show()
 
 if __name__ == '__main__':
-    args = docopt(__doc__, version=__version__)
-    main(args)
+    main()
 
