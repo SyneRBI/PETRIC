@@ -54,8 +54,8 @@ python petric.py
 > To avoid timing out (5 min runtime), please disable any debugging/plotting code before submitting!
 > This includes removing any progress/logging from `submission_callbacks`.
 
-- `metrics` are described in the [wiki](https://github.com/SyneRBI/PETRIC/wiki), but are not yet part of this repository
 - `data` to test/train your `Algorithm`s is available at https://petric.tomography.stfc.ac.uk/data/ and is likely to grow (more info to follow soon)
   + fewer datasets will be used by the organisers to provide a temporary [leaderboard](https://petric.tomography.stfc.ac.uk/leaderboard)
+- `metrics` are calculated by `class QualityMetrics` within `petric.py`
 
 Any modifications to `petric.py` are ignored.
