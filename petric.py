@@ -52,7 +52,7 @@ class SaveIters(cbks.Callback):
         if algo.iteration % algo.update_objective_interval == 0 or algo.iteration == algo.max_iteration:
             log.debug("saving iter %d...", algo.iteration)
             algo.x.write(str(self.outdir / f'iter_{algo.iteration:04d}.hv'))
-            self.csv.writerow((algo.iterations, algo.loss))
+            self.csv.writerow((algo.iteration, algo.get_last_loss()))
             log.debug("...saved")
         if algo.iteration == algo.max_iteration:
             algo.x.write(str(self.outdir / 'iter_final.hv'))
