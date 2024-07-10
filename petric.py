@@ -136,7 +136,11 @@ def construct_RDP(penalty_strength, initial_image, kappa, max_scaling=1e-3):
     initial_image: used to determine a smoothing factor (epsilon).
     kappa: used to pass voxel-dependent weights.
     """
-    prior = STIR.RelativeDifferencePrior()
+    try:
+        prior = STIR.CudaRelativeDifferencePrior()
+    except:
+        prior = STIR.RelativeDifferencePrior()
+
     # need to make it differentiable
     epsilon = initial_image.max() * max_scaling
     prior.set_epsilon(epsilon)
