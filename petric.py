@@ -138,7 +138,7 @@ def construct_RDP(penalty_strength, initial_image, kappa, max_scaling=1e-3):
     """
     try:
         prior = STIR.CudaRelativeDifferencePrior()
-    except:
+    except NameError:
         prior = STIR.RelativeDifferencePrior()
 
     # need to make it differentiable
