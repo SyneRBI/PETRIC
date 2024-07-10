@@ -131,6 +131,6 @@ def main(args=None):
     plt.show()
 
 if __name__ == '__main__':
-    args = docopt(__doc__, argv=sys.argv, version=__version__)
+    args = docopt(__doc__, version=__version__)
     main(args)
 
