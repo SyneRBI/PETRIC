@@ -192,16 +192,17 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
         penalty_strength = 1 / 700 # default choice
     prior = construct_RDP(penalty_strength, OSEM_image, kappa)
 
-    reference_image = STIR.ImageData(str(srcdir / 'reference_image.hv')) if (srcdir /
-                                                                             'reference_image.hv').is_file() else None
-    whole_object_mask = STIR.ImageData(str(srcdir /
-                                           'VOI_whole_object.hv')) if (srcdir /
-                                                                       'VOI_whole_object.hv').is_file() else None
-    background_mask = STIR.ImageData(str(srcdir / 'VOI_background.hv')) if (srcdir /
-                                                                            'VOI_background.hv').is_file() else None
+    def get_image(fname):
+        if (source := srcdir / 'PETRIC' / fname).is_file():
+            return STIR.ImageData(str(source))
+        return None # explicit to suppress linter warnings
+
+    reference_image = get_image('reference_image.hv')
+    whole_object_mask = get_image('VOI_whole_object.hv')
+    background_mask = get_image('VOI_background.hv')
     voi_masks = {
         voi.stem: STIR.ImageData(str(voi))
-        for voi in srcdir.glob("VOI_*.hv") if voi.stem[4:] not in ('background', 'whole_object')}
+        for voi in (srcdir / 'PETRIC').glob("VOI_*.hv") if voi.stem[4:] not in ('background', 'whole_object')}
 
     return Dataset(acquired_data, additive_term, mult_factors, OSEM_image, prior, kappa, reference_image,
                    whole_object_mask, background_mask, voi_masks)
