@@ -92,8 +92,8 @@ class QualityMetrics(ImageQualityCallback):
     """From https://github.com/SyneRBI/PETRIC/wiki#metrics-and-thresholds"""
     def __init__(self, reference_image, whole_object_mask, background_mask, **kwargs):
         super().__init__(reference_image, **kwargs)
-        self.whole_object_indices = np.where(whole_object_mask == 1)
-        self.background_indices = np.where(background_mask == 1)
+        self.whole_object_indices = np.where(whole_object_mask.as_array())
+        self.background_indices = np.where(background_mask.as_array())
         self.ref_im_arr = reference_image.as_array()
         self.norm = self.ref_im_arr[self.background_indices].mean()
 
@@ -201,7 +201,7 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
     whole_object_mask = get_image('VOI_whole_object.hv')
     background_mask = get_image('VOI_background.hv')
     voi_masks = {
-        voi.stem: STIR.ImageData(str(voi))
+        voi.stem[4:]: STIR.ImageData(str(voi))
         for voi in (srcdir / 'PETRIC').glob("VOI_*.hv") if voi.stem[4:] not in ('background', 'whole_object')}
 
     return Dataset(acquired_data, additive_term, mult_factors, OSEM_image, prior, kappa, reference_image,
@@ -238,7 +238,7 @@ else:
         if data.reference_image is not None:
             metrics_with_timeout.callbacks.append(
                 QualityMetrics(data.reference_image, data.whole_object_mask, data.background_mask,
-                               tb_summary_writer=metrics_with_timeout.tb, roi_mask_dict=data.voi_masks))
+                               tb_summary_writer=metrics_with_timeout.tb, voi_mask_dict=data.voi_masks))
         metrics_with_timeout.reset() # timeout from now
         algo = Submission(data)
         try:
