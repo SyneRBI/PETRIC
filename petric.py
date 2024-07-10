@@ -36,7 +36,7 @@ VERSION = os.getenv("GITHUB_REF_NAME", "")
 OUTDIR = Path(f"/o/logs/{TEAM}/{VERSION}" if TEAM and VERSION else "./output")
 SRCDIR = Path("/mnt/share/petric")
 if not SRCDIR.is_dir():
-    SRCDIR = Path(f"{Path.cwd()}/data")
+    SRCDIR = Path("./data")
 
 
 class SaveIters(cbks.Callback):
