@@ -38,7 +38,7 @@ def plot_sinogram_profile(prompts, background, sumaxis=(0, 1), select=0):
     plt.savefig('prompts_background_profiles.png')
 
 
-def plot_image(image, save_name,
+def plot_image(image, save_name=None,
                transverse_slice=-1,
                coronal_slice=-1,
                sagital_slice=-1,
@@ -64,14 +64,15 @@ def plot_image(image, save_name,
     plt.subplot(133)
     plt.imshow(arr[:,:, sagital_slice], vmin=vmin, vmax=vmax)
     plt.colorbar(shrink=.6)
-    plt.savefig(save_name + '_slices.png')
-    plt.suptitle(os.path.basename(save_name))
+    if save_name is not None:
+        plt.savefig(save_name + '_slices.png')
+        plt.suptitle(os.path.basename(save_name))
 
 
-def plot_image_if_exists(prefix):
+def plot_image_if_exists(prefix, **kwargs):
     if os.path.isfile(prefix + '.hv'):
         im = STIR.ImageData(prefix + '.hv')
-        plot_image(im, prefix)
+        plot_image(im, prefix, *kwargs)
         return im
     else:
         return None
