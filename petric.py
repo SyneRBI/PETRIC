@@ -20,7 +20,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from time import time
 from traceback import print_exc
-from typing import Any
 
 import numpy as np
 from skimage.metrics import mean_squared_error as mse
@@ -177,7 +176,7 @@ class Dataset:
     additive_term: STIR.AcquisitionData
     mult_factors: STIR.AcquisitionData
     OSEM_image: STIR.ImageData
-    prior: STIR.RelativeDifferencePrior | Any
+    prior: STIR.RelativeDifferencePrior
     kappa: STIR.ImageData
     reference_image: STIR.ImageData | None = None
     whole_object_mask: STIR.ImageData | None = None
