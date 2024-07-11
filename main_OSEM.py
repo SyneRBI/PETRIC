@@ -31,8 +31,8 @@ class MaxIteration(callbacks.Callback):
 class Submission(Algorithm):
     """
     OSEM algorithm example.
-    NB: In OSEM Poisson log-likelihood, the multiplicative term cancels in the quotient of measured & estimated data
-    (so is rewritten here for efficiency).
+    NB: In OSEM, the multiplicative term cancels in the back-projection of the quotient of measured & estimated data
+    (so this is used here for efficiency). Note that a similar optimisation can be used for all algorithms using the Poisson log-likelihood.
     NB: OSEM does not use `data.prior` and thus does not converge to the MAP reference used in PETRIC.
     NB: this example does not use the `sirf.STIR` Poisson objective function.
     NB: see https://github.com/SyneRBI/SIRF-Contribs/tree/master/src/Python/sirf/contrib/BSREM
