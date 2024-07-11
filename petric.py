@@ -178,10 +178,10 @@ class Dataset:
     OSEM_image: STIR.ImageData
     prior: STIR.RelativeDifferencePrior
     kappa: STIR.ImageData
-    reference_image: STIR.ImageData | None = None
-    whole_object_mask: STIR.ImageData | None = None
-    background_mask: STIR.ImageData | None = None
-    voi_masks: dict[str, STIR.ImageData] = {}
+    reference_image: STIR.ImageData | None
+    whole_object_mask: STIR.ImageData | None
+    background_mask: STIR.ImageData | None
+    voi_masks: dict[str, STIR.ImageData]
 
 
 def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
