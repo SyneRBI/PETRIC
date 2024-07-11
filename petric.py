@@ -16,7 +16,7 @@ Options:
 import csv
 import logging
 import os
-from collections import namedtuple
+from dataclasses import dataclass
 from pathlib import Path
 from time import time
 from traceback import print_exc
@@ -170,9 +170,18 @@ def construct_RDP(penalty_strength, initial_image, kappa, max_scaling=1e-3):
     return prior
 
 
-Dataset = namedtuple('Dataset', [
-    'acquired_data', 'additive_term', 'mult_factors', 'OSEM_image', 'prior', 'kappa', 'reference_image',
-    'whole_object_mask', 'background_mask', 'voi_masks'])
+@dataclass
+class Dataset:
+    acquired_data: STIR.AcquisitionData
+    additive_term: STIR.AcquisitionData
+    mult_factors: STIR.AcquisitionData
+    OSEM_image: STIR.ImageData
+    prior: STIR.RelativeDifferencePrior
+    kappa: STIR.ImageData
+    reference_image: STIR.ImageData | None = None
+    whole_object_mask: STIR.ImageData | None = None
+    background_mask: STIR.ImageData | None = None
+    voi_masks: dict[str, STIR.ImageData] = {}
 
 
 def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
