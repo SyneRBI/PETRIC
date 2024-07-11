@@ -102,11 +102,11 @@ class QualityMetrics(ImageQualityCallback):
         iteration = algorithm.iteration
         if iteration % algorithm.update_objective_interval != 0 and iteration != algorithm.max_iteration:
             return
+        self.log(algorithm.x, iteration)
 
+    def log(self, test_im, iteration):
         assert not any(self.filter.values()), "Filtering not implemented"
-        test_im_arr = algorithm.x.as_array()
-
-        # (1) global metrics & statistics
+        test_im_arr = test_im.as_array()
         self.tb_summary_writer.add_scalar(
             "RMSE_whole_object",
             np.sqrt(mse(self.ref_im_arr[self.whole_object_indices], test_im_arr[self.whole_object_indices])) /
@@ -115,10 +115,7 @@ class QualityMetrics(ImageQualityCallback):
             "RMSE_background",
             np.sqrt(mse(self.ref_im_arr[self.background_indices], test_im_arr[self.background_indices])) / self.norm,
             iteration)
-
-        # (2) local metrics & statistics
         for voi_name, voi_indices in sorted(self.voi_indices.items()):
-            # AEM not to be confused with MAE
             self.tb_summary_writer.add_scalar(
                 f"AEM_VOI_{voi_name}",
                 np.abs(test_im_arr[voi_indices].mean() - self.ref_im_arr[voi_indices].mean()) / self.norm, iteration)
