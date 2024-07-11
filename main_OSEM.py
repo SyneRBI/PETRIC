@@ -88,10 +88,10 @@ class Submission(Algorithm):
         self.subset = (self.subset + 1) % len(self.prompts)
 
     def update_objective(self):
-        # should do some stuff here to have a correct TensorBoard display, but the
-        # objective function value is not part of the challenge, we will take an ugly short-cut.
-        # If you need it, you can implement it as a sum over subsets of something like
-        #   prompts * log(acq_model.forward(self.x)) - self.x * sensitivity
+        """
+        NB: The objective value is not required by OSEM nor by PETRIC, so this returns `0`.
+        NB: In theory it should be `sum(prompts * log(acq_model.forward(self.x)) - self.x * sensitivity)` across all subsets.
+        """
         return 0
 
 
