@@ -12,8 +12,8 @@ The organisers will provide GPU-enabled cloud runners which have access to large
 
 ## Layout
 
-The organisers will import your submitted algorithm from [`main.py`](main.py) and then run & evaluate it.
-Please modify this file!
+The organisers will import your submitted algorithm from `main.py` and then run & evaluate it.
+Please create this file! See the example `main_*.py` files for inspiration.
 
 [SIRF](https://github.com/SyneRBI/SIRF), [CIL](https://github.com/TomographicImaging/CIL), and CUDA are already installed (using [synerbi/sirf](https://github.com/synerbi/SIRF-SuperBuild/pkgs/container/sirf)).
 Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/or `requirements.txt`.
