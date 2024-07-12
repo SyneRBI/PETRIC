@@ -44,7 +44,7 @@ class SaveIters(cbks.Callback):
         super().__init__(verbose)
         self.outdir = Path(outdir)
         self.outdir.mkdir(parents=True, exist_ok=True)
-        self.csv = csv.writer((self.outdir / csv_file).open("w", newline=""))
+        self.csv = csv.writer((self.outdir / csv_file).open("w", buffering=1))
         self.csv.writerow(("iter", "objective"))
 
     def __call__(self, algo: Algorithm):
