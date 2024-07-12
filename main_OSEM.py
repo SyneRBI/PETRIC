@@ -90,7 +90,7 @@ class Submission(Algorithm):
     def update_objective(self):
         """
         NB: The objective value is not required by OSEM nor by PETRIC, so this returns `0`.
-        NB: In theory it should be `sum(prompts * log(acq_model.forward(self.x)) - self.x * sensitivity)` across all subsets.
+        NB: It should be `sum(prompts * log(acq_model.forward(self.x)) - self.x * sensitivity)` across all subsets.
         """
         return 0
 
