@@ -135,7 +135,7 @@ class QualityMetrics(ImageQualityCallback, Callback):
             for voi_name, voi_indices in sorted(self.voi_indices.items())}
         return {**whole, **local}
 
-    def keys():
+    def keys(self):
         l = ["RMSE_whole_object", "RMSE_background"]
         for voi_name in sorted(self.voi_indices.keys()):
             l.append(f"AEM_VOI_{voi_name}")
