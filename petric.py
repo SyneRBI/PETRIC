@@ -138,7 +138,6 @@ class QualityMetrics(ImageQualityCallback, Callback):
     def keys(self):
         return ["RMSE_whole_object", "RMSE_background"] + [f"AEM_VOI_{name}" for name in sorted(self.voi_indices)]
 
-
 class MetricsWithTimeout(cil_callbacks.Callback):
     """Stops the algorithm after `seconds`"""
     def __init__(self, seconds=300, outdir=OUTDIR, transverse_slice=None, coronal_slice=None, **kwargs):
