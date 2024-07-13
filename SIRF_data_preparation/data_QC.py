@@ -116,14 +116,15 @@ def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', *
     VOIkwargs['vmax'] = 1
     VOIkwargs['vmin'] = 0
     for VOIname in allVOInames:
-        filename = os.path.join(srcdir, VOIname + '.hv')
+        prefix = os.path.join(srcdir, VOIname)
+        filename = prefix + '.hv'
         if not os.path.isfile(filename):
             print(f"VOI {VOIname} does not exist")
             continue
         VOI = STIR.ImageData(filename)
         COM = np.rint(ndimage.center_of_mass(VOI.as_array()))
         plt.figure()
-        plot_image(VOI, save_name=VOIname, vmin=0, vmax=1,
+        plot_image(VOI, save_name=prefix, vmin=0, vmax=1,
             transverse_slice = int(COM[0]),
             coronal_slice = int(COM[1]),
             sagittal_slice = int(COM[2]))
@@ -143,7 +144,7 @@ def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', *
 
     if OSEM_image is not None:
         plt.figure()
-        plot_image(OSEM_image, alpha=allVOIs, save_name="OSEM_image and VOIs", **kwargs)
+        plot_image(OSEM_image, alpha=allVOIs, save_name="OSEM_image_and_VOIs", **kwargs)
 
     # unformatted print of VOI values for now
     print(allVOInames)
