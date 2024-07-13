@@ -74,12 +74,15 @@ def plot_image(image, save_name=None,
         alpha_cor = alpha_arr[:, coronal_slice, :]
         alpha_sag = alpha_arr[:, :, sagittal_slice]
 
-    plt.subplot(131)
+    ax = plt.subplot(131)
     plt.imshow(arr[transverse_slice, :, :], vmin=vmin, vmax=vmax, alpha=alpha_trans, **kwargs)
-    plt.subplot(132)
+    ax.set_title(f"T={transverse_slice}")
+    ax = plt.subplot(132)
     plt.imshow(arr[:, coronal_slice, :], vmin=vmin, vmax=vmax, alpha=alpha_cor, **kwargs)
-    plt.subplot(133)
+    ax.set_title(f"C={coronal_slice}")
+    ax = plt.subplot(133)
     plt.imshow(arr[:, :, sagittal_slice], vmin=vmin, vmax=vmax, alpha=alpha_sag, **kwargs)
+    ax.set_title(f"S={sagittal_slice}")
     plt.colorbar(shrink=.6)
     if save_name is not None:
         plt.savefig(save_name + '_slices.png')
@@ -101,6 +104,8 @@ def VOI_mean(image, VOI):
     return float((image * VOI).sum() / VOI.sum())
 
 
+from scipy import ndimage
+
 def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', **kwargs):
     if len(allVOInames) == 0:
         return
@@ -111,10 +116,18 @@ def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', *
     VOIkwargs['vmax'] = 1
     VOIkwargs['vmin'] = 0
     for VOIname in allVOInames:
-        VOI = plot_image_if_exists(os.path.join(srcdir, VOIname), **VOIkwargs)
-        if VOI is None:
+        filename = os.path.join(srcdir, VOIname + '.hv')
+        if not os.path.isfile(filename):
             print(f"VOI {VOIname} does not exist")
             continue
+        VOI = STIR.ImageData(filename)
+        COM = np.rint(ndimage.center_of_mass(VOI.as_array()))
+        plt.figure()
+        plot_image(VOI, save_name=VOIname, vmin=0, vmax=1,
+            transverse_slice = int(COM[0]),
+            coronal_slice = int(COM[1]),
+            sagittal_slice = int(COM[2]))
+
         # construct transparency image
         if VOIname == 'VOI_whole_object':
             VOI /= 2
@@ -130,9 +143,7 @@ def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', *
 
     if OSEM_image is not None:
         plt.figure()
-        plot_image(OSEM_image, **kwargs)
-        plt.figure()
-        plot_image(OSEM_image, alpha=allVOIs, **kwargs)
+        plot_image(OSEM_image, alpha=allVOIs, save_name="OSEM_image and VOIs", **kwargs)
 
     # unformatted print of VOI values for now
     print(allVOInames)
