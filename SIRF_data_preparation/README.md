@@ -19,4 +19,5 @@ Participants should never have to use these (unless you want to create your own 
 
 ## Helpers
 
+- `evaluation_utilities.py`: reading/plotting helpers for values of the objective function and metrics
 - `PET_plot_functions.py`: plotting helpers
