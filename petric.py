@@ -85,7 +85,7 @@ class StatsLog(Callback):
     def __call__(self, algo: Algorithm):
         if self.skip_iteration(algo):
             return
-        t = getattr(self, '__time', time())
+        t = getattr(self, '__time', None) or time()
         log.debug("logging iter %d...", algo.iteration)
         # initialise `None` values
         self.transverse_slice = algo.x.dimensions()[0] // 2 if self.transverse_slice is None else self.transverse_slice
@@ -118,7 +118,7 @@ class QualityMetrics(ImageQualityCallback, Callback):
     def __call__(self, algo: Algorithm):
         if self.skip_iteration(algo):
             return
-        t = getattr(self, '__time', time())
+        t = getattr(self, '__time', None) or time()
         for tag, value in self.evaluate(algo.x).items():
             self.tb_summary_writer.add_scalar(tag, value, algo.iteration, t)
 
