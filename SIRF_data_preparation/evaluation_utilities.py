@@ -1,8 +1,6 @@
-"""
-Some utilities for plotting objectives and metrics
-"""
+"""Some utilities for plotting objectives and metrics."""
 import csv
-import os
+from pathlib import Path
 from typing import Iterator
 
 import matplotlib.pyplot as plt
@@ -12,27 +10,24 @@ import sirf.STIR as STIR
 from petric import QualityMetrics
 
 
-def read_objectives(datadir='.') -> numpy.array:
+def read_objectives(datadir='.'):
     """Reads objectives.csv and returns as 2d array"""
-    with open(os.path.join(datadir, 'objectives.csv'), newline='') as csvfile:
+    with (Path(datadir) / 'objectives.csv').open() as csvfile:
         reader = csv.reader(csvfile)
-        next(reader) # skip first line
-        objs = numpy.array([(float(row[0]), float(row[1])) for row in reader])
-        return objs
+        next(reader) # skip first (header) line
+        return numpy.asarray([tuple(map(float, row)) for row in reader])
 
 
-def get_metrics(qm: QualityMetrics, iters: Iterator, srcdir='.') -> numpy.array:
-    """Read 'iter*.hv' images from datadir, compute metrics and return as 2d array"""
-    m = []
-    for iter in iters:
-        im = STIR.ImageData(os.path.join(srcdir, f"iter_{iter:04d}.hv"))
-        m.append([*qm.evaluate(im).values()])
-    return numpy.array(m)
+def get_metrics(qm: QualityMetrics, iters: Iterator[int], srcdir='.'):
+    """Read 'iter_{iter_glob}.hv' images from datadir, compute metrics and return as 2d array"""
+    return numpy.asarray([
+        list(qm.evaluate(STIR.ImageData(str(Path(srcdir) / f'iter_{i:04d}.hv'))).values()) for i in iters])
 
 
-#%%
-def plot_metrics(iters: Iterator, m: numpy.array, labels=[], suffix=""):
+def plot_metrics(iters: Iterator[int], m: numpy.ndarray, labels=None, suffix=""):
     """Make 2 subplots of metrics"""
+    if labels is None:
+        labels = [""] * m.shape[1]
     ax = plt.subplot(121)
     plt.plot(iters, m[:, 0], label=labels[0] + suffix)
     plt.plot(iters, m[:, 1], label=labels[1] + suffix)
