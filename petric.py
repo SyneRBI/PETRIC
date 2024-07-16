@@ -3,7 +3,8 @@
 ANY CHANGES TO THIS FILE ARE IGNORED BY THE ORGANISERS.
 Only the `main.py` file may be modified by participants.
 
-This file is not intended for participants to use.
+This file is not intended for participants to use, except for
+the `get_data` function (and possibly `QualityMetrics` class).
 It is used by the organisers to run the submissions in a controlled way.
 It is included here purely in the interest of transparency.
 
@@ -133,6 +134,9 @@ class QualityMetrics(ImageQualityCallback, Callback):
             self.norm
             for voi_name, voi_indices in sorted(self.voi_indices.items())}
         return {**whole, **local}
+
+    def keys(self):
+        return ["RMSE_whole_object", "RMSE_background"] + [f"AEM_VOI_{name}" for name in sorted(self.voi_indices)]
 
 
 class MetricsWithTimeout(cil_callbacks.Callback):

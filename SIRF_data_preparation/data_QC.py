@@ -49,9 +49,8 @@ def plot_sinogram_profile(prompts, background, sumaxis=(0, 1), select=0, srcdir=
     plt.savefig(os.path.join(srcdir, 'prompts_background_profiles.png'))
 
 
-def plot_image(image, save_name=None,
-    transverse_slice=-1, coronal_slice=-1, sagittal_slice=-1,
-    vmin=0, vmax=None, alpha=None, **kwargs):
+def plot_image(image, save_name=None, transverse_slice=-1, coronal_slice=-1, sagittal_slice=-1, vmin=0, vmax=None,
+               alpha=None, **kwargs):
     """
     Plot transverse/coronal/sagital slices through sirf.STIR.ImageData
     """
@@ -106,6 +105,7 @@ def VOI_mean(image, VOI):
 
 from scipy import ndimage
 
+
 def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', **kwargs):
     if len(allVOInames) == 0:
         return
@@ -124,10 +124,8 @@ def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', *
         VOI = STIR.ImageData(filename)
         COM = np.rint(ndimage.center_of_mass(VOI.as_array()))
         plt.figure()
-        plot_image(VOI, save_name=prefix, vmin=0, vmax=1,
-            transverse_slice = int(COM[0]),
-            coronal_slice = int(COM[1]),
-            sagittal_slice = int(COM[2]))
+        plot_image(VOI, save_name=prefix, vmin=0, vmax=1, transverse_slice=int(COM[0]), coronal_slice=int(COM[1]),
+                   sagittal_slice=int(COM[2]))
 
         # construct transparency image
         if VOIname == 'VOI_whole_object':
@@ -169,7 +167,7 @@ def main(argv=None):
         plot_sinogram_profile(acquired_data, background, srcdir=srcdir)
 
     OSEM_image = plot_image_if_exists(os.path.join(srcdir, 'OSEM_image'), **slices)
-    plot_image_if_exists(os.path.join(srcdir,'kappa'), **slices)
+    plot_image_if_exists(os.path.join(srcdir, 'kappa'), **slices)
     reference_image = plot_image_if_exists(os.path.join(srcdir, 'PETRIC/reference_image'), **slices)
 
     VOIdir = os.path.join(srcdir, 'PETRIC')
