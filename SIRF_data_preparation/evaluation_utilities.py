@@ -35,8 +35,11 @@ def pass_index(metrics: np.ndarray, thresh: np.ndarray, window: int = 1) -> int:
     assert thresh.ndim == 1
 
     m = (metrics <= thresh[None]).all(1)
-    assert window == 1
-    return np.where(m[1:] & m[:-1])[0][0]
+    res = m[:-window]
+    for i in range(1, window):
+        res &= m[i:-window+i]
+    res &= m[window:]
+    return np.where(res)[0][0]
 
 
 def plot_metrics(iters: Iterator[int], m: np.ndarray, labels=None, suffix=""):
