@@ -18,10 +18,35 @@ Please create this file! See the example `main_*.py` files for inspiration.
 [SIRF](https://github.com/SyneRBI/SIRF), [CIL](https://github.com/TomographicImaging/CIL), and CUDA are already installed (using [synerbi/sirf](https://github.com/synerbi/SIRF-SuperBuild/pkgs/container/sirf)).
 Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/or `requirements.txt`.
 
-- (required) `main.py`: must define a `class Submission(cil.optimisation.algorithms.Algorithm)` and a list of `submission_callbacks`
+- (required) `main.py`: must define a `class Submission(cil.optimisation.algorithms.Algorithm)` and a (potentially empty) list of `submission_callbacks`, e.g.:
+  + [main_BSREM.py](main_BSREM.py)
+  + [main_ISTA.py](main_ISTA.py)
+  + [main_OSEM.py](main_OSEM.py)
 - `apt.txt`: passed to `apt install`
-- `environment.yml`: passed to `conda install`
-- `requirements.txt`: passed to `pip install`
+- `environment.yml`: passed to `conda install`, e.g.:
+
+  ```yml
+  name: winning-submission
+  channels: [conda-forge, pytorch, nvidia]
+  dependencies:
+  - cupy
+  - cuda-version =11.8
+  - pytorch-cuda =11.8
+  - tensorflow-gpu
+  - cudatoolkit =11.8.0
+  - pip
+  - pip:
+    - git+https://github.com/MyResearchGroup/prize-winning-algos
+  ```
+
+- `requirements.txt`: passed to `pip install`, e.g.:
+
+  ```txt
+  cupy-cuda11x
+  torch --index-url https://download.pytorch.org/whl/cu118
+  tensorflow[and-cuda]
+  git+https://github.com/MyResearchGroup/prize-winning-algos
+  ```
 
 You can also find some example notebooks here which should help you with your development:
 - https://github.com/SyneRBI/SIRF-Contribs/blob/master/src/notebooks/BSREM_illustration.ipynb
