@@ -51,11 +51,12 @@ python petric.py
 <!-- br -->
 
 > [!WARNING]
-> To avoid timing out (5 min runtime), please disable any debugging/plotting code before submitting!
+> To avoid timing out (currently 10 min runtime, will likely be increased a bit for the final evaluation after submissions close), please disable any debugging/plotting code before submitting!
 > This includes removing any progress/logging from `submission_callbacks`.
 
 - `data` to test/train your `Algorithm`s is available at https://petric.tomography.stfc.ac.uk/data/ and is likely to grow (more info to follow soon)
   + fewer datasets will be used by the organisers to provide a temporary [leaderboard](https://petric.tomography.stfc.ac.uk/leaderboard)
+  + please contact us if you'd like to contribute your own public datasets!
 - `metrics` are calculated by `class QualityMetrics` within `petric.py`
 
 Any modifications to `petric.py` are ignored.
