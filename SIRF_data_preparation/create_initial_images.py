@@ -7,7 +7,7 @@ Arguments:
   <data_path>  path to data files
 
 Options:
-  -t <template_image>, --template_image=<template_image>  filename of image to use for data sizes [default: VOI.hv]
+  -t <template_image>, --template_image=<template_image>  filename of image to use for data sizes [default: None]
   -s <xy-size>, --xy-size=<xy-size>                       force xy-size (do not use when using VOIs as init) [default: -1]
   -S <subsets>, --subsets=<subsets>                       number of subsets [default: 2]
   -i <subiterations>, --subiterations=<subiterations>     number of sub-iterations [default: 14]
@@ -105,7 +105,11 @@ def main(argv=None):
         acquired_data = STIR.AcquisitionData('prompts.hs')
         additive_term = STIR.AcquisitionData('additive_term.hs')
         mult_factors = STIR.AcquisitionData('mult_factors.hs')
-        template_image = STIR.ImageData(template_image_filename)
+        if template_image_filename == 'None':
+            log.info("Constructing template image from prompts", data_path)
+            template_image = acquired_data.create_uniform_image(0)
+        else:
+            template_image = STIR.ImageData(template_image_filename)
         if xy_size > 0:
             template_image = template_image.zoom_image(zooms=(1, 1, 1), offsets_in_mm=(0, 0, 0),
                                                        size=(-1, xy_size, xy_size))
