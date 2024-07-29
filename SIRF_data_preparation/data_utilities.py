@@ -13,7 +13,7 @@ pet = importlib.import_module('sirf.STIR')
 pet.AcquisitionData.set_storage_scheme('memory')
 
 logger = logging.getLogger("PETRIC")
-#DATA_PATH = '/home/KrisThielemans/devel/PETRIC/data'
+# DATA_PATH = '/home/KrisThielemans/devel/PETRIC/data'
 this_directory = os.path.dirname(__file__)
 repo_directory = os.path.dirname(this_directory)
 DATA_PATH = os.path.join(repo_directory, 'data')
@@ -33,7 +33,7 @@ def fix_siemens_norm_EOL(in_filename, out_filename):
     with open(in_filename, mode="rb") as f:
         data = bytearray(f.read())
     for i in range(len(data)):
-        if data[i] == 13: #'\r'
+        if data[i] == 13: # '\r'
             data[i] = 10  # \n
     with open(out_filename, mode="wb") as f:
         f.write(data)
