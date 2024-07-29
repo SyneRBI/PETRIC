@@ -48,6 +48,9 @@ Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/o
   git+https://github.com/MyResearchGroup/prize-winning-algos
   ```
 
+> [!TIP]
+> You probably should create either an `environment.yml` or `requirements.txt` file (but not both).
+
 You can also find some example notebooks here which should help you with your development:
 - https://github.com/SyneRBI/SIRF-Contribs/blob/master/src/notebooks/BSREM_illustration.ipynb
 
