@@ -1,15 +1,13 @@
-import os
-import sys
-
-this_directory = os.path.dirname(__file__)
-sys.path.append(this_directory)
-repo_directory = os.path.dirname(this_directory)
-challenge_data_path = os.path.join(repo_directory, 'data')
-
 import argparse
 import logging
+import os
 
 from data_utilities import prepare_challenge_Siemens_data, the_data_path
+
+this_directory = os.path.dirname(__file__)
+# sys.path.append(this_directory)
+repo_directory = os.path.dirname(this_directory)
+challenge_data_path = os.path.join(repo_directory, 'data')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='SyneRBI PETRIC Siemens mMR NEMA IQ data preparation script.')
