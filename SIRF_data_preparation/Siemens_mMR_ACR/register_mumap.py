@@ -26,7 +26,8 @@ reg.add_floating_image(mumap)
 reg.process()
 # %% write as Nifti
 reg_mumap_filename = os.path.join(intermediate_data_path, 'reg_mumap')
-reg.get_output(0).write(reg_mumap_filename + '.nii')
+reg_mumap_filename_nii = reg_mumap_filename + '.nii' 
+reg.get_output(0).write(reg_mumap_filename_nii)
 # %% write as Interfile
 reg_mumap=STIR.ImageData(reg_mumap_filename_nii)
 reg_mumap.write(reg_mumap_filename + '.hv')

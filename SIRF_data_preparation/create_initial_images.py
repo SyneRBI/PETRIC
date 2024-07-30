@@ -106,7 +106,7 @@ def main(argv=None):
         additive_term = STIR.AcquisitionData('additive_term.hs')
         mult_factors = STIR.AcquisitionData('mult_factors.hs')
         if template_image_filename == 'None':
-            log.info("Constructing template image from prompts", data_path)
+            log.info("Constructing template image from prompts") #, data_path)
             template_image = acquired_data.create_uniform_image(0)
         else:
             template_image = STIR.ImageData(template_image_filename)
