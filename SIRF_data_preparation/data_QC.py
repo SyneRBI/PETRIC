@@ -20,13 +20,13 @@ __version__ = '0.2.0'
 
 import os
 import os.path
-import sys
 from ast import literal_eval
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 from docopt import docopt
+from scipy import ndimage
 
 import sirf.STIR as STIR
 
@@ -101,9 +101,6 @@ def plot_image_if_exists(prefix, **kwargs):
 
 def VOI_mean(image, VOI):
     return float((image * VOI).sum() / VOI.sum())
-
-
-from scipy import ndimage
 
 
 def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', **kwargs):
