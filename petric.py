@@ -20,7 +20,6 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 from time import time
-from traceback import print_exc
 
 import numpy as np
 from skimage.metrics import mean_squared_error as mse
@@ -261,6 +260,8 @@ if __name__ != "__main__":
         data = get_data(srcdir=srcdir, outdir=outdir)
         metrics[0].reset()
 else:
+    from traceback import print_exc
+
     from docopt import docopt
     args = docopt(__doc__)
     logging.basicConfig(level=getattr(logging, args["--log"].upper()))
