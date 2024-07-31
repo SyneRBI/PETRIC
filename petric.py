@@ -18,7 +18,7 @@ import csv
 import logging
 import os
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePath
 from time import time
 from traceback import print_exc
 
@@ -199,6 +199,7 @@ class Dataset:
     whole_object_mask: STIR.ImageData | None
     background_mask: STIR.ImageData | None
     voi_masks: dict[str, STIR.ImageData]
+    path: PurePath
 
 
 def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
@@ -236,7 +237,7 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
         for voi in (srcdir / 'PETRIC').glob("VOI_*.hv") if voi.stem[4:] not in ('background', 'whole_object')}
 
     return Dataset(acquired_data, additive_term, mult_factors, OSEM_image, prior, kappa, reference_image,
-                   whole_object_mask, background_mask, voi_masks)
+                   whole_object_mask, background_mask, voi_masks, srcdir.resolve())
 
 
 if SRCDIR.is_dir():
