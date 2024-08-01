@@ -56,21 +56,29 @@ You can also find some example notebooks here which should help you with your de
 
 ## Organiser setup
 
-The organisers will execute (after downloading https://petric.tomography.stfc.ac.uk/data/ to `/path/to/data`):
+The organisers will execute (after installing [nvidia-docker](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) & downloading <https://petric.tomography.stfc.ac.uk/data/> to `/path/to/data`):
+
+<!-- TODO: use synerbi/sirf:latest-gpu after the next SIRF release -->
 
 ```sh
-docker run --rm -it -v /path/to/data:/mnt/share/petric:ro -v .:/workdir -w /workdir --gpus all synerbi/sirf:edge-gpu /bin/bash
-# ... or ideally synerbi/sirf:latest-gpu after the next SIRF release!
+# 1. git clone & cd to your submission repository
+# 2. mount `.` to container `/workdir`:
+docker run --rm -it --gpus all -p 6006:6006 \
+  -v /path/to/data:/mnt/share/petric:ro \
+  -v .:/workdir -w /workdir synerbi/sirf:edge-gpu /bin/bash
+# 3. optionally, conda/pip/apt install environment.yml/requirements.txt/apt.txt
+# 4. install metrics & run your submission
 pip install git+https://github.com/TomographicImaging/Hackathon-000-Stochastic-QualityMetrics
-# ... conda/pip/apt install environment.yml/requirements.txt/apt.txt
-python petric.py
+python petric.py &
+# 5. optionally, serve logs at <http://localhost:6006>
+tensorboard --bind_all --port 6006 --logdir ./output
 ```
 
 > [!TIP]
 > `petric.py` will effectively execute:
 >
 > ```python
-> from main import Submission, submission_callbacks  # your submission
+> from main import Submission, submission_callbacks  # your submission (`main.py`)
 > from petric import data, metrics  # our data & evaluation
 > assert issubclass(Submission, cil.optimisation.algorithms.Algorithm)
 > Submission(data).run(numpy.inf, callbacks=metrics + submission_callbacks)
@@ -82,7 +90,7 @@ python petric.py
 > To avoid timing out (currently 10 min runtime, will likely be increased a bit for the final evaluation after submissions close), please disable any debugging/plotting code before submitting!
 > This includes removing any progress/logging from `submission_callbacks`.
 
-- `data` to test/train your `Algorithm`s is available at https://petric.tomography.stfc.ac.uk/data/ and is likely to grow (more info to follow soon)
+- `data` to test/train your `Algorithm`s is available at <https://petric.tomography.stfc.ac.uk/data/> and is likely to grow (more info to follow soon)
   + fewer datasets will be used by the organisers to provide a temporary [leaderboard](https://petric.tomography.stfc.ac.uk/leaderboard)
   + please contact us if you'd like to contribute your own public datasets!
 - `metrics` are calculated by `class QualityMetrics` within `petric.py`
