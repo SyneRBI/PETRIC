@@ -7,6 +7,7 @@
 import importlib
 import logging
 import os
+import shutil
 
 pet = importlib.import_module('sirf.STIR')
 
@@ -42,7 +43,7 @@ def fix_siemens_norm_EOL(in_filename, out_filename):
 def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_data_path, f_root, f_listmode, f_mumap,
                                    f_attn, f_norm, f_stir_norm, f_template, f_prompts, f_multfactors, f_additive,
                                    f_randoms, f_af, f_acf, f_scatter, start, stop):
-    '''Prepares data for SyneRBI Challenge24
+    '''Prepares Siemens data for SyneRBI PETRIC
 
     data_path: path to Siemens data
     challenge_data_path: path to final prepared data
@@ -85,10 +86,15 @@ def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_
     f_info = os.path.join(intermediate_data_path, 'info.txt')
     f_warn = os.path.join(intermediate_data_path, 'warn.txt')
 
-    os.system('cp ' + f_siemens_attn_image + ' ' + intermediate_data_path)
-    os.system('convertSiemensInterfileToSTIR.sh ' + f_siemens_attn_header + ' ' + f_stir_attn_header)
-    os.system('cp ' + f_siemens_norm + ' ' + intermediate_data_path)
+    if os.path.exists(f_siemens_attn_image):
+        if data_path != intermediate_data_path:
+            shutil.copy(f_siemens_attn_image, intermediate_data_path)
+        os.system('convertSiemensInterfileToSTIR.sh ' + f_siemens_attn_header + ' ' + f_stir_attn_header)
+    else:
+        print(f"WARNING: {f_siemens_attn_image} not found. NAC only")
 
+    if data_path != intermediate_data_path:
+        shutil.copy(f_siemens_norm, intermediate_data_path)
     fix_siemens_norm_EOL(f_siemens_norm_header, f_stir_norm_header)
 
     # engine's messages go to files, except error messages, which go to stdout
@@ -127,29 +133,36 @@ def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_
     prompts.write(f_prompts)
     randoms.write(f_randoms)
 
-    attn_image = pet.ImageData(f_stir_attn_header)
-    af, acf = pet.AcquisitionSensitivityModel.compute_attenuation_factors(prompts, attn_image)
-    logger.info('norm of the attenuation factor: %f' % af.norm())
-    logger.info('norm of the attenuation correction factor: %f' % acf.norm())
-    logger.info(f'writing intermediate attenuation factors to {f_af}')
-    logger.info(f'writing intermediate attenuation coefficient factors to {f_acf}')
-    af.write(f_af)
-    acf.write(f_acf)
-
     asm = pet.AcquisitionSensitivityModel(f_stir_norm_header)
-    se = pet.ScatterEstimator()
-    se.set_input(prompts)
-    se.set_attenuation_image(attn_image)
-    se.set_randoms(randoms)
-    se.set_asm(asm)
-    se.set_attenuation_correction_factors(acf)
-    se.set_num_iterations(4)
-    se.set_OSEM_num_subsets(7)
-    se.set_output_prefix(f_scatter)
-    se.set_up()
-    se.process()
-    scatter = se.get_output()
-    logger.info('norm of the scatter estimate: %f' % scatter.norm())
+
+    if os.path.exists(f_siemens_attn_image):
+        attn_image = pet.ImageData(f_stir_attn_header)
+        af, acf = pet.AcquisitionSensitivityModel.compute_attenuation_factors(prompts, attn_image)
+        logger.info('norm of the attenuation factor: %f' % af.norm())
+        logger.info('norm of the attenuation correction factor: %f' % acf.norm())
+        logger.info(f'writing intermediate attenuation factors to {f_af}')
+        logger.info(f'writing intermediate attenuation coefficient factors to {f_acf}')
+        af.write(f_af)
+        acf.write(f_acf)
+
+        se = pet.ScatterEstimator()
+        se.set_input(prompts)
+        se.set_attenuation_image(attn_image)
+        se.set_randoms(randoms)
+        se.set_asm(asm)
+        se.set_attenuation_correction_factors(acf)
+        se.set_num_iterations(4)
+        se.set_OSEM_num_subsets(7)
+        se.set_output_prefix(f_scatter)
+        se.set_up()
+        se.process()
+        scatter = se.get_output()
+        logger.info('norm of the scatter estimate: %f' % scatter.norm())
+        background = randoms + scatter
+    else:
+        af = prompts.allocate(1)
+        logger.info(f'No attenuation image: skipping attenuation and scatter')
+        background = randoms
 
     multfact = af.clone()
     asm.set_up(af)
@@ -158,7 +171,6 @@ def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_
     logger.info(f'writing multiplicative factors to {f_multfactors}')
     multfact.write(f_multfactors)
 
-    background = randoms + scatter
     logger.info('norm of the background term: %f' % background.norm())
 
     asm_mf = pet.AcquisitionSensitivityModel(multfact)
