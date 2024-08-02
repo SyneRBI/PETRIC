@@ -18,9 +18,8 @@ import csv
 import logging
 import os
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePath
 from time import time
-from traceback import print_exc
 
 import numpy as np
 from skimage.metrics import mean_squared_error as mse
@@ -199,6 +198,7 @@ class Dataset:
     whole_object_mask: STIR.ImageData | None
     background_mask: STIR.ImageData | None
     voi_masks: dict[str, STIR.ImageData]
+    path: PurePath
 
 
 def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
@@ -236,7 +236,7 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
         for voi in (srcdir / 'PETRIC').glob("VOI_*.hv") if voi.stem[4:] not in ('background', 'whole_object')}
 
     return Dataset(acquired_data, additive_term, mult_factors, OSEM_image, prior, kappa, reference_image,
-                   whole_object_mask, background_mask, voi_masks)
+                   whole_object_mask, background_mask, voi_masks, srcdir.resolve())
 
 
 if SRCDIR.is_dir():
@@ -261,6 +261,8 @@ if __name__ != "__main__":
         data = get_data(srcdir=srcdir, outdir=outdir)
         metrics[0].reset()
 else:
+    from traceback import print_exc
+
     from docopt import docopt
     args = docopt(__doc__)
     logging.basicConfig(level=getattr(logging, args["--log"].upper()))

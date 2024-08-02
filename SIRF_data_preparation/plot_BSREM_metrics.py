@@ -7,9 +7,10 @@ import matplotlib.pyplot as plt
 import numpy
 
 import sirf.STIR as STIR
-import SIRF_data_preparation.data_QC as data_QC
 from petric import OUTDIR, SRCDIR, QualityMetrics, get_data
-from SIRF_data_preparation.evaluation_utilities import get_metrics, pass_index, plot_metrics, read_objectives
+
+from . import data_QC
+from .evaluation_utilities import get_metrics, pass_index, plot_metrics, read_objectives
 
 if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
     PETRICDIR = Path('~/devel/PETRIC').expanduser()

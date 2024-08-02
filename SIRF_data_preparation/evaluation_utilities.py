@@ -1,7 +1,7 @@
 """Some utilities for plotting objectives and metrics."""
 import csv
 from pathlib import Path
-from typing import Iterator
+from typing import Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,13 +19,13 @@ def read_objectives(datadir='.'):
         return np.asarray([tuple(map(float, row)) for row in reader])
 
 
-def get_metrics(qm: QualityMetrics, iters: Iterator[int], srcdir='.'):
+def get_metrics(qm: QualityMetrics, iters: Iterable[int], srcdir='.'):
     """Read 'iter_{iter_glob}.hv' images from datadir, compute metrics and return as 2d array"""
     return np.asarray([
         list(qm.evaluate(STIR.ImageData(str(Path(srcdir) / f'iter_{i:04d}.hv'))).values()) for i in iters])
 
 
-def pass_index(metrics: np.ndarray, thresh: Iterator, window: int = 1) -> int:
+def pass_index(metrics: np.ndarray, thresh: Iterable, window: int = 1) -> int:
     """
     Returns first index of `metrics` with value <= `thresh`.
     The values must remain below the respective thresholds for at least `window` number of entries.
@@ -40,7 +40,7 @@ def pass_index(metrics: np.ndarray, thresh: Iterator, window: int = 1) -> int:
     return np.where(res)[0][0]
 
 
-def plot_metrics(iters: Iterator[int], m: np.ndarray, labels=None, suffix=""):
+def plot_metrics(iters: Iterable[int], m: np.ndarray, labels=None, suffix=""):
     """Make 2 subplots of metrics"""
     if labels is None:
         labels = [""] * m.shape[1]
