@@ -156,6 +156,13 @@ def main(argv=None):
     slices["coronal_slice"] = literal_eval(args['--coronal_slice'])
     slices["sagittal_slice"] = literal_eval(args['--sagittal_slice'])
 
+    root = srcdir
+
+    vendor_recon_dir = os.path.join(root, 'vendor_recon')
+    names = [os.path.basename(str(f)[:-3]) for f in Path(vendor_recon_dir).glob("*.hv")]
+    reference_image_name = names[0]
+
+    srcdir = os.path.join(root, 'sinograms')
     if not skip_sino_profiles:
         acquired_data = STIR.AcquisitionData(os.path.join(srcdir, 'prompts.hs'))
         additive_term = STIR.AcquisitionData(os.path.join(srcdir, 'additive_term.hs'))
@@ -163,12 +170,12 @@ def main(argv=None):
         background = additive_term * mult_factors
         plot_sinogram_profile(acquired_data, background, srcdir=srcdir)
 
-    OSEM_image = plot_image_if_exists(os.path.join(srcdir, 'OSEM_image'), **slices)
+    OSEM_image = plot_image_if_exists(os.path.join(srcdir, 'OSEM_image'), vmax=0.01, **slices)
     plot_image_if_exists(os.path.join(srcdir, 'kappa'), **slices)
-    reference_image = plot_image_if_exists(os.path.join(srcdir, 'PETRIC/reference_image'), **slices)
+    reference_image = plot_image_if_exists(os.path.join(vendor_recon_dir, reference_image_name), vmax=0.01, **slices)
 
-    VOIdir = os.path.join(srcdir, 'PETRIC')
-    allVOInames = [os.path.basename(str(voi)[:-3]) for voi in Path(VOIdir).glob("VOI_*.hv")]
+    VOIdir = os.path.join(root, 'VOIs')
+    allVOInames = [os.path.basename(str(voi)[:-3]) for voi in Path(VOIdir).glob("VOI*.hv")]
     VOI_checks(allVOInames, OSEM_image, reference_image, srcdir=VOIdir, **slices)
     plt.show()
 
