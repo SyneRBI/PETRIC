@@ -3,7 +3,7 @@
 [![website](https://img.shields.io/badge/announcement-website-purple?logo=workplace&logoColor=white)](https://www.ccpsynerbi.ac.uk/events/petric/)
 [![wiki](https://img.shields.io/badge/details-wiki-blue?logo=googledocs&logoColor=white)](https://github.com/SyneRBI/PETRIC/wiki)
 [![register](https://img.shields.io/badge/participate-register-green?logo=ticktick&logoColor=white)](https://github.com/SyneRBI/PETRIC/issues/new/choose)
-[![leaderboard](https://img.shields.io/badge/rankings-leaderboard-orange?logo=tensorflow&logoColor=white)](https://petric.tomography.stfc.ac.uk/leaderboard)
+[![leaderboard](https://img.shields.io/badge/rankings-leaderboard-orange?logo=tensorflow&logoColor=white)][leaderboard]
 [![discord](https://img.shields.io/badge/chat-discord-blue?logo=discord&logoColor=white)](https://discord.gg/Ayd72Aa4ry)
 
 ## Participating
@@ -88,11 +88,19 @@ tensorboard --bind_all --port 6006 --logdir ./output
 
 > [!WARNING]
 > To avoid timing out (currently 10 min runtime, will likely be increased a bit for the final evaluation after submissions close), please disable any debugging/plotting code before submitting!
-> This includes removing any progress/logging from `submission_callbacks`.
+> This includes removing any progress/logging from `submission_callbacks` and any debugging from `Submission.__init__`.
 
 - `data` to test/train your `Algorithm`s is available at <https://petric.tomography.stfc.ac.uk/data/> and is likely to grow (more info to follow soon)
-  + fewer datasets will be used by the organisers to provide a temporary [leaderboard](https://petric.tomography.stfc.ac.uk/leaderboard)
+  + fewer datasets will be available during the submission phase, but more will be available for the final evaluation after submissions close
   + please contact us if you'd like to contribute your own public datasets!
 - `metrics` are calculated by `class QualityMetrics` within `petric.py`
+  + this does not contribute to your runtime limit
+  + effectively, only `Submission(data).run(np.inf, callbacks=submission_callbacks)` is timed
+- when using the temporary [leaderboard], it is best to:
+  + change `Horizontal Axis` to `Relative`
+  + untick `Ignore outliers in chart scaling`
+  + see [the wiki](https://github.com/SyneRBI/PETRIC/wiki#metrics-and-thresholds) for details
 
 Any modifications to `petric.py` are ignored.
+
+[leaderboard]: https://petric.tomography.stfc.ac.uk/leaderboard/?smoothing=0#timeseries&_smoothingWeight=0
