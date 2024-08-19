@@ -1,16 +1,13 @@
+import argparse
+import logging
 import os
-import sys
+
+from data_utilities import prepare_challenge_Siemens_data, the_data_path
 
 this_directory = os.path.dirname(__file__)
 repo_directory = os.path.dirname(this_directory)
-sys.path.append(repo_directory)
 repo_directory = os.path.dirname(repo_directory)
 output_path = os.path.join(repo_directory, 'data')
-
-import argparse
-import logging
-
-from data_utilities import prepare_challenge_Siemens_data, the_data_path
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='SyneRBI PETRIC Siemens mMR ACR data preparation script.')
@@ -47,7 +44,7 @@ if __name__ == '__main__':
 
     f_template = os.path.join(data_path, 'mMR_template_span11.hs')
 
-    prepare_challenge_Siemens_data(data_path, output_path, intermediate_data_path, '',
-                                   'list.l.hdr', 'reg_mumap.v', 'reg_mumap.hv', 'norm.n', 'norm.n.hdr', f_template,
-                                   'prompts', 'mult_factors', 'additive_term', 'randoms', 'attenuation_factor',
-                                   'attenuation_correction_factor', 'scatter', start, end)
+    prepare_challenge_Siemens_data(data_path, output_path, intermediate_data_path, '', 'list.l.hdr', 'reg_mumap.v',
+                                   'reg_mumap.hv', 'norm.n', 'norm.n.hdr', f_template, 'prompts', 'mult_factors',
+                                   'additive_term', 'randoms', 'attenuation_factor', 'attenuation_correction_factor',
+                                   'scatter', start, end)

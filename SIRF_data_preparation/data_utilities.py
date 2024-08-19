@@ -161,7 +161,7 @@ def prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_
         background = randoms + scatter
     else:
         af = prompts.allocate(1)
-        logger.info(f'No attenuation image: skipping attenuation and scatter')
+        logger.info('No attenuation image: skipping attenuation and scatter')
         background = randoms
 
     multfact = af.clone()
