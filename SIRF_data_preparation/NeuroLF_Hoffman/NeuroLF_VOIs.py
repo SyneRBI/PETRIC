@@ -8,7 +8,7 @@ from sirf.Utilities import examples_data_path
 from scipy.ndimage import binary_erosion
 from pathlib import Path
 #%%
-%matplotlib ipympl
+#%matplotlib ipympl
 #%%
 STIR.AcquisitionData.set_storage_scheme('memory')
 # set-up redirection of STIR messages to files
@@ -29,10 +29,11 @@ def plot_image(image, vmin=0, vmax=None):
     plt.show()
 
 #%% read
-datadir = '~/devel/PETRIC/data/NeuroLF_Hoffman_Dataset/'
-#acquired_data = STIR.AcquisitionData(datadir+'prompts.hs')
-#additive_term = STIR.AcquisitionData(datadir+'additive_term.hs')
-#mult_factors = STIR.AcquisitionData(datadir+'mult_factors.hs')
+if not SRCDIR.is_dir():
+    PETRICDIR = Path('~/devel/PETRIC').expanduser()
+    SRCDIR = PETRICDIR / 'data'
+datadir = str(SRCDIR / 'NeuroLF_Hoffman_Dataset') + '/'
+
 #%%
 OSEM_image = STIR.ImageData(datadir+'OSEM_image.hv')
 im_slice = 72

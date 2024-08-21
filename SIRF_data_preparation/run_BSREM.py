@@ -18,7 +18,7 @@ import os
 
 from docopt import docopt
 
-from petric import MetricsWithTimeout, get_data, SRCDIR
+from petric import MetricsWithTimeout, get_data, SRCDIR, OUTDIR
 from SIRF_data_preparation.dataset_settings import get_settings
 from pathlib import Path
 
@@ -33,7 +33,12 @@ args = docopt(__doc__, argv=None, version=__version__)
 
 scanID = args['<data_set>']
 
-outdir = Path("./output") / scanID / "OSEM"
+if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
+    PETRICDIR = Path('~/devel/PETRIC').expanduser()
+    SRCDIR = PETRICDIR / 'data'
+    OUTDIR = PETRICDIR / 'output'
+
+outdir = OUTDIR/ scanID / "BSREM"
 srcdir = SRCDIR / scanID
 #log.info("Finding files in %s", srcdir)
 
@@ -56,5 +61,5 @@ algo.run(15000, callbacks=[MetricsWithTimeout(**settings.slices, outdir=outdir, 
 #%%
 fig = plt.figure()
 data_QC.plot_image(algo.get_output(), **settings.slices)
-fig.savefig(outdir / "OSEM_slices.png")
+fig.savefig(outdir / "BSREM_slices.png")
 #plt.show()

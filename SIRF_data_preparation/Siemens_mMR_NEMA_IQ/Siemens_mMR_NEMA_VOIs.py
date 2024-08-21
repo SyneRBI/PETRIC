@@ -15,9 +15,10 @@ from pathlib import Path
 %autoreload 2
 
 #%%
+from petric import get_data, SRCDIR
 import data_QC
 #%%
-%matplotlib ipympl
+#%matplotlib ipympl
 #%%
 STIR.AcquisitionData.set_storage_scheme('memory')
 # set-up redirection of STIR messages to files
@@ -26,9 +27,12 @@ STIR.AcquisitionData.set_storage_scheme('memory')
 STIR.set_verbosity(0)
 
 #%% read
-datadir = '/home/kris/devel/PETRIC/data/Siemens_mMR_NEMA_IQ/'
+if not SRCDIR.is_dir():
+    PETRICDIR = Path('~/devel/PETRIC').expanduser()
+    SRCDIR = PETRICDIR / 'data'
+datadir = str(SRCDIR /'Siemens_mMR_NEMA_IQ/')
 #%%
-OSEM_image = STIR.ImageData(datadir+'OSEM_image.hv')
+OSEM_image = STIR.ImageData(datadir + 'OSEM_image.hv')
 im_slice = 72
 cor_slice = 109
 sag_slice = OSEM_image.dimensions()[2]//2
