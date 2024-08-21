@@ -7,6 +7,7 @@ Participants should never have to use these (unless you want to create your own 
 - `create_initial_images.py`: functions+script to run OSEM and compute the "kappa" image from existing data
 - `data_QC.py`: generates plots for QC
 - `plot_BSREM_metrics.py`: plot objective functions/metrics after a BSREM run
+- `run_BSREM.py` and `run_OSEM.py`: scripts to run these algorithms for a dataset
 
 ## Helpers
 
@@ -14,6 +15,7 @@ Participants should never have to use these (unless you want to create your own 
   and handle Siemens data
 - `evaluation_utilities.py`: reading/plotting helpers for values of the objective function and metrics
 - `PET_plot_functions.py`: plotting helpers
+- `dataset_settings.py`: settings for display of good slices, subsets etc
 
 ## Sub-folders per data-set
 
