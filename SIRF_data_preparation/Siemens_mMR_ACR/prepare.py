@@ -1,16 +1,19 @@
-import argparse
-import logging
 import os
-
-from .data_utilities import prepare_challenge_Siemens_data, the_data_path
+import sys
 
 this_directory = os.path.dirname(__file__)
-# sys.path.append(this_directory)
 repo_directory = os.path.dirname(this_directory)
-challenge_data_path = os.path.join(repo_directory, 'data')
+sys.path.append(repo_directory)
+repo_directory = os.path.dirname(repo_directory)
+output_path = os.path.join(repo_directory, 'data')
+
+import argparse
+import logging
+
+from data_utilities import prepare_challenge_Siemens_data, the_data_path
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='SyneRBI PETRIC Siemens mMR NEMA IQ data preparation script.')
+    parser = argparse.ArgumentParser(description='SyneRBI PETRIC Siemens mMR ACR data preparation script.')
 
     parser.add_argument('--log', type=str, default='warning')
     parser.add_argument('--start', type=float, default=0)
@@ -27,24 +30,24 @@ if __name__ == '__main__':
     end = args.end
 
     if args.raw_data_path is None:
-        data_path = the_data_path('Siemens_mMR_NEMA_IQ', 'raw', 'NEMA_IQ')
+        data_path = the_data_path('Siemens_mMR_ACR', 'processing')
     else:
         data_path = args.raw_data_path
 
     data_path = os.path.abspath(data_path)
     logging.debug(f"Raw data path: {data_path}")
 
-    challenge_data_path = os.path.join(challenge_data_path, 'Siemens_mMR_NEMA_IQ')
-    intermediate_data_path = os.path.join(challenge_data_path, 'processing')
-    challenge_data_path = os.path.join(challenge_data_path, 'final')
+    output_path = os.path.join(output_path, 'Siemens_mMR_ACR')
+    intermediate_data_path = os.path.join(output_path, 'processing')
+    output_path = os.path.join(output_path, 'final')
 
-    os.makedirs(challenge_data_path, exist_ok=True)
-    os.chdir(challenge_data_path)
+    os.makedirs(output_path, exist_ok=True)
+    os.chdir(output_path)
     os.makedirs(intermediate_data_path, exist_ok=True)
 
     f_template = os.path.join(data_path, 'mMR_template_span11.hs')
 
-    prepare_challenge_Siemens_data(data_path, challenge_data_path, intermediate_data_path, '20170809_NEMA_',
-                                   '60min_UCL.l.hdr', 'MUMAP_UCL.v', 'MUMAP_UCL.hv', 'UCL.n', 'norm.n.hdr', f_template,
+    prepare_challenge_Siemens_data(data_path, output_path, intermediate_data_path, '',
+                                   'list.l.hdr', 'reg_mumap.v', 'reg_mumap.hv', 'norm.n', 'norm.n.hdr', f_template,
                                    'prompts', 'mult_factors', 'additive_term', 'randoms', 'attenuation_factor',
                                    'attenuation_correction_factor', 'scatter', start, end)

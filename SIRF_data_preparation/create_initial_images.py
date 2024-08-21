@@ -8,8 +8,8 @@ Arguments:
 
 Options:
   -t <template_image>, --template_image=<template_image>  filename of image to use for data sizes [default: VOI.hv]
-  -s <xy-size>, --xy-size=<xy-size>                       force xy-size (do not use when using VOIs as init) [default: -1]
-  -S <subsets>, --subsets=<subsets>                       number of subsets [default: 2]
+  -s <xy-size>, --xy-size=<xy-size>  force xy-size (do not use when using VOIs as init) [default: -1]
+  -S <subsets>, --subsets=<subsets>  number of subsets [default: 2]
   -i <subiterations>, --subiterations=<subiterations>     number of sub-iterations [default: 14]
 """
 # Copyright 2024 Rutherford Appleton Laboratory STFC
@@ -45,15 +45,15 @@ def scale_initial_image(acquired_data, additive_term, mult_factors, template_ima
     Return a uniform image that has a reasonable "scale" (i.e. image values) for the data given.
 
     If there is an additive term, OSEM can be a bit slow to converge if the initial image has very wrong
-    image values. Here we find a scale such that the sum of the forward projection of the initial image is equal to the sum of the acquired data.
+    image values. Here we find a scale such that the sum of the forward projection of the initial image is
+    equal to the sum of the acquired data.
 
     WARNING: assumes that obj_fun has been set_up already
     """
     data_sum = (acquired_data.sum() - (additive_term * mult_factors).sum())
     if data_sum <= 0 or math.isinf(data_sum) or math.isnan(data_sum):
-        raise ValueError(
-            f'Something wrong with input data. Sum of (prompts-background) is negative: sum prompts: {acquired_data.sum()}, sum corrected: {data_sum}'
-        )
+        raise ValueError("Something wrong with input data. Sum of (prompts-background) is negative:"
+                         f" sum prompts: {acquired_data.sum()}, sum corrected: {data_sum}")
     ratio = data_sum / (obj_fun.get_subset_sensitivity(0).sum() * obj_fun.get_num_subsets())
     return template_image.allocate(ratio)
 
@@ -105,7 +105,11 @@ def main(argv=None):
         acquired_data = STIR.AcquisitionData('prompts.hs')
         additive_term = STIR.AcquisitionData('additive_term.hs')
         mult_factors = STIR.AcquisitionData('mult_factors.hs')
-        template_image = STIR.ImageData(template_image_filename)
+        if template_image_filename == 'None':
+            log.info("Constructing template image from prompts")
+            template_image = acquired_data.create_uniform_image(0)
+        else:
+            template_image = STIR.ImageData(template_image_filename)
         if xy_size > 0:
             template_image = template_image.zoom_image(zooms=(1, 1, 1), offsets_in_mm=(0, 0, 0),
                                                        size=(-1, xy_size, xy_size))

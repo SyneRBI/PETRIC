@@ -18,9 +18,8 @@ import csv
 import logging
 import os
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePath
 from time import time
-from traceback import print_exc
 
 import numpy as np
 from skimage.metrics import mean_squared_error as mse
@@ -85,22 +84,22 @@ class StatsLog(Callback):
     def __call__(self, algo: Algorithm):
         if self.skip_iteration(algo):
             return
+        t = getattr(self, '__time', None) or time()
         log.debug("logging iter %d...", algo.iteration)
         # initialise `None` values
         self.transverse_slice = algo.x.dimensions()[0] // 2 if self.transverse_slice is None else self.transverse_slice
         self.coronal_slice = algo.x.dimensions()[1] // 2 if self.coronal_slice is None else self.coronal_slice
         self.vmax = algo.x.max() if self.vmax is None else self.vmax
 
-        self.tb.add_scalar("objective", algo.get_last_loss(), algo.iteration)
+        self.tb.add_scalar("objective", algo.get_last_loss(), algo.iteration, t)
         if self.x_prev is not None:
             normalised_change = (algo.x - self.x_prev).norm() / algo.x.norm()
-            self.tb.add_scalar("normalised_change", normalised_change, algo.iteration)
+            self.tb.add_scalar("normalised_change", normalised_change, algo.iteration, t)
         self.x_prev = algo.x.clone()
-        self.tb.add_image("transverse",
-                          np.clip(algo.x.as_array()[self.transverse_slice:self.transverse_slice + 1] / self.vmax, 0, 1),
-                          algo.iteration)
-        self.tb.add_image("coronal", np.clip(algo.x.as_array()[None, :, self.coronal_slice] / self.vmax, 0, 1),
-                          algo.iteration)
+        x_arr = algo.x.as_array()
+        self.tb.add_image("transverse", np.clip(x_arr[self.transverse_slice:self.transverse_slice + 1] / self.vmax, 0,
+                                                1), algo.iteration, t)
+        self.tb.add_image("coronal", np.clip(x_arr[None, :, self.coronal_slice] / self.vmax, 0, 1), algo.iteration, t)
         log.debug("...logged")
 
 
@@ -118,8 +117,9 @@ class QualityMetrics(ImageQualityCallback, Callback):
     def __call__(self, algo: Algorithm):
         if self.skip_iteration(algo):
             return
+        t = getattr(self, '__time', None) or time()
         for tag, value in self.evaluate(algo.x).items():
-            self.tb_summary_writer.add_scalar(tag, value, algo.iteration)
+            self.tb_summary_writer.add_scalar(tag, value, algo.iteration, t)
 
     def evaluate(self, test_im: STIR.ImageData) -> dict[str, float]:
         assert not any(self.filter.values()), "Filtering not implemented"
@@ -140,7 +140,7 @@ class QualityMetrics(ImageQualityCallback, Callback):
 
 class MetricsWithTimeout(cil_callbacks.Callback):
     """Stops the algorithm after `seconds`"""
-    def __init__(self, seconds=300, outdir=OUTDIR, transverse_slice=None, coronal_slice=None, **kwargs):
+    def __init__(self, seconds=600, outdir=OUTDIR, transverse_slice=None, coronal_slice=None, **kwargs):
         super().__init__(**kwargs)
         self._seconds = seconds
         self.callbacks = [
@@ -152,15 +152,16 @@ class MetricsWithTimeout(cil_callbacks.Callback):
 
     def reset(self, seconds=None):
         self.limit = time() + (self._seconds if seconds is None else seconds)
+        self.offset = 0
 
     def __call__(self, algo: Algorithm):
-        if (now := time()) > self.limit:
+        if (now := time()) > self.limit + self.offset:
             log.warning("Timeout reached. Stopping algorithm.")
             raise StopIteration
-        if self.callbacks:
-            for c in self.callbacks:
-                c(algo)
-            self.limit += time() - now
+        for c in self.callbacks:
+            c.__time = now - self.offset # privately inject walltime-excluding-petric-callbacks
+            c(algo)
+        self.offset += time() - now
 
     @staticmethod
     def mean_absolute_error(y, x):
@@ -196,6 +197,7 @@ class Dataset:
     whole_object_mask: STIR.ImageData | None
     background_mask: STIR.ImageData | None
     voi_masks: dict[str, STIR.ImageData]
+    path: PurePath
 
 
 def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
@@ -233,7 +235,7 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
         for voi in (srcdir / 'PETRIC').glob("VOI_*.hv") if voi.stem[4:] not in ('background', 'whole_object')}
 
     return Dataset(acquired_data, additive_term, mult_factors, OSEM_image, prior, kappa, reference_image,
-                   whole_object_mask, background_mask, voi_masks)
+                   whole_object_mask, background_mask, voi_masks, srcdir.resolve())
 
 
 if SRCDIR.is_dir():
@@ -258,6 +260,8 @@ if __name__ != "__main__":
         data = get_data(srcdir=srcdir, outdir=outdir)
         metrics[0].reset()
 else:
+    from traceback import print_exc
+
     from docopt import docopt
     args = docopt(__doc__)
     logging.basicConfig(level=getattr(logging, args["--log"].upper()))
