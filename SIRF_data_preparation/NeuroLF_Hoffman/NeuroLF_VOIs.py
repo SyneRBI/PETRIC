@@ -29,7 +29,7 @@ def plot_image(image, vmin=0, vmax=None):
     plt.show()
 
 #%% read
-datadir = '/home/kris/devel/PETRIC/data/NeuroLF_Hoffman_Dataset/'
+datadir = '~/devel/PETRIC/data/NeuroLF_Hoffman_Dataset/'
 #acquired_data = STIR.AcquisitionData(datadir+'prompts.hs')
 #additive_term = STIR.AcquisitionData(datadir+'additive_term.hs')
 #mult_factors = STIR.AcquisitionData(datadir+'mult_factors.hs')
@@ -58,11 +58,11 @@ VOI2_mask.fill(binary_erosion(allVOIs.as_array() == 2, iterations=1))
 VOI3_mask = whole_object_mask.clone()
 VOI3_mask.fill(allVOIs.as_array() == 3)
 #%% write PETRIC VOIs
-whole_object_mask.write(datadir+'PETRIC_VOIs/VOI_whole_object.hv')
-background_mask.write(datadir+'PETRIC_VOIs/VOI_background.hv')
-VOI1_mask.write(datadir+'PETRIC_VOIs/VOI_ventricles.hv')
-VOI2_mask.write(datadir+'PETRIC_VOIs/VOI_WM.hv')
-VOI3_mask.write(datadir+'VOI_GM.hv')
+whole_object_mask.write(datadir+'PETRIC/VOI_whole_object.hv')
+background_mask.write(datadir+'PETRIC/VOI_background.hv')
+VOI1_mask.write(datadir+'PETRIC/VOI_ventricles.hv')
+VOI2_mask.write(datadir+'PETRIC/VOI_WM.hv')
+VOI3_mask.write(datadir+'PETRIC/VOI_GM.hv')
 #%%
 VOIs = (whole_object_mask, background_mask, VOI1_mask, VOI2_mask, VOI3_mask)
 #%%
@@ -83,5 +83,6 @@ os.chdir(datadir)
 #%%
 data_QC.main()
 # %%
-[str(voi)[:-3] for voi in Path(datadir).glob("VOI_*.hv")]
+voidir = Path(datadir) / 'PETRIC'
+[str(voi)[:-3] for voi in voidir.glob("VOI_*.hv")]
 # %%

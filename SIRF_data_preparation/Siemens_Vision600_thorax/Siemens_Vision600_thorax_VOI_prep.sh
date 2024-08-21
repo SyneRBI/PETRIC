@@ -1,6 +1,6 @@
 #! /bin/bash
-
-for f in *nii.gzxx; do
+# get rid of offset in niftis, as they are currently not in the reconstructed images
+for f in *nii.gz; do
    base=${f%%.nii.gz}
    stir_math $base.hv $base.nii.gz
    sed -i -e '/first pixel offset/ d' \
