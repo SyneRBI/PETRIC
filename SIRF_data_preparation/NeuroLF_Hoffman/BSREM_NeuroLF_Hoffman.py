@@ -3,18 +3,14 @@ from sirf.contrib.BSREM.BSREM import BSREM1
 from sirf.contrib.partitioner import partitioner
 
 scanID = "NeuroLF_Hoffman_Dataset"
-if scanID == 'Siemens_mMR_NEMA_IQ':
-    slices = { 'transverse_slice': 72, 'coronal_slice': 109} #, 'sagittal_slice': 89}
-    num_subsets = 7
-elif scanID == 'NeuroLF_Hoffman_Dataset':
-    slices = { 'transverse_slice': 72}
-    num_subsets = 16
-else:
-    slices = {}
-    # Vision
-    num_subsets = 5
 
-outdir="./output/BSREM_" + scanID
+from SIRF_data_preparation.dataset_settings import get_settings
+settings = get_settings(scanID)
+slices = settings.slices
+num_subsets = settings.num_subsets
+outdir=f"./output/{scanID}/BSREM"
+outdir1=f"./output/{scanID}/BSREM_cont"
+
 data = get_data(srcdir=SRCDIR / scanID, outdir=outdir)
 data_sub, acq_models, obj_funs = partitioner.data_partition(data.acquired_data, data.additive_term, data.mult_factors,
                                                             num_subsets, initial_image=data.OSEM_image)
