@@ -1,17 +1,17 @@
-from petric import MetricsWithTimeout, get_data, SRCDIR
-from sirf.contrib.BSREM.BSREM import BSREM1
-from sirf.contrib.partitioner import partitioner
-import sirf.STIR as STIR
 import os
 
-scanID = 'Siemens_Vision600_thorax'
-
+import sirf.STIR as STIR
+from petric import SRCDIR, MetricsWithTimeout, get_data
+from sirf.contrib.BSREM.BSREM import BSREM1
+from sirf.contrib.partitioner import partitioner
 from SIRF_data_preparation.dataset_settings import get_settings
+
+scanID = 'Siemens_Vision600_thorax'
 settings = get_settings(scanID)
 slices = settings.slices
 num_subsets = settings.num_subsets
-outdir=f"./output/{scanID}/BSREM"
-outdir1=f"./output/{scanID}/BSREM_cont"
+outdir = f"./output/{scanID}/BSREM"
+outdir1 = f"./output/{scanID}/BSREM_cont"
 
 data = get_data(srcdir=SRCDIR / scanID, outdir=outdir)
 data_sub, acq_models, obj_funs = partitioner.data_partition(data.acquired_data, data.additive_term, data.mult_factors,
@@ -27,13 +27,13 @@ OSEM_image = data.OSEM_image
 del data
 try:
     image1000 = STIR.ImageData(os.path.join(outdir, 'iter_1000.hv'))
-except:
+except Exception:
     algo = BSREM1(data_sub, obj_funs, initial=OSEM_image, initial_step_size=.3, relaxation_eta=.01,
                   update_objective_interval=5)
-    algo.run(1005, callbacks=[MetricsWithTimeout(seconds=3600*34, outdir=outdir)])
+    algo.run(1005, callbacks=[MetricsWithTimeout(seconds=3600 * 34, outdir=outdir)])
 
 # restart
 
 algo = BSREM1(data_sub, obj_funs, initial=image1000, initial_step_size=.3, relaxation_eta=.01,
               update_objective_interval=5)
-algo.run(9000, callbacks=[MetricsWithTimeout(seconds=3600*34, outdir=outdir1)])
+algo.run(9000, callbacks=[MetricsWithTimeout(seconds=3600 * 34, outdir=outdir1)])
