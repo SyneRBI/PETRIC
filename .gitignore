@@ -1,4 +1,5 @@
 data/
+orgdata/
 output/
 tmp*/
 err*.txt

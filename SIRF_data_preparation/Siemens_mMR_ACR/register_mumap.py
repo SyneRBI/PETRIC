@@ -2,16 +2,11 @@ import os
 
 import sirf.Reg as Reg
 import sirf.STIR as STIR
-
-# %%
-this_directory = os.path.dirname(__file__)
-repo_directory = os.path.dirname(this_directory)
-repo_directory = os.path.dirname(repo_directory)
+from SIRF_data_preparation.data_utilities import the_data_path, the_orgdata_path
 # %% set paths filenames
-root_path = os.path.join(repo_directory, 'data', 'Siemens_mMR_ACR')
-intermediate_data_path = os.path.join(root_path, 'processing')
-output_path = os.path.join(root_path, 'final')
-mumap_filename = os.path.join(root_path, 'ACR_data_design/synth_mumap/acr-complete-umap.nii.gz')
+scanID = 'Siemens_mMR_ACR'
+intermediate_data_path = the_orgdata_path(scanID, 'processing')
+mumap_filename = the_orgdata_path(scanID, 'ACR_data_design/synth_mumap/acr-complete-umap.nii.gz')
 # %% write current OSEM image as Nifti
 NAC_image = STIR.ImageData(os.path.join(intermediate_data_path, 'OSEM_image.hv'))
 NAC_image_filename = os.path.join(intermediate_data_path, 'NAC_image.nii')
