@@ -23,9 +23,10 @@ Steps to follow:
    ```sh
    stir_math --accumulate  orgdata/Siemens_mMR_ACR/processing/reg_mumap.hv  orgdata/Siemens_mMR_ACR/output/ACR_hardware-to-STIR.nii.gz
    ```
-7. `python SIRF_data_preparation/Siemens_mMR_ACR/prepare.py --end 200` (As there is now a useful mumap, this will now do attenuation and scatter estimation)
+7. 11. `python SIRF_data_preparation/run_OSEM.py Siemens_mMR_ACR`--end 200` (As there is now a useful mumap, this will now do attenuation and scatter estimation)
 8. `python SIRF_data_preparation/create_initial_images.py data/Siemens_mMR_ACR --template_image=../../orgdata/Siemens_mMR_ACR/output/sampling_masks/acr-all-sampling-0-2mm_dipy.nii`
 9. `python SIRF_data_preparation/data_QC.py --srcdir='data/Siemens_mMR_ACR' --transverse_slice=99`
-10. edit `SIRF_data_prepatation/dataset_settings.py` for subsets etc. edit `OSEM_image.hv` to add radionuclide and duration info which got lost.
-11. `python SIRF_data_preparation/run_OSEM.py Siemens_mMR_ACR`
-12. `python SIRF_data_preparation/run_BSREM.py Siemens_mMR_ACR`
+10. edit `SIRF_data_prepatation/dataset_settings.py` for subsets etc. edit `OSEM_image.hv` to add modality, radionuclide and duration info which got lost.
+11. `python SIRF_data_preparation/Siemens_mMR_ACR/VOI_prep.py`
+12. `python SIRF_data_preparation/run_OSEM.py Siemens_mMR_ACR`
+13. `python SIRF_data_preparation/run_BSREM.py Siemens_mMR_ACR`
