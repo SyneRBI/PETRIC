@@ -8,9 +8,9 @@ import numpy
 
 import sirf.STIR as STIR
 from petric import OUTDIR, SRCDIR, QualityMetrics, get_data
-
-from . import data_QC
-from .evaluation_utilities import get_metrics, pass_index, plot_metrics, read_objectives
+from SIRF_data_preparation.dataset_settings import get_settings
+import SIRF_data_preparation.data_QC as data_QC
+from SIRF_data_preparation.evaluation_utilities import get_metrics, pass_index, plot_metrics, read_objectives
 
 if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
     PETRICDIR = Path('~/devel/PETRIC').expanduser()
@@ -24,16 +24,17 @@ STIR.set_verbosity(0)
 scanID = 'Siemens_mMR_NEMA_IQ'
 
 srcdir = SRCDIR / scanID
-OSEMdir = OUTDIR / f'OSEM_{scanID}'
-datadir = OUTDIR / f'BSREM_{scanID}'
+outdir = OUTDIR / scanID
+OSEMdir = outdir /'OSEM'
+datadir = outdir / 'BSREM'
 # we will check for images obtained after restarting BSREM (with new settings)
-datadir1 = OUTDIR / f'BSREM_{scanID}_cont'
+datadir1 = outdir / 'BSREM_cont'
 
 OSEM_image = STIR.ImageData(str(datadir / 'iter_0000.hv'))
-if scanID == 'Siemens_mMR_NEMA_IQ':
-    slices = {'transverse_slice': 72, 'coronal_slice': 109, 'sagittal_slice': 89}
-else:
-    slices = {}
+
+settings = get_settings(scanID)
+slices = settings.slices
+
 cmax = OSEM_image.max()
 
 image = data_QC.plot_image_if_exists(str(datadir / 'iter_final'), **slices, vmax=cmax)
@@ -52,59 +53,71 @@ if datadir1.is_dir():
     objs = numpy.concatenate((objs, tmp))
 fig = plt.figure()
 plt.plot(objs[2:, 0], objs[2:, 1])
-fig.savefig(OUTDIR / f'{scanID}_BSREM_objectives.png')
+#%%
+fig.savefig(outdir / f'{scanID}_BSREM_objectives.png')
+#%%
 fig = plt.figure()
 plt.plot(objs[50:, 0], objs[50:, 1])
-fig.savefig(OUTDIR / f'{scanID}_BSREM_objectives_last.png')
+#%%
+fig.savefig(outdir / f'{scanID}_BSREM_objectives_last.png')
 
-data = get_data(srcdir=srcdir, outdir=OUTDIR / 'test')
+#%%
+data = get_data(srcdir=srcdir, outdir=outdir / 'test')
 if datadir1.is_dir():
     reference_image = STIR.ImageData(str(datadir1 / 'iter_final.hv'))
 else:
     reference_image = STIR.ImageData(str(datadir / 'iter_final.hv'))
-qm = QualityMetrics(reference_image, data.whole_object_mask, data.background_mask, tb_summary_writer='outdir/test',
+qm = QualityMetrics(reference_image, data.whole_object_mask, data.background_mask, tb_summary_writer=None,
                     voi_mask_dict=data.voi_masks)
 last_iteration = int(objs[-1, 0] + .5)
 iteration_interval = int(objs[-1, 0] - objs[-2, 0] + .5)
 if datadir1.is_dir():
     last_iteration = int(objs0[-1, 0] + .5)
     iteration_interval = int(objs0[-1, 0] - objs0[-2, 0] + .5) * 2
+#%%
 iters = range(0, last_iteration, iteration_interval)
 m = get_metrics(qm, iters, srcdir=datadir)
+#%%
 OSEMiters = range(0, 400, 20)
 OSEMm = get_metrics(qm, OSEMiters, srcdir=OSEMdir)
+#%%
 fig = plt.figure()
 plot_metrics(iters, m, qm.keys(), '_BSREM')
 plot_metrics(OSEMiters, OSEMm, qm.keys(), '_OSEM')
 [ax.set_xlim(0, 400) for ax in fig.axes]
-fig.savefig(OUTDIR / f'{scanID}_metrics_BSREM_OSEM.png')
+# %%
+fig.savefig(outdir / f'{scanID}_metrics_BSREM_OSEM.png')
+#%%
 fig = plt.figure()
 plot_metrics(iters, m, qm.keys(), '_BSREM')
 fig.axes[0].set_ylim(0, .04)
 fig.axes[1].set_ylim(0, .02)
-fig.savefig(OUTDIR / f'{scanID}_metrics_BSREM.png')
+fig.savefig(outdir / f'{scanID}_metrics_BSREM.png')
+#%%
 m1 = None
 if datadir1.is_dir():
     last_iteration1 = int(objs1[-1, 0] + .5)
     iteration_interval1 = int(objs1[-1, 0] - objs1[-2, 0] + .5) * 2
     iters1 = range(0, last_iteration1, iteration_interval1)
     m1 = get_metrics(qm, iters1, srcdir=datadir1)
+#%%
 if m1 is not None:
     fig = plt.figure()
     plot_metrics(objs0[-1, 0] + iters1, m1, qm.keys(), '_BSREM_cont')
-    fig.savefig(OUTDIR / f'{scanID}_metrics_BSREM.png')
+    fig.savefig(outdir / f'{scanID}_metrics_BSREM.png')
 
+#%%
 idx = pass_index(m, numpy.array([.01, .01, .005, .005, .005]), 10)
 iter = iters[idx]
 print(iter)
 image = STIR.ImageData(str(datadir / f"iter_{iter:04d}.hv"))
 plt.figure()
 data_QC.plot_image(image, **slices, vmax=cmax)
-plt.savefig(OUTDIR / f'{scanID}_image_at_0.01_0.005.png')
+plt.savefig(outdir / f'{scanID}_image_at_0.01_0.005.png')
 
 plt.figure()
 data_QC.plot_image(image - data.OSEM_image, **slices, vmin=-cmax / 20, vmax=cmax / 20)
-plt.savefig(OUTDIR / f'{scanID}_OSEM_diff_image_at_0.01_0.005.png')
+plt.savefig(outdir / f'{scanID}_OSEM_diff_image_at_0.01_0.005.png')
 plt.figure()
 data_QC.plot_image(image - reference_image, **slices, vmin=-cmax / 100, vmax=cmax / 100)
-plt.savefig(OUTDIR / f'{scanID}_ref_diff_image_at_0.01_0.005.png')
+plt.savefig(outdir / f'{scanID}_ref_diff_image_at_0.01_0.005.png')

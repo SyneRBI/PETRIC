@@ -1,7 +1,7 @@
 # PETRIC: PET Rapid Image reconstruction Challenge
 
 [![website](https://img.shields.io/badge/announcement-website-purple?logo=workplace&logoColor=white)](https://www.ccpsynerbi.ac.uk/events/petric/)
-[![wiki](https://img.shields.io/badge/details-wiki-blue?logo=googledocs&logoColor=white)](https://github.com/SyneRBI/PETRIC/wiki)
+[![wiki](https://img.shields.io/badge/details-wiki-blue?logo=googledocs&logoColor=white)][wiki]
 [![register](https://img.shields.io/badge/participate-register-green?logo=ticktick&logoColor=white)][register]
 [![leaderboard](https://img.shields.io/badge/rankings-leaderboard-orange?logo=tensorflow&logoColor=white)][leaderboard]
 [![discord](https://img.shields.io/badge/chat-discord-blue?logo=discord&logoColor=white)](https://discord.gg/Ayd72Aa4ry)
@@ -76,6 +76,10 @@ python petric.py &
 tensorboard --bind_all --port 6006 --logdir ./output
 ```
 
+## FAQ
+
+See the [wiki/Home][wiki] and [wiki/FAQ](https://github.com/SyneRBI/PETRIC/wiki/FAQ) for more info.
+
 > [!TIP]
 > `petric.py` will effectively execute:
 >
@@ -105,4 +109,5 @@ tensorboard --bind_all --port 6006 --logdir ./output
 
 Any modifications to `petric.py` are ignored.
 
+[wiki]: https://github.com/SyneRBI/PETRIC/wiki
 [leaderboard]: https://petric.tomography.stfc.ac.uk/leaderboard/?smoothing=0#timeseries&_smoothingWeight=0
