@@ -11,6 +11,9 @@ def get_settings(scanID : str):
     if scanID == 'Siemens_mMR_NEMA_IQ':
         slices = { 'transverse_slice': 72, 'coronal_slice': 109} #, 'sagittal_slice': 89}
         num_subsets = 7
+    elif scanID == 'Siemens_mMR_ACR':
+        slices = { 'transverse_slice': 99}
+        num_subsets = 7
     elif scanID == 'NeuroLF_Hoffman_Dataset':
         slices = { 'transverse_slice': 72}
         num_subsets = 16
