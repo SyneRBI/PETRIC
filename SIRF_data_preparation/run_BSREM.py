@@ -11,25 +11,20 @@ Arguments:
 # Copyright 2024 University College London
 # Licence: Apache-2.0
 __version__ = '0.1.0'
-
-import logging
-import math
-import os
-
-from docopt import docopt
-
-from petric import MetricsWithTimeout, get_data, SRCDIR, OUTDIR
-from SIRF_data_preparation.dataset_settings import get_settings
 from pathlib import Path
 
-from sirf.contrib.BSREM.BSREM import BSREM1
-from sirf.contrib.partitioner import partitioner
+import matplotlib.pyplot as plt
+from docopt import docopt
 
 import SIRF_data_preparation.data_QC as data_QC
-import matplotlib.pyplot as plt
-#%%
+from petric import OUTDIR, SRCDIR, MetricsWithTimeout, get_data
+from sirf.contrib.BSREM.BSREM import BSREM1
+from sirf.contrib.partitioner import partitioner
+from SIRF_data_preparation.dataset_settings import get_settings
+
+# %%
 args = docopt(__doc__, argv=None, version=__version__)
-#logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 scanID = args['<data_set>']
 
@@ -38,9 +33,9 @@ if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
     SRCDIR = PETRICDIR / 'data'
     OUTDIR = PETRICDIR / 'output'
 
-outdir = OUTDIR/ scanID / "BSREM"
+outdir = OUTDIR / scanID / "BSREM"
 srcdir = SRCDIR / scanID
-#log.info("Finding files in %s", srcdir)
+# log.info("Finding files in %s", srcdir)
 
 settings = get_settings(scanID)
 
@@ -56,10 +51,10 @@ for f in obj_funs: # add prior evenly to every objective function
 
 algo = BSREM1(data_sub, obj_funs, initial=data.OSEM_image, initial_step_size=.3, relaxation_eta=.01,
               update_objective_interval=80)
-#%%
-algo.run(15000, callbacks=[MetricsWithTimeout(**settings.slices, outdir=outdir, seconds=3600*100)])
-#%%
+# %%
+algo.run(15000, callbacks=[MetricsWithTimeout(**settings.slices, outdir=outdir, seconds=3600 * 100)])
+# %%
 fig = plt.figure()
 data_QC.plot_image(algo.get_output(), **settings.slices)
 fig.savefig(outdir / "BSREM_slices.png")
-#plt.show()
+# plt.show()

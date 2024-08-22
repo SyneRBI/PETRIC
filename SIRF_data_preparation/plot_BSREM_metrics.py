@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 import numpy
 
 import sirf.STIR as STIR
+import SIRF_data_preparation.data_QC as data_QC
 from petric import OUTDIR, SRCDIR, QualityMetrics, get_data
 from SIRF_data_preparation.dataset_settings import get_settings
-import SIRF_data_preparation.data_QC as data_QC
 from SIRF_data_preparation.evaluation_utilities import get_metrics, pass_index, plot_metrics, read_objectives
 
 if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
@@ -25,7 +25,7 @@ scanID = 'Siemens_mMR_NEMA_IQ'
 
 srcdir = SRCDIR / scanID
 outdir = OUTDIR / scanID
-OSEMdir = outdir /'OSEM'
+OSEMdir = outdir / 'OSEM'
 datadir = outdir / 'BSREM'
 # we will check for images obtained after restarting BSREM (with new settings)
 datadir1 = outdir / 'BSREM_cont'
@@ -53,15 +53,15 @@ if datadir1.is_dir():
     objs = numpy.concatenate((objs, tmp))
 fig = plt.figure()
 plt.plot(objs[2:, 0], objs[2:, 1])
-#%%
+# %%
 fig.savefig(outdir / f'{scanID}_BSREM_objectives.png')
-#%%
+# %%
 fig = plt.figure()
 plt.plot(objs[50:, 0], objs[50:, 1])
-#%%
+# %%
 fig.savefig(outdir / f'{scanID}_BSREM_objectives_last.png')
 
-#%%
+# %%
 data = get_data(srcdir=srcdir, outdir=outdir / 'test')
 if datadir1.is_dir():
     reference_image = STIR.ImageData(str(datadir1 / 'iter_final.hv'))
@@ -74,39 +74,39 @@ iteration_interval = int(objs[-1, 0] - objs[-2, 0] + .5)
 if datadir1.is_dir():
     last_iteration = int(objs0[-1, 0] + .5)
     iteration_interval = int(objs0[-1, 0] - objs0[-2, 0] + .5) * 2
-#%%
+# %%
 iters = range(0, last_iteration, iteration_interval)
 m = get_metrics(qm, iters, srcdir=datadir)
-#%%
+# %%
 OSEMiters = range(0, 400, 20)
 OSEMm = get_metrics(qm, OSEMiters, srcdir=OSEMdir)
-#%%
+# %%
 fig = plt.figure()
 plot_metrics(iters, m, qm.keys(), '_BSREM')
 plot_metrics(OSEMiters, OSEMm, qm.keys(), '_OSEM')
 [ax.set_xlim(0, 400) for ax in fig.axes]
 # %%
 fig.savefig(outdir / f'{scanID}_metrics_BSREM_OSEM.png')
-#%%
+# %%
 fig = plt.figure()
 plot_metrics(iters, m, qm.keys(), '_BSREM')
 fig.axes[0].set_ylim(0, .04)
 fig.axes[1].set_ylim(0, .02)
 fig.savefig(outdir / f'{scanID}_metrics_BSREM.png')
-#%%
+# %%
 m1 = None
 if datadir1.is_dir():
     last_iteration1 = int(objs1[-1, 0] + .5)
     iteration_interval1 = int(objs1[-1, 0] - objs1[-2, 0] + .5) * 2
     iters1 = range(0, last_iteration1, iteration_interval1)
     m1 = get_metrics(qm, iters1, srcdir=datadir1)
-#%%
+# %%
 if m1 is not None:
     fig = plt.figure()
     plot_metrics(objs0[-1, 0] + iters1, m1, qm.keys(), '_BSREM_cont')
     fig.savefig(outdir / f'{scanID}_metrics_BSREM.png')
 
-#%%
+# %%
 idx = pass_index(m, numpy.array([.01, .01, .005, .005, .005]), 10)
 iter = iters[idx]
 print(iter)
