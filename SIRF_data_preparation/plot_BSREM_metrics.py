@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import numpy
 
 import sirf.STIR as STIR
-import SIRF_data_preparation.data_QC as data_QC
 from petric import OUTDIR, SRCDIR, QualityMetrics, get_data
+from SIRF_data_preparation import data_QC
 from SIRF_data_preparation.dataset_settings import get_settings
 from SIRF_data_preparation.evaluation_utilities import get_metrics, pass_index, plot_metrics, read_objectives
 

@@ -18,8 +18,8 @@ import matplotlib.pyplot as plt
 from docopt import docopt
 
 import main_OSEM
-import SIRF_data_preparation.data_QC as data_QC
 from petric import OUTDIR, SRCDIR, MetricsWithTimeout, get_data
+from SIRF_data_preparation import data_QC
 from SIRF_data_preparation.dataset_settings import get_settings
 
 # %%

@@ -4,7 +4,6 @@
 import os
 from pathlib import Path
 
-import data_QC
 import matplotlib.pyplot as plt
 import numpy
 from data_QC import VOI_mean, plot_image
@@ -13,6 +12,7 @@ from scipy.ndimage import binary_erosion
 
 import sirf.STIR as STIR
 from petric import SRCDIR
+from SIRF_data_preparation import data_QC
 
 # %%
 # %autoreload 2

@@ -2,12 +2,12 @@
 import os
 from pathlib import Path
 
-import data_QC
 import matplotlib.pyplot as plt
 from scipy.ndimage import binary_erosion
 
 import sirf.STIR as STIR
 from petric import SRCDIR
+from SIRF_data_preparation import data_QC
 
 # %%
 # %matplotlib ipympl
