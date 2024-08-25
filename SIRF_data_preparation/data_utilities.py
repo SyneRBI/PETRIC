@@ -17,18 +17,25 @@ logger = logging.getLogger("PETRIC")
 # DATA_PATH = '/home/KrisThielemans/devel/PETRIC/data'
 this_directory = os.path.dirname(__file__)
 repo_directory = os.path.dirname(this_directory)
+ORG_DATA_PATH = os.path.join(repo_directory, 'orgdata')
 DATA_PATH = os.path.join(repo_directory, 'data')
 
 
-def the_data_path(*data_type):
+def the_data_path(*folders):
     '''
     Returns the path to data.
 
-    data_type: either 'PET', 'MR' or 'Synergistic', or use multiple arguments for
-    subdirectories like the_data_path('PET', 'mMR', 'NEMA_IQ').
+    data_type: subfolders like the_data_path('Siemens_mMR_ACR').
     '''
-    return os.path.join(DATA_PATH, *data_type)
+    return os.path.join(DATA_PATH, *folders)
 
+def the_orgdata_path(*folders):
+    '''
+    Returns the path to original data (for downloads/processing)
+
+    data_type: subfolders like the_orgdata_path('Siemens_mMR_ACR', 'processing').
+    '''
+    return os.path.join(ORG_DATA_PATH, *folders)
 
 def fix_siemens_norm_EOL(in_filename, out_filename):
     with open(in_filename, mode="rb") as f:

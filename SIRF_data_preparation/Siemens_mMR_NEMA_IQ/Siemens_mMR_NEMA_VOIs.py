@@ -77,58 +77,10 @@ plt.figure()
 data_QC.plot_image(reference_image, **slices)
 plt.figure()
 data_QC.plot_image(reference_image, **slices, alpha=allVOIs)
-# %%
 
-
-def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', **kwargs):
-    if len(allVOInames) == 0:
-        return
-    OSEM_VOI_values = []
-    ref_VOI_values = []
-    allVOIs = None
-    VOIkwargs = kwargs.copy()
-    VOIkwargs['vmax'] = 1
-    VOIkwargs['vmin'] = 0
-    for VOIname in allVOInames:
-        filename = os.path.join(srcdir, VOIname + '.hv')
-        if not os.path.isfile(filename):
-            print(f"VOI {VOIname} does not exist")
-            continue
-        VOI = STIR.ImageData(filename)
-        COM = numpy.rint(ndimage.measurements.center_of_mass(VOI.as_array()))
-        print(COM)
-        plt.figure()
-        plot_image(VOI, vmin=0, vmax=1, transverse_slice=int(COM[0]), coronal_slice=int(COM[1]),
-                   sagittal_slice=int(COM[2]))
-
-        # construct transparency image
-        if VOIname == 'VOI_whole_object':
-            VOI /= 2
-        if allVOIs is None:
-            allVOIs = VOI.clone()
-        else:
-            allVOIs += VOI
-        if OSEM_image is not None:
-            OSEM_VOI_values.append(VOI_mean(OSEM_image, VOI))
-        if reference_image:
-            ref_VOI_values.append(VOI_mean(reference_image, VOI))
-    allVOIs /= allVOIs.max()
-
-    if OSEM_image is not None:
-        plt.figure()
-        plot_image(OSEM_image, **kwargs)
-        plt.figure()
-        plot_image(OSEM_image, alpha=allVOIs, **kwargs)
-
-
-# %%
+#%%
 VOI_checks(['VOI_whole_object', 'VOI_sphere5'], OSEM_image, srcdir=os.path.join(datadir, 'PETRIC'), **slices)
-# %%
-OSEM_image
-# %%
-[data_QC.VOI_mean(OSEM_image, VOI) for VOI in VOIs]
-# %%
-[data_QC.VOI_mean(reference_image, VOI) for VOI in VOIs]
-# %%
-data_QC.main(['--srcdir', datadir])
-# %%
+#%%
+[ VOI_mean(OSEM_image, VOI) for VOI in VOIs]
+#%%
+[ VOI_mean(reference_image, VOI) for VOI in VOIs]

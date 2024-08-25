@@ -4,13 +4,14 @@ Usage:
   run_BSREM.py <data_set> [--help | options]
 
 Arguments:
-  <data_set>  path to data files as well as prefix to use
+  <data_set>  path to data files as well as prefix to use (e.g. Siemens_mMR_NEMA_EQ)
 
 """
 # Copyright 2024 Rutherford Appleton Laboratory STFC
 # Copyright 2024 University College London
 # Licence: Apache-2.0
-__version__ = '0.1.0'
+__version__ = '0.2.0'
+
 from pathlib import Path
 
 import matplotlib.pyplot as plt

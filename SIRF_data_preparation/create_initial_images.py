@@ -7,7 +7,7 @@ Arguments:
   <data_path>  path to data files
 
 Options:
-  -t <template_image>, --template_image=<template_image>  filename of image to use for data sizes [default: VOI.hv]
+  -t <template_image>, --template_image=<template_image>  filename (relative to <data_path>) of image to use for data sizes [default: PETRIC/VOI_whole_phantom.hv]
   -s <xy-size>, --xy-size=<xy-size>  force xy-size (do not use when using VOIs as init) [default: -1]
   -S <subsets>, --subsets=<subsets>  number of subsets [default: 2]
   -i <subiterations>, --subiterations=<subiterations>     number of sub-iterations [default: 14]

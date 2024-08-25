@@ -7,20 +7,16 @@ from zipfile import ZipFile
 from zenodo_get import zenodo_get
 
 # %%
+from SIRF_data_preparation.data_utilities import the_data_path
 from sirf.Utilities import examples_data_path
 
 sirf_data_path = os.path.join(examples_data_path('PET'), 'mMR')
 
 # %% set paths
-this_directory = os.path.dirname(__file__)
-repo_directory = os.path.dirname(os.path.dirname(this_directory))
-challenge_data_path = os.path.join(repo_directory, 'data')
-print('PETRIC data path: %s' % challenge_data_path)
-
-download_path = os.path.join(challenge_data_path, 'downloads')
+download_path = the_data_path('downloads')
 os.makedirs(download_path, exist_ok=True)
 
-dest_path = os.path.join(challenge_data_path, 'Siemens_mMR_ACR')
+dest_path = the_data_path('Siemens_mMR_ACR')
 os.makedirs(dest_path, exist_ok=True)
 print('dest path: %s' % dest_path)
 processing_path = os.path.join(dest_path, 'processing')
