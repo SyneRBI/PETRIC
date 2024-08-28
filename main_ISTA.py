@@ -58,7 +58,10 @@ class Submission(ISTA):
         data_sub, acq_models, obj_funs = partitioner.data_partition(data.acquired_data, data.additive_term,
                                                                     data.mult_factors, num_subsets, mode='staggered',
                                                                     initial_image=data.OSEM_image)
-        for f in obj_funs: # add prior to every objective function
+        # WARNING: modifies prior strength with 1/num_subsets (as currently needed for ISTA implementations)
+        data.prior.set_penalisation_factor(data.prior.get_penalisation_factor() / len(obj_funs))
+        data.prior.set_up(data.OSEM_image)
+        for f in obj_funs: # add prior evenly to every objective function
             f.set_prior(data.prior)
 
         sampler = Sampler.random_without_replacement(len(obj_funs))
