@@ -29,6 +29,7 @@ def the_data_path(*folders):
     '''
     return os.path.join(DATA_PATH, *folders)
 
+
 def the_orgdata_path(*folders):
     '''
     Returns the path to original data (for downloads/processing)
@@ -36,6 +37,7 @@ def the_orgdata_path(*folders):
     data_type: subfolders like the_orgdata_path('Siemens_mMR_ACR', 'processing').
     '''
     return os.path.join(ORG_DATA_PATH, *folders)
+
 
 def fix_siemens_norm_EOL(in_filename, out_filename):
     with open(in_filename, mode="rb") as f:

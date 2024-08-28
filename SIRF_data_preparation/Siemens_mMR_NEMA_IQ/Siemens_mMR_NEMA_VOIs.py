@@ -5,9 +5,7 @@ import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy
-from data_QC import VOI_mean, plot_image
-from scipy import ndimage
+from data_QC import VOI_mean
 from scipy.ndimage import binary_erosion
 
 import sirf.STIR as STIR
@@ -78,9 +76,9 @@ data_QC.plot_image(reference_image, **slices)
 plt.figure()
 data_QC.plot_image(reference_image, **slices, alpha=allVOIs)
 
-#%%
-VOI_checks(['VOI_whole_object', 'VOI_sphere5'], OSEM_image, srcdir=os.path.join(datadir, 'PETRIC'), **slices)
-#%%
-[ VOI_mean(OSEM_image, VOI) for VOI in VOIs]
-#%%
-[ VOI_mean(reference_image, VOI) for VOI in VOIs]
+# %%
+data_QC.VOI_checks(['VOI_whole_object', 'VOI_sphere5'], OSEM_image, srcdir=os.path.join(datadir, 'PETRIC'), **slices)
+# %%
+[VOI_mean(OSEM_image, VOI) for VOI in VOIs]
+# %%
+[VOI_mean(reference_image, VOI) for VOI in VOIs]

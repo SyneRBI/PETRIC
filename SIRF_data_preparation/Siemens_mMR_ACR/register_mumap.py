@@ -2,7 +2,8 @@ import os
 
 import sirf.Reg as Reg
 import sirf.STIR as STIR
-from SIRF_data_preparation.data_utilities import the_data_path, the_orgdata_path
+from SIRF_data_preparation.data_utilities import the_orgdata_path
+
 # %% set paths filenames
 scanID = 'Siemens_mMR_ACR'
 intermediate_data_path = the_orgdata_path(scanID, 'processing')

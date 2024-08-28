@@ -6,9 +6,10 @@ from zipfile import ZipFile
 
 from zenodo_get import zenodo_get
 
+from sirf.Utilities import examples_data_path
+
 # %%
 from SIRF_data_preparation.data_utilities import the_data_path
-from sirf.Utilities import examples_data_path
 
 sirf_data_path = os.path.join(examples_data_path('PET'), 'mMR')
 
