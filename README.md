@@ -28,8 +28,10 @@ Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/o
 - `environment.yml`: passed to `conda install`, e.g.:
 
   ```yml
-  name: winning-submission
-  channels: [conda-forge, pytorch, nvidia]
+  channels:
+  - conda-forge
+  - pytorch
+  - nvidia
   dependencies:
   - cupy
   - cuda-version =11.8
