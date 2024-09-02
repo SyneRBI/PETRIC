@@ -22,7 +22,8 @@ jobs:
           xargs -a apt.txt sudo apt-get install -y
         fi
         if test -f environment.yml; then
-          conda install --file environment.yml
+          sed -i '/^name:.*/d' environment.yml
+          conda env update -n base
         fi
         if test -f requirements.txt; then
           pip install -r requirements.txt
