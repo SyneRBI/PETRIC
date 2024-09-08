@@ -19,6 +19,9 @@ def get_settings(scanID: str):
     elif scanID == 'NeuroLF_Hoffman_Dataset':
         slices = {'transverse_slice': 72}
         num_subsets = 16
+    elif scanID == 'Mediso_NEMA_IQ':
+        slices = {'transverse_slice': 22, 'coronal_slice': 89, 'sagittal_slice': 66}
+        num_subsets = 12
     else:                                                       # Vision
         slices = {}
         num_subsets = 5
