@@ -121,8 +121,10 @@ def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', *
             print(f"VOI {VOIname} does not exist")
             continue
         VOI = STIR.ImageData(filename)
-        COM = np.rint(ndimage.center_of_mass(VOI.as_array()))
-        print(f"VOI: {VOIname}: COM: {COM}")
+        VOI_arr = VOI.as_array()
+        COM = np.rint(ndimage.center_of_mass(VOI_arr))
+        num_voxels = VOI_arr.sum()
+        print(f"VOI: {VOIname}: COM (in indices): {COM} voxels {num_voxels} = {num_voxels * np.prod(VOI.spacing)} mm^3")
         plt.figure()
         plot_image(VOI, save_name=prefix, vmin=0, vmax=1, transverse_slice=int(COM[0]), coronal_slice=int(COM[1]),
                    sagittal_slice=int(COM[2]))
