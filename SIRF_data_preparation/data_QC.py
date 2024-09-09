@@ -11,12 +11,13 @@ Options:
   --transverse_slice=<i>  idx [default: -1]
   --coronal_slice=<c>    idx [default: -1]
   --sagittal_slice=<s>   idx [default: -1]
+  --dataset=<name>       dataset name. if set, it is used to override default slices
 
 Note that -1 one means to use middle of image
 """
 # Copyright 2024 University College London
 # Licence: Apache-2.0
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 import os
 import os.path
@@ -29,6 +30,7 @@ from docopt import docopt
 from scipy import ndimage
 
 import sirf.STIR as STIR
+from SIRF_data_preparation.dataset_settings import get_settings
 
 STIR.AcquisitionData.set_storage_scheme('memory')
 
@@ -119,7 +121,10 @@ def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', *
             print(f"VOI {VOIname} does not exist")
             continue
         VOI = STIR.ImageData(filename)
-        COM = np.rint(ndimage.center_of_mass(VOI.as_array()))
+        VOI_arr = VOI.as_array()
+        COM = np.rint(ndimage.center_of_mass(VOI_arr))
+        num_voxels = VOI_arr.sum()
+        print(f"VOI: {VOIname}: COM (in indices): {COM} voxels {num_voxels} = {num_voxels * np.prod(VOI.spacing)} mm^3")
         plt.figure()
         plot_image(VOI, save_name=prefix, vmin=0, vmax=1, transverse_slice=int(COM[0]), coronal_slice=int(COM[1]),
                    sagittal_slice=int(COM[2]))
@@ -149,12 +154,20 @@ def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', *
 
 def main(argv=None):
     args = docopt(__doc__, argv=argv, version=__version__)
+    dataset = args['--dataset']
     srcdir = args['--srcdir']
     skip_sino_profiles = args['--skip_sino_profiles']
     slices = {}
     slices["transverse_slice"] = literal_eval(args['--transverse_slice'])
     slices["coronal_slice"] = literal_eval(args['--coronal_slice'])
     slices["sagittal_slice"] = literal_eval(args['--sagittal_slice'])
+
+    if (dataset):
+        settings = get_settings(dataset)
+        for key in slices.keys():
+            if slices[key] == -1 and key in settings.slices:
+                slices[key] = settings.slices[key]
+    print(slices)
 
     if not skip_sino_profiles:
         acquired_data = STIR.AcquisitionData(os.path.join(srcdir, 'prompts.hs'))

@@ -42,7 +42,7 @@ settings = get_settings(scanID)
 data = get_data(srcdir=srcdir, outdir=outdir)
 # %%
 algo = main_OSEM.Submission(data, settings.num_subsets, update_objective_interval=20)
-algo.run(20, callbacks=[MetricsWithTimeout(**settings.slices, seconds=5000, outdir=outdir)])
+algo.run(400, callbacks=[MetricsWithTimeout(**settings.slices, seconds=5000, outdir=outdir)])
 # %%
 fig = plt.figure()
 data_QC.plot_image(algo.get_output(), **settings.slices)
