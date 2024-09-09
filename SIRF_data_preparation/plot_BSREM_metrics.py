@@ -1,4 +1,5 @@
-"""Preliminary file to check evolution of metrics as well as pass_index"""
+#%%
+# """Preliminary file to check evolution of metrics as well as pass_index"""
 # %load_ext autoreload
 # %autoreload 2
 from pathlib import Path
@@ -21,7 +22,8 @@ STIR.set_verbosity(0)
 
 # scanID = 'Siemens_Vision600_thorax'
 # scanID = 'NeuroLF_Hoffman_Dataset'
-scanID = 'Siemens_mMR_NEMA_IQ'
+# scanID = 'Siemens_mMR_NEMA_IQ'
+scanID = 'Mediso_NEMA_IQ'
 
 srcdir = SRCDIR / scanID
 outdir = OUTDIR / scanID
@@ -69,8 +71,10 @@ else:
     reference_image = STIR.ImageData(str(datadir / 'iter_final.hv'))
 qm = QualityMetrics(reference_image, data.whole_object_mask, data.background_mask, tb_summary_writer=None,
                     voi_mask_dict=data.voi_masks)
+#%% get update ("iteration") numbers from objective functions
 last_iteration = int(objs[-1, 0] + .5)
-iteration_interval = int(objs[-1, 0] - objs[-2, 0] + .5)
+# find interval(don't use last value, as that interval can be smaller)
+iteration_interval = int(objs[-2, 0] - objs[-3, 0] + .5)
 if datadir1.is_dir():
     last_iteration = int(objs0[-1, 0] + .5)
     iteration_interval = int(objs0[-1, 0] - objs0[-2, 0] + .5) * 2
@@ -78,7 +82,8 @@ if datadir1.is_dir():
 iters = range(0, last_iteration, iteration_interval)
 m = get_metrics(qm, iters, srcdir=datadir)
 # %%
-OSEMiters = range(0, 400, 20)
+OSEMobjs = read_objectives(OSEMdir)
+OSEMiters = OSEMobjs[:, 0].astype(int)
 OSEMm = get_metrics(qm, OSEMiters, srcdir=OSEMdir)
 # %%
 fig = plt.figure()
@@ -107,7 +112,7 @@ if m1 is not None:
     fig.savefig(outdir / f'{scanID}_metrics_BSREM.png')
 
 # %%
-idx = pass_index(m, numpy.array([.01, .01, .005, .005, .005]), 10)
+idx = pass_index(m, numpy.array([.01, .01] + [.005 for i in range(len(data.voi_masks))]), 10)
 iter = iters[idx]
 print(iter)
 image = STIR.ImageData(str(datadir / f"iter_{iter:04d}.hv"))
