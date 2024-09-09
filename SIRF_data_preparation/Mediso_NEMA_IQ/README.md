@@ -10,12 +10,15 @@ cd ~/devel/PETRIC/data
 mkdir -p  Mediso_NEMA_IQ
 cd Mediso_NEMA_IQ/
 # trim sinograms to avoid "corner" problems in mult_factors
+# TODO for next data: use 30 (as some problems remain)
 for f in additive_term.hs  mult_factors.hs  prompts.hs; do
    SSRB -t 20 $f $orgpath/sinograms/$f; 
 done
+# alternative if we don't need to trim
 #cp -rp $orgpath/sinograms/* .
 # get rid of NaNs
 python prepare.py
+# now handle VOIs
 mkdir PETRIC
 cp -rp $orgpath/VOIs/* PETRIC
 # cp -rp $orgpath/README.md .
