@@ -1,4 +1,4 @@
-#%%
+# %%
 # """Preliminary file to check evolution of metrics as well as pass_index"""
 # %load_ext autoreload
 # %autoreload 2
@@ -71,7 +71,7 @@ else:
     reference_image = STIR.ImageData(str(datadir / 'iter_final.hv'))
 qm = QualityMetrics(reference_image, data.whole_object_mask, data.background_mask, tb_summary_writer=None,
                     voi_mask_dict=data.voi_masks)
-#%% get update ("iteration") numbers from objective functions
+# %% get update ("iteration") numbers from objective functions
 last_iteration = int(objs[-1, 0] + .5)
 # find interval(don't use last value, as that interval can be smaller)
 iteration_interval = int(objs[-2, 0] - objs[-3, 0] + .5)
