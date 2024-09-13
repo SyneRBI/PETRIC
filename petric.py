@@ -43,7 +43,7 @@ class Callback(cil_callbacks.Callback):
     CIL Callback but with `self.skip_iteration` checking `min(self.interval, algo.update_objective_interval)`.
     TODO: backport this class to CIL.
     """
-    def __init__(self, interval: int = 1 << 31, **kwargs):
+    def __init__(self, interval: int = 1, **kwargs):
         super().__init__(**kwargs)
         self.interval = interval
 
@@ -110,7 +110,7 @@ class StatsLog(Callback):
 
 class QualityMetrics(ImageQualityCallback, Callback):
     """From https://github.com/SyneRBI/PETRIC/wiki#metrics-and-thresholds"""
-    def __init__(self, reference_image, whole_object_mask, background_mask, interval: int = 1 << 31, **kwargs):
+    def __init__(self, reference_image, whole_object_mask, background_mask, interval: int = 1, **kwargs):
         # TODO: drop multiple inheritance once `interval` included in CIL
         Callback.__init__(self, interval=interval)
         ImageQualityCallback.__init__(self, reference_image, **kwargs)
@@ -297,7 +297,7 @@ else:
         metrics_with_timeout.reset() # timeout from now
         algo = Submission(data)
         try:
-            algo.run(np.inf, callbacks=metrics + submission_callbacks)
+            algo.run(np.inf, callbacks=metrics + submission_callbacks, update_objective_interval=np.inf)
         except Exception:
             print_exc(limit=2)
         finally:
