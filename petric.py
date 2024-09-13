@@ -246,15 +246,23 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
                    whole_object_mask, background_mask, voi_masks, srcdir.resolve())
 
 
+DATA_SLICES = {
+    'Siemens_mMR_NEMA_IQ': {'transverse_slice': 72, 'coronal_slice': 109},                 # 'sagittal_slice': 89
+    'Siemens_mMR_ACR': {'transverse_slice': 99},
+    'NeuroLF_Hoffman_Dataset': {'transverse_slice': 72},
+    'Mediso_NEMA_IQ': {'transverse_slice': 22, 'coronal_slice': 89, 'sagittal_slice': 66},
+    'Siemens_Vision600_thorax': {}}
+
 if SRCDIR.is_dir():
     # create list of existing data
     # NB: `MetricsWithTimeout` initialises `SaveIters` which creates `outdir`
-    data_dirs_metrics = [(SRCDIR / "Siemens_mMR_NEMA_IQ", OUTDIR / "mMR_NEMA",
-                          [MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", transverse_slice=72, coronal_slice=109)]),
-                         (SRCDIR / "NeuroLF_Hoffman_Dataset", OUTDIR / "NeuroLF_Hoffman",
-                          [MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Hoffman", transverse_slice=72)]),
-                         (SRCDIR / "Siemens_Vision600_thorax", OUTDIR / "Vision600_thorax",
-                          [MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax")])]
+    data_dirs_metrics = [
+        (SRCDIR / "Siemens_mMR_NEMA_IQ", OUTDIR / "mMR_NEMA",
+         [MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", **DATA_SLICES['Siemens_mMR_NEMA_IQ'])]),
+        (SRCDIR / "NeuroLF_Hoffman_Dataset", OUTDIR / "NeuroLF_Hoffman",
+         [MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Hoffman", **DATA_SLICES['NeuroLF_Hoffman_Dataset'])]),
+        (SRCDIR / "Siemens_Vision600_thorax", OUTDIR / "Vision600_thorax",
+         [MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax", **DATA_SLICES['Siemens_Vision600_thorax'])])]
 else:
     log.warning("Source directory does not exist: %s", SRCDIR)
     data_dirs_metrics = [(None, None, [])] # type: ignore

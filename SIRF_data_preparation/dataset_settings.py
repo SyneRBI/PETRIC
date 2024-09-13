@@ -1,6 +1,11 @@
 """Settings for recon and display used in the data preparation"""
-
 from dataclasses import dataclass
+
+from petric import DATA_SLICES
+
+DATA_SUBSETS = {
+    'Siemens_mMR_NEMA_IQ': 7, 'Siemens_mMR_ACR': 7, 'NeuroLF_Hoffman_Dataset': 16, 'Mediso_NEMA_IQ': 12,
+    'Siemens_Vision600_thorax': 5}
 
 
 @dataclass
@@ -10,19 +15,4 @@ class DatasetSettings:
 
 
 def get_settings(scanID: str):
-    if scanID == 'Siemens_mMR_NEMA_IQ':
-        slices = {'transverse_slice': 72, 'coronal_slice': 109} # , 'sagittal_slice': 89}
-        num_subsets = 7
-    elif scanID == 'Siemens_mMR_ACR':
-        slices = {'transverse_slice': 99}
-        num_subsets = 7
-    elif scanID == 'NeuroLF_Hoffman_Dataset':
-        slices = {'transverse_slice': 72}
-        num_subsets = 16
-    elif scanID == 'Mediso_NEMA_IQ':
-        slices = {'transverse_slice': 22, 'coronal_slice': 89, 'sagittal_slice': 66}
-        num_subsets = 12
-    else:                                                       # Vision
-        slices = {}
-        num_subsets = 5
-    return DatasetSettings(num_subsets, slices)
+    return DatasetSettings(DATA_SUBSETS[scanID], DATA_SLICES[scanID])
