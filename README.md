@@ -68,6 +68,7 @@ conda install monai tensorboard tensorboardx jupytext cudatoolkit=11.8
 pip uninstall torch # monai installs pytorch (CPU), so remove it
 pip install tensorflow[and-cuda]==2.14  # last to support cu118
 pip install torch --index-url https://download.pytorch.org/whl/cu118
+pip install tensorboard-plugin-3d
 pip install git+https://github.com/TomographicImaging/Hackathon-000-Stochastic-QualityMetrics
 # 4. optionally, conda/pip/apt install environment.yml/requirements.txt/apt.txt
 # 5. run your submission

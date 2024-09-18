@@ -109,6 +109,12 @@ class StatsLog(Callback):
         self.tb.add_image("coronal", np.clip(x_arr[None, :, self.coronal_slice] / self.vmax, 0, 1), algo.iteration, t)
         self.tb.add_image("sagittal", np.clip(x_arr[None, :, :, self.sagittal_slice] / self.vmax, 0, 1), algo.iteration,
                           t)
+        try:
+            from monai.visualize import plot_2d_or_3d_image
+        except ImportError:
+            pass
+        else:
+            plot_2d_or_3d_image(np.clip(x_arr[None, None] / self.vmax, 0, 1), algo.iteration, self.tb, tag='image')
         log.debug("...logged")
 
 
