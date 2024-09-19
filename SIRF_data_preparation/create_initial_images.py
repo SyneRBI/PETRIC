@@ -82,9 +82,8 @@ def compute_kappa_image(obj_fun, initial_image):
 
     WARNING: Assumes the objective function has been set-up already
     """
-    # This needs SIRF 3.7. If you don't have that yet, you should probably upgrade anyway!
-    Hessian_row_sum = obj_fun.multiply_with_Hessian(initial_image, initial_image.allocate(1))
-    return (-1 * Hessian_row_sum).power(.5)
+    minus_Hessian_row_sum = -1 * obj_fun.multiply_with_Hessian(initial_image, initial_image.allocate(1))
+    return minus_Hessian_row_sum.maximum(0).power(.5)
 
 
 def main(argv=None):
