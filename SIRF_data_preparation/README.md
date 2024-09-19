@@ -35,24 +35,24 @@ PYTHONPATH=~/devel/PETRIC:$PYTHONPATH`
 
 1. Run initial [data_QC.py](data_QC)
    ```
-   python ../../SIRF_data_preparation/data_QC.py
+   python -m SIRF_data_preparation.data_QC
    ```
 
 2. Run [create_initial_images.py](create_initial_images).
    ```
-   python ../../SIRF_data_preparation/create_initial_images.py --template_image=<some_image>
+   python -m SIRF_data_preparation.create_initial_images --template_image=<some_image>
    ```
    where the template image is one of the given VOIs (it does not matter which one, as they should all have the same geometry). (If you need to create VOIs yourself, you can use `None` or the vendor image).
 3. Edit `OSEM_image.hv` to add modality, radionuclide and duration info which got lost (copy from `prompts.hs`)
 4. Edit [dataset_settings.py](dataset_settings.py) for subsets (used by our reference reconstructions only, not by participants).
-5. Edit [../petric.py](petric.py) for slices to use for creating figures (`DATA_SLICES`). Note that `data_QC.py` outputs centre-of-mass of the VOIs, which can be helpful for this.
-6. Run [data_QC.py](data_QC) which should now make more plots. Check VOI alignment etc.
+5. Edit [../petric.py](petric.py) for slices to use for creating figures (`DATA_SLICES`). Note that `data_QC` outputs centre-of-mass of the VOIs, which can be helpful for this.
+6. Run [data_QC](data_QC) which should now make more plots. Check VOI alignment etc.
    ```
-   python ../../SIRF_data_preparation/data_QC.py --dataset=<datasetname>
+   python -m SIRF_data_preparation.data_QC --dataset=<datasetname>
    ```
 7. `cd ../..`
-8. `python SIRF_data_preparation/run_OSEM.py <datasetname>`
-9. `python SIRF_data_preparation/run_BSREM.py  <datasetname>`
+8. `python -m SIRF_data_preparation.run_OSEM <datasetname>`
+9. `python -m SIRF_data_preparation.run_BSREM  <datasetname>`
 10. Adapt [plot_BSREM_metrics.py](plot_BSREM_metrics.py) (probably only the `<datasetname>`) and run interactively.
 11. Copy the BSREM ` iter_final` to `data/<datasetname>/PETRIC/reference_image`, e.g.
     ```

@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 
-from .data_utilities import prepare_challenge_Siemens_data, the_data_path
+from ..data_utilities import prepare_challenge_Siemens_data, the_data_path, the_orgdata_path
 
 this_directory = os.path.dirname(__file__)
 repo_directory = os.path.dirname(this_directory)
