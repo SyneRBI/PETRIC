@@ -6,7 +6,7 @@ Usage:
 
 Options:
   -h, --help
-  --srcdir=<path>        pathname (must have trailing slash!) [default: ./]
+  --srcdir=<path>        pathname. Will default to current directory unless dataset is set
   --skip_sino_profiles   do not plot the sinogram profiles
   --transverse_slice=<i>  idx [default: -1]
   --coronal_slice=<c>    idx [default: -1]
@@ -17,7 +17,7 @@ Note that -1 one means to use middle of image
 """
 # Copyright 2024 University College London
 # Licence: Apache-2.0
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 import os
 import os.path
@@ -31,6 +31,7 @@ from scipy import ndimage
 
 import sirf.STIR as STIR
 from SIRF_data_preparation.dataset_settings import get_settings
+from SIRF_data_preparation.data_utilities import the_data_path
 
 STIR.AcquisitionData.set_storage_scheme('memory')
 
@@ -163,11 +164,15 @@ def main(argv=None):
     slices["sagittal_slice"] = literal_eval(args['--sagittal_slice'])
 
     if (dataset):
+        if srcdir is None:
+            srcdir = the_data_path(dataset)
         settings = get_settings(dataset)
         for key in slices.keys():
             if slices[key] == -1 and key in settings.slices:
                 slices[key] = settings.slices[key]
-    print(slices)
+    else:
+        if srcdir is None:
+            srcdir = os.getcwd()
 
     if not skip_sino_profiles:
         acquired_data = STIR.AcquisitionData(os.path.join(srcdir, 'prompts.hs'))
