@@ -8,7 +8,7 @@ Arguments:
 
 Options:
   -t <template_image>, --template_image=<template_image>  filename (relative to <data_path>) of image to use
-                                                          for data sizes [default: PETRIC/VOI_whole_phantom.hv]
+                                                          for data sizes [default: PETRIC/VOI_whole_object.hv]
   -s <xy-size>, --xy-size=<xy-size>  force xy-size (do not use when using VOIs as init) [default: -1]
   -S <subsets>, --subsets=<subsets>  number of subsets [default: 2]
   -i <subiterations>, --subiterations=<subiterations>     number of sub-iterations [default: 14]
@@ -16,7 +16,7 @@ Options:
 # Copyright 2024 Rutherford Appleton Laboratory STFC
 # Copyright 2024 University College London
 # Licence: Apache-2.0
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 import logging
 import math

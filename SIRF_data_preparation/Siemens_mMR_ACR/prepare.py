@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 
-from SIRF_data_preparation.data_utilities import prepare_challenge_Siemens_data, the_data_path, the_orgdata_path
+from ..data_utilities import prepare_challenge_Siemens_data, the_data_path, the_orgdata_path
 
 scanID = 'Siemens_mMR_ACR'
 
