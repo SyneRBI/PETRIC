@@ -25,20 +25,32 @@ import os
 from docopt import docopt
 
 import sirf.STIR as STIR
-from sirf.contrib.partitioner import partitioner
 
 log = logging.getLogger('create_initial_images')
 STIR.AcquisitionData.set_storage_scheme('memory')
 
 
-def create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, template_image):
+def create_acq_model_and_obj_fun(acquired_data, additive_term, mult_factors, initial_image):
     """Create an acquisition model and objective function, corresponding to the given data"""
-    # We could construct this by hand here, but instead will just use `partitioner.data_partition`
-    # with 1 subset, which will then do the work for us.
-    num_subsets = 1
-    _, acq_models, obj_funs = partitioner.data_partition(acquired_data, additive_term, mult_factors, num_subsets,
-                                                         initial_image=template_image)
-    return (acq_models[0], obj_funs[0])
+
+    sensitivity_factors = STIR.AcquisitionSensitivityModel(mult_factors)
+    sensitivity_factors.set_up(mult_factors)
+    try:
+        acquisition_model = STIR.AcquisitionModelUsingParallelproj()
+    except AttributeError:
+        acquisition_model = STIR.AcquisitionModelUsingRayTracingMatrix()
+        acquisition_model.set_num_tangential_LORs(5)
+    acquisition_model.set_acquisition_sensitivity(sensitivity_factors)
+    acquisition_model.set_background_term(additive_term)
+
+    if initial_image is not None:
+        acquisition_model.set_up(acquired_data, initial_image)
+
+    obj_fun = STIR.make_Poisson_loglikelihood(acquired_data, acq_model=acquisition_model)
+    if initial_image is not None:
+        obj_fun.set_up(initial_image)
+
+    return acquisition_model, obj_fun
 
 
 def scale_initial_image(acquired_data, additive_term, mult_factors, template_image, obj_fun):
