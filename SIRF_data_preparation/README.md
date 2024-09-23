@@ -33,20 +33,20 @@ in `~/devel/PETRIC/data/<datasetname>` with `datasetname` following convention o
 PYTHONPATH=~/devel/PETRIC:$PYTHONPATH`
 ```
 
-1. Run initial [data_QC.py](data_QC)
+1. Run initial [data_QC.py](data_QC.py)
    ```
    python -m SIRF_data_preparation.data_QC
    ```
 
-2. Run [create_initial_images.py](create_initial_images).
+2. Run [create_initial_images.py](create_initial_images.py).
    ```
    python -m SIRF_data_preparation.create_initial_images --template_image=<some_image>
    ```
    where the template image is one of the given VOIs (it does not matter which one, as they should all have the same geometry). (If you need to create VOIs yourself, you can use `None` or the vendor image).
 3. Edit `OSEM_image.hv` to add modality, radionuclide and duration info which got lost (copy from `prompts.hs`)
 4. Edit [dataset_settings.py](dataset_settings.py) for subsets (used by our reference reconstructions only, not by participants).
-5. Edit [../petric.py](petric.py) for slices to use for creating figures (`DATA_SLICES`). Note that `data_QC` outputs centre-of-mass of the VOIs, which can be helpful for this.
-6. Run [data_QC](data_QC) which should now make more plots. Check VOI alignment etc.
+5. Edit [petric.py](../petric.py) for slices to use for creating figures (`DATA_SLICES`). Note that `data_QC` outputs centre-of-mass of the VOIs, which can be helpful for this.
+6. Run [data_QC.py](data_QC.py) which should now make more plots. Check VOI alignment etc.
    ```
    python -m SIRF_data_preparation.data_QC --dataset=<datasetname>
    ```
@@ -58,5 +58,5 @@ PYTHONPATH=~/devel/PETRIC:$PYTHONPATH`
     ```
     stir_math data/<datasetname>/PETRIC/reference_image.hv output/<datasetname>/iter_final.hv
     ```
-12. `rm output/<datasetname>/*ahv`, check its `README.md` etc
+12. `cd data/<datasetname>; rm -f *ahv info.txt warnings.txt`, check its `README.md` etc
 13. Transfer to web-server
