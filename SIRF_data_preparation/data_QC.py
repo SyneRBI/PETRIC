@@ -30,8 +30,8 @@ from docopt import docopt
 from scipy import ndimage
 
 import sirf.STIR as STIR
-from SIRF_data_preparation.dataset_settings import get_settings
 from SIRF_data_preparation.data_utilities import the_data_path
+from SIRF_data_preparation.dataset_settings import get_settings
 
 STIR.AcquisitionData.set_storage_scheme('memory')
 
