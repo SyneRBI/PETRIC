@@ -266,7 +266,9 @@ if SRCDIR.is_dir():
         (SRCDIR / "Siemens_mMR_ACR", OUTDIR / "mMR_ACR",
          [MetricsWithTimeout(outdir=OUTDIR / "mMR_ACR", **DATA_SLICES['Siemens_mMR_ACR'])]),
         (SRCDIR / "Mediso_NEMA_IQ", OUTDIR / "Mediso_NEMA",
-         [MetricsWithTimeout(outdir=OUTDIR / "Mediso_NEMA", **DATA_SLICES['Mediso_NEMA_IQ'])])]
+         [MetricsWithTimeout(outdir=OUTDIR / "Mediso_NEMA", **DATA_SLICES['Mediso_NEMA_IQ'])]),
+        (SRCDIR / "GE_DMI3_Torso", OUTDIR / "DMI3_Torso",
+         [MetricsWithTimeout(outdir=OUTDIR / "DMI3_Torso", **DATA_SLICES['GE_DMI3_Torso'])])]
 else:
     log.warning("Source directory does not exist: %s", SRCDIR)
     data_dirs_metrics = [(None, None, [])] # type: ignore
