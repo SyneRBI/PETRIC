@@ -63,9 +63,16 @@ class Submission(Algorithm):
 
             acquisition_model_subset = STIR.AcquisitionModelUsingParallelproj()
             acquisition_model_subset.set_additive_term(additive_term_subset)
-            acquisition_model_subset.set_up(prompts_subset, self.x)
+            if prompts_subset.dimensions()[0] > 1 and multiplicative_factors_subset.dimensions()[0] == 1:
+                # non-TOF multiplicative factors for TOF data
+                acquisition_model_subset.set_up(multiplicative_factors_subset, self.x)
+                subset_sensitivity = acquisition_model_subset.backward(multiplicative_factors_subset)
+                acquisition_model_subset.set_up(prompts_subset, self.x)
+            else:
+                assert prompts_subset.dimensions()[0] == multiplicative_factors_subset.dimensions()[0]
+                acquisition_model_subset.set_up(prompts_subset, self.x)
+                subset_sensitivity = acquisition_model_subset.backward(multiplicative_factors_subset)
 
-            subset_sensitivity = acquisition_model_subset.backward(multiplicative_factors_subset)
             # add a small number to avoid NaN in division
             subset_sensitivity += subset_sensitivity.max() * 1e-6
 

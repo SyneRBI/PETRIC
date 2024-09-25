@@ -51,7 +51,10 @@ def scale_initial_image(acquired_data, additive_term, mult_factors, template_ima
 
     WARNING: assumes that obj_fun has been set_up already
     """
-    data_sum = (acquired_data.sum() - (additive_term * mult_factors).sum())
+    sensitivity_factors = STIR.AcquisitionSensitivityModel(mult_factors)
+    sensitivity_factors.set_up(acquired_data)
+    background = sensitivity_factors.forward(additive_term)
+    data_sum = acquired_data.sum() - background.sum()
     if data_sum <= 0 or math.isinf(data_sum) or math.isnan(data_sum):
         raise ValueError("Something wrong with input data. Sum of (prompts-background) is negative:"
                          f" sum prompts: {acquired_data.sum()}, sum corrected: {data_sum}")
