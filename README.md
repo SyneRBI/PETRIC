@@ -29,13 +29,10 @@ Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/o
 
   ```yml
   name: winning-submission
-  channels: [conda-forge, pytorch, nvidia]
+  channels: [conda-forge, nvidia]
   dependencies:
   - cupy
   - cuda-version =11.8
-  - pytorch-cuda =11.8
-  - tensorflow-gpu
-  - cudatoolkit =11.8.0
   - pip
   - pip:
     - git+https://github.com/MyResearchGroup/prize-winning-algos
@@ -45,8 +42,6 @@ Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/o
 
   ```txt
   cupy-cuda11x
-  torch --index-url https://download.pytorch.org/whl/cu118
-  tensorflow[and-cuda]
   git+https://github.com/MyResearchGroup/prize-winning-algos
   ```
 
@@ -68,11 +63,16 @@ The organisers will execute (after installing [nvidia-docker](https://docs.nvidi
 docker run --rm -it --gpus all -p 6006:6006 \
   -v /path/to/data:/mnt/share/petric:ro \
   -v .:/workdir -w /workdir synerbi/sirf:edge-gpu /bin/bash
-# 3. optionally, conda/pip/apt install environment.yml/requirements.txt/apt.txt
-# 4. install metrics & run your submission
+# 3. install metrics & GPU libraries
+conda install monai tensorboard tensorboardx jupytext cudatoolkit=11.8
+pip uninstall torch # monai installs pytorch (CPU), so remove it
+pip install tensorflow[and-cuda]==2.14  # last to support cu118
+pip install torch --index-url https://download.pytorch.org/whl/cu118
 pip install git+https://github.com/TomographicImaging/Hackathon-000-Stochastic-QualityMetrics
+# 4. optionally, conda/pip/apt install environment.yml/requirements.txt/apt.txt
+# 5. run your submission
 python petric.py &
-# 5. optionally, serve logs at <http://localhost:6006>
+# 6. optionally, serve logs at <http://localhost:6006>
 tensorboard --bind_all --port 6006 --logdir ./output
 ```
 
