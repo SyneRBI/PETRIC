@@ -43,7 +43,7 @@ class Callback(cil_callbacks.Callback):
     CIL Callback but with `self.skip_iteration` checking `min(self.interval, algo.update_objective_interval)`.
     TODO: backport this class to CIL.
     """
-    def __init__(self, interval: int = 1 << 31, **kwargs):
+    def __init__(self, interval: int = 1, **kwargs):
         super().__init__(**kwargs)
         self.interval = interval
 
@@ -110,7 +110,7 @@ class StatsLog(Callback):
 
 class QualityMetrics(ImageQualityCallback, Callback):
     """From https://github.com/SyneRBI/PETRIC/wiki#metrics-and-thresholds"""
-    def __init__(self, reference_image, whole_object_mask, background_mask, interval: int = 1 << 31, **kwargs):
+    def __init__(self, reference_image, whole_object_mask, background_mask, interval: int = 3, **kwargs):
         # TODO: drop multiple inheritance once `interval` included in CIL
         Callback.__init__(self, interval=interval)
         ImageQualityCallback.__init__(self, reference_image, **kwargs)
@@ -259,10 +259,18 @@ if SRCDIR.is_dir():
     data_dirs_metrics = [
         (SRCDIR / "Siemens_mMR_NEMA_IQ", OUTDIR / "mMR_NEMA",
          [MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA", **DATA_SLICES['Siemens_mMR_NEMA_IQ'])]),
+        (SRCDIR / "Siemens_mMR_NEMA_IQ_lowcounts", OUTDIR / "mMR_NEMA_lowcounts",
+         [MetricsWithTimeout(outdir=OUTDIR / "mMR_NEMA_lowcounts", **DATA_SLICES['Siemens_mMR_NEMA_IQ_lowcounts'])]),
         (SRCDIR / "NeuroLF_Hoffman_Dataset", OUTDIR / "NeuroLF_Hoffman",
          [MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Hoffman", **DATA_SLICES['NeuroLF_Hoffman_Dataset'])]),
         (SRCDIR / "Siemens_Vision600_thorax", OUTDIR / "Vision600_thorax",
-         [MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax", **DATA_SLICES['Siemens_Vision600_thorax'])])]
+         [MetricsWithTimeout(outdir=OUTDIR / "Vision600_thorax", **DATA_SLICES['Siemens_Vision600_thorax'])]),
+        (SRCDIR / "Siemens_mMR_ACR", OUTDIR / "mMR_ACR",
+         [MetricsWithTimeout(outdir=OUTDIR / "mMR_ACR", **DATA_SLICES['Siemens_mMR_ACR'])]),
+        (SRCDIR / "Mediso_NEMA_IQ", OUTDIR / "Mediso_NEMA",
+         [MetricsWithTimeout(outdir=OUTDIR / "Mediso_NEMA", **DATA_SLICES['Mediso_NEMA_IQ'])]),
+        (SRCDIR / "GE_DMI3_Torso", OUTDIR / "DMI3_Torso",
+         [MetricsWithTimeout(outdir=OUTDIR / "DMI3_Torso", **DATA_SLICES['GE_DMI3_Torso'])])]
 else:
     log.warning("Source directory does not exist: %s", SRCDIR)
     data_dirs_metrics = [(None, None, [])] # type: ignore
@@ -293,7 +301,7 @@ else:
         metrics_with_timeout.reset() # timeout from now
         algo = Submission(data)
         try:
-            algo.run(np.inf, callbacks=metrics + submission_callbacks)
+            algo.run(np.inf, callbacks=metrics + submission_callbacks, update_objective_interval=np.inf)
         except Exception:
             print_exc(limit=2)
         finally:
