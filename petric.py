@@ -110,7 +110,7 @@ class StatsLog(Callback):
 
 class QualityMetrics(ImageQualityCallback, Callback):
     """From https://github.com/SyneRBI/PETRIC/wiki#metrics-and-thresholds"""
-    def __init__(self, reference_image, whole_object_mask, background_mask, interval: int = 1, **kwargs):
+    def __init__(self, reference_image, whole_object_mask, background_mask, interval: int = 3, **kwargs):
         # TODO: drop multiple inheritance once `interval` included in CIL
         Callback.__init__(self, interval=interval)
         ImageQualityCallback.__init__(self, reference_image, **kwargs)
