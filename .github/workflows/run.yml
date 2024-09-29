@@ -36,7 +36,6 @@ jobs:
         dataset=Siemens_mMR_NEMA_IQ
         curl -sfSL -o  ${dataset}.zip https://petric.tomography.stfc.ac.uk/data/${dataset}.zip
         mkdir -p data; cd data; unzip -u ../${dataset}.zip; cd ..
-        curl -fsSL https://raw.githubusercontent.com/SyneRBI/PETRIC/main/petric.py > petric.py
         test -f main.py || ln -s main_ISTA.py main.py
         python <<EOF
         import petric
