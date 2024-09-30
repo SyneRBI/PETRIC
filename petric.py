@@ -43,7 +43,7 @@ class Callback(cil_callbacks.Callback):
     CIL Callback but with `self.skip_iteration` checking `min(self.interval, algo.update_objective_interval)`.
     TODO: backport this class to CIL.
     """
-    def __init__(self, interval: int = 1, **kwargs):
+    def __init__(self, interval: int = 3, **kwargs):
         super().__init__(**kwargs)
         self.interval = interval
 
