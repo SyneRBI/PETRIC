@@ -27,7 +27,7 @@ for the Siemens mMR NEMA IQ data (on Zenodo):
 - `BSREM_*.py`: functions with specific settings for a particular data-set
 
 # Steps to follow to prepare data
-If starting from Siemens list-mode data and letting SIRF take care of scatter etc, check for instance [Siemens_mMR_ACR/README.md](steps for Siemens mMR ACR). If pre-prepared data are given, check that naming of all files is correct. KT normally puts all data
+If starting from Siemens mMR list-mode data and letting SIRF take care of scatter etc, check for instance [steps for Siemens mMR ACR](Siemens_mMR_ACR/README.md). If pre-prepared data are given, check that naming of all files is correct. KT normally puts all data
 in `~/devel/PETRIC/data/<datasetname>` with `datasetname` following convention of `scanner_phantom-name` as others (instructions below and indeed some scripts might assume this location). Change working directory to where data sits and add PETRIC to your python-path, e.g.
 ```
 PYTHONPATH=~/devel/PETRIC:$PYTHONPATH`
