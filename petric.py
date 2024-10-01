@@ -86,7 +86,7 @@ class StatsLog(Callback):
     def __call__(self, algo: Algorithm):
         if self.skip_iteration(algo):
             return
-        t = getattr(self, '__time', None) or time()
+        t = self._time_
         log.debug("logging iter %d...", algo.iteration)
         # initialise `None` values
         self.transverse_slice = algo.x.dimensions()[0] // 2 if self.transverse_slice is None else self.transverse_slice
@@ -123,7 +123,7 @@ class QualityMetrics(ImageQualityCallback, Callback):
     def __call__(self, algo: Algorithm):
         if self.skip_iteration(algo):
             return
-        t = getattr(self, '__time', None) or time()
+        t = self._time_
         for tag, value in self.evaluate(algo.x).items():
             self.tb_summary_writer.add_scalar(tag, value, algo.iteration, t)
 
@@ -159,16 +159,16 @@ class MetricsWithTimeout(cil_callbacks.Callback):
         self.tb = tb_cbk.tb # convenient access to the underlying SummaryWriter
         self.reset()
 
-    def reset(self, seconds=None):
-        self.limit = time() + (self._seconds if seconds is None else seconds)
+    def reset(self):
+        self.limit = time() + self._seconds
         self.offset = 0
 
     def __call__(self, algo: Algorithm):
-        if (now := time()) > self.limit + self.offset:
+        if (time_excluding_metrics := (now := time()) - self.offset) > self.limit:
             log.warning("Timeout reached. Stopping algorithm.")
             raise StopIteration
         for c in self.callbacks:
-            c.__time = now - self.offset # privately inject walltime-excluding-petric-callbacks
+            c._time_ = time_excluding_metrics
             c(algo)
         self.offset += time() - now
 
