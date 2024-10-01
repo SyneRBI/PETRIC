@@ -292,8 +292,11 @@ else:
     from traceback import print_exc
 
     from docopt import docopt
+    from tqdm.contrib.logging import logging_redirect_tqdm
     args = docopt(__doc__)
     logging.basicConfig(level=getattr(logging, args["--log"].upper()))
+    redir = logging_redirect_tqdm()
+    redir.__enter__()
     from main import Submission, submission_callbacks
     assert issubclass(Submission, Algorithm)
     for srcdir, outdir, metrics in data_dirs_metrics:
