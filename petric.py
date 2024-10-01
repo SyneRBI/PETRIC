@@ -21,8 +21,10 @@ import re
 from dataclasses import dataclass
 from pathlib import Path, PurePath
 from time import time
+from typing import Iterable
 
 import numpy as np
+from scipy.ndimage import binary_erosion
 from skimage.metrics import mean_squared_error as mse
 from tensorboardX import SummaryWriter
 
@@ -159,6 +161,21 @@ class QualityMetrics(ImageQualityCallback, Callback):
 
     def keys(self):
         return ["RMSE_whole_object", "RMSE_background"] + [f"AEM_VOI_{name}" for name in sorted(self.voi_indices)]
+
+    @staticmethod
+    def pass_index(metrics: np.ndarray, thresh: Iterable, window: int = 10) -> int:
+        """
+        Returns first index of `metrics` with value <= `thresh`.
+        The values must remain below the respective thresholds for at least `window` number of entries.
+        Otherwise raises IndexError.
+        """
+        thr_arr = np.asanyarray(thresh)
+        assert metrics.ndim == 2
+        assert thr_arr.ndim == 1
+        assert metrics.shape[1] == thr_arr.shape[0]
+        passed = (metrics <= thr_arr[None]).all(axis=1)
+        res = binary_erosion(passed, structure=np.ones(window), origin=-(window // 2))
+        return np.where(res)[0][0]
 
 
 class MetricsWithTimeout(cil_callbacks.Callback):
