@@ -94,11 +94,12 @@ class StatsLog(Callback):
         self.sagittal_slice = algo.x.dimensions()[2] // 2 if self.sagittal_slice is None else self.sagittal_slice
         self.vmax = algo.x.max() if self.vmax is None else self.vmax
 
-        self.tb.add_scalar("objective", algo.get_last_loss(), algo.iteration, t)
-        if self.x_prev is not None:
-            normalised_change = (algo.x - self.x_prev).norm() / algo.x.norm()
-            self.tb.add_scalar("normalised_change", normalised_change, algo.iteration, t)
-        self.x_prev = algo.x.clone()
+        if log.getEffectiveLevel() <= logging.DEBUG:
+            self.tb.add_scalar("objective", algo.get_last_loss(), algo.iteration, t)
+            if self.x_prev is not None:
+                normalised_change = (algo.x - self.x_prev).norm() / algo.x.norm()
+                self.tb.add_scalar("normalised_change", normalised_change, algo.iteration, t)
+            self.x_prev = algo.x.clone()
         x_arr = algo.x.as_array()
         self.tb.add_image("transverse", np.clip(x_arr[None, self.transverse_slice] / self.vmax, 0, 1), algo.iteration,
                           t)
