@@ -17,6 +17,7 @@ Options:
 import csv
 import logging
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path, PurePath
 from time import time
@@ -111,7 +112,10 @@ class StatsLog(Callback):
 
 class QualityMetrics(ImageQualityCallback, Callback):
     """From https://github.com/SyneRBI/PETRIC/wiki#metrics-and-thresholds"""
-    def __init__(self, reference_image, whole_object_mask, background_mask, interval: int = 1, **kwargs):
+    THRESHOLD = {"AEM_VOI": 0.005, "RMSE_whole_object": 0.01, "RMSE_background": 0.01}
+
+    def __init__(self, reference_image, whole_object_mask, background_mask, interval: int = 1,
+                 threshold_window: int = 10, **kwargs):
         # TODO: drop multiple inheritance once `interval` included in CIL
         Callback.__init__(self, interval=interval)
         ImageQualityCallback.__init__(self, reference_image, **kwargs)
@@ -119,13 +123,25 @@ class QualityMetrics(ImageQualityCallback, Callback):
         self.background_indices = np.where(background_mask.as_array())
         self.ref_im_arr = reference_image.as_array()
         self.norm = self.ref_im_arr[self.background_indices].mean()
+        self.threshold_window = threshold_window
+        self.threshold_iters = 0
 
     def __call__(self, algo: Algorithm):
         if self.skip_iteration(algo):
             return
         t = self._time_
-        for tag, value in self.evaluate(algo.x).items():
+        # log metrics
+        metrics = self.evaluate(algo.x)
+        for tag, value in metrics.items():
             self.tb_summary_writer.add_scalar(tag, value, algo.iteration, t)
+        # stop if `all(metrics < THRESHOLD)` for `threshold_window` iters
+        # NB: need to strip suffix from "AEM_VOI" tags
+        if all(value <= self.THRESHOLD[re.sub("^(AEM_VOI)_.*", r"\1", tag)] for tag, value in metrics.items()):
+            self.threshold_iters += 1
+            if self.threshold_iters >= self.threshold_window:
+                raise StopIteration
+        else:
+            self.threshold_iters = 0
 
     def evaluate(self, test_im: STIR.ImageData) -> dict[str, float]:
         assert not any(self.filter.values()), "Filtering not implemented"

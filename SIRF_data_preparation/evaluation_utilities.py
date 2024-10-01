@@ -25,7 +25,7 @@ def get_metrics(qm: QualityMetrics, iters: Iterable[int], srcdir='.'):
         list(qm.evaluate(STIR.ImageData(str(Path(srcdir) / f'iter_{i:04d}.hv'))).values()) for i in iters])
 
 
-def pass_index(metrics: np.ndarray, thresh: Iterable, window: int = 1) -> int:
+def pass_index(metrics: np.ndarray, thresh: Iterable, window: int = 10) -> int:
     """
     Returns first index of `metrics` with value <= `thresh`.
     The values must remain below the respective thresholds for at least `window` number of entries.
