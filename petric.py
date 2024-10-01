@@ -176,12 +176,14 @@ class MetricsWithTimeout(cil_callbacks.Callback):
         self.reset()
 
     def reset(self):
-        self.limit = time() + self._seconds
         self.offset = 0
+        self.limit = (now := time()) + self._seconds
+        self.tb.add_scalar("reset", 0, -1, now) # for relative timing calculation
 
     def __call__(self, algo: Algorithm):
         if (time_excluding_metrics := (now := time()) - self.offset) > self.limit:
             log.warning("Timeout reached. Stopping algorithm.")
+            self.tb.add_scalar("reset", 0, algo.iteration, time_excluding_metrics)
             raise StopIteration
         for c in self.callbacks:
             c._time_ = time_excluding_metrics
