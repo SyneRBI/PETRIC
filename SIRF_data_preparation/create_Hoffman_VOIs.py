@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Download/Register Hoffman and create VOIs
 
 Usage:
