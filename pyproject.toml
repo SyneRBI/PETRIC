@@ -1,0 +1,21 @@
+[tool.flake8]
+max_line_length = 120
+extend_ignore = ["E261"]
+exclude = [".git", "__pycache__", "build", "dist", ".eggs"]
+
+[tool.yapf]
+spaces_before_comment = [15, 20]
+arithmetic_precedence_indication = true
+allow_split_before_dict_value = false
+coalesce_brackets = true
+column_limit = 120
+each_dict_entry_on_separate_line = false
+space_between_ending_comma_and_closing_bracket = false
+split_before_named_assigns = false
+split_before_closing_bracket = false
+blank_line_before_nested_class_or_def = false
+
+[tool.isort]
+profile = "black"
+line_length = 120
+known_first_party = ["cil", "sirf", "main", "petric", "img_quality_cil_stir"]
