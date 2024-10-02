@@ -11,7 +11,7 @@ import sirf.STIR as STIR
 from petric import OUTDIR, SRCDIR, QualityMetrics, get_data
 from SIRF_data_preparation import data_QC
 from SIRF_data_preparation.dataset_settings import get_settings
-from SIRF_data_preparation.evaluation_utilities import get_metrics, pass_index, plot_metrics, read_objectives
+from SIRF_data_preparation.evaluation_utilities import get_metrics, plot_metrics, read_objectives
 
 if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
     PETRICDIR = Path('~/devel/PETRIC').expanduser()
@@ -112,7 +112,7 @@ if m1 is not None:
     fig.savefig(outdir / f'{scanID}_metrics_BSREM.png')
 
 # %%
-idx = pass_index(m, numpy.array([.01, .01] + [.005 for i in range(len(data.voi_masks))]), 10)
+idx = QualityMetrics.pass_index(m, numpy.array([.01, .01] + [.005 for i in range(len(data.voi_masks))]), 10)
 iter = iters[idx]
 print(iter)
 image = STIR.ImageData(str(datadir / f"iter_{iter:04d}.hv"))
