@@ -16,6 +16,7 @@ Participants should never have to use these (unless you want to create your own 
 - `evaluation_utilities.py`: reading/plotting helpers for values of the objective function and metrics
 - `PET_plot_functions.py`: plotting helpers
 - `dataset_settings.py`: settings for display of good slices, subsets etc
+- `create_Hoffman_VOIs.py`: create VOIs registered to the OSEM image for a dataset
 
 ## Sub-folders per data-set
 
@@ -46,17 +47,21 @@ PYTHONPATH=~/devel/PETRIC:$PYTHONPATH`
 3. Edit `OSEM_image.hv` to add modality, radionuclide and duration info which got lost (copy from `prompts.hs`)
 4. Edit [dataset_settings.py](dataset_settings.py) for subsets (used by our reference reconstructions only, not by participants).
 5. Edit [petric.py](../petric.py) for slices to use for creating figures (`DATA_SLICES`). Note that `data_QC` outputs centre-of-mass of the VOIs, which can be helpful for this.
-6. Run [data_QC.py](data_QC.py) which should now make more plots. Check VOI alignment etc.
+6. Optionally make VOIs, e.g.
+   ```
+   python -m SIRF_data_preparation.create_Hoffman_VOIs --dataset=<datasetname>
+   ```
+7. Run [data_QC.py](data_QC.py) which should now make more plots. Check VOI alignment etc.
    ```
    python -m SIRF_data_preparation.data_QC --dataset=<datasetname>
    ```
-7. `cd ../..`
-8. `python -m SIRF_data_preparation.run_OSEM <datasetname>`
-9. `python -m SIRF_data_preparation.run_BSREM  <datasetname>`
-10. Adapt [plot_BSREM_metrics.py](plot_BSREM_metrics.py) (probably only the `<datasetname>`) and run interactively.
-11. Copy the BSREM ` iter_final` to `data/<datasetname>/PETRIC/reference_image`, e.g.
+8. `cd ../..`
+9. `python -m SIRF_data_preparation.run_OSEM <datasetname>`
+10. `python -m SIRF_data_preparation.run_BSREM  <datasetname>`
+11. Adapt [plot_BSREM_metrics.py](plot_BSREM_metrics.py) (probably only the `<datasetname>`) and run interactively.
+12. Copy the BSREM ` iter_final` to `data/<datasetname>/PETRIC/reference_image`, e.g.
     ```
     stir_math data/<datasetname>/PETRIC/reference_image.hv output/<datasetname>/iter_final.hv
     ```
-12. `cd data/<datasetname>; rm -f *ahv info.txt warnings.txt`, check its `README.md` etc
-13. Transfer to web-server
+13. `cd data/<datasetname>; rm -f *ahv info.txt warnings.txt`, check its `README.md` etc
+14. Transfer to web-server
