@@ -17,33 +17,32 @@ Options:
 # %% imports
 import os
 import sys
+import typing
 from pathlib import Path
+from zipfile import ZipFile
+
 import matplotlib.pyplot as plt
-from docopt import docopt
 import numpy as np
 import numpy.typing as npt
-import typing
 import requests
-from zipfile import ZipFile
 import scipy.ndimage as ndimage
+from docopt import docopt
 
-
-import sirf.STIR as STIR
 import sirf.Reg as Reg
-
-from petric import OUTDIR, SRCDIR, get_data
-from SIRF_data_preparation.data_utilities import the_orgdata_path
+import sirf.STIR as STIR
+from petric import OUTDIR, SRCDIR
 from SIRF_data_preparation.data_QC import plot_image
+from SIRF_data_preparation.data_utilities import the_orgdata_path
 
 # %%
 __version__ = "0.1.0"
 
 write_PETRIC_VOIs = True
-if (
-    not "ipykernel" in sys.argv[0]
-):  # clunky way to be able to set variables from within jupyter/VScode without docopt
+if "ipykernel" not in sys.argv[0]: # clunky way to be able to set variables from within jupyter/VScode without docopt
     args = docopt(__doc__, argv=None, version=__version__)
+
     # logging.basicConfig(level=logging.INFO)
+
     scanID = args["--dataset"]
     if scanID is None:
         print("Need to set the --dataset argument")
@@ -54,6 +53,7 @@ else:
     # set it by hand, e.g.
     scanID = "NeuroLF_Hoffman_Dataset"
     write_PETRIC_VOIs = False
+
 # %% standard PETRIC directories
 if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
     PETRICDIR = Path("~/devel/PETRIC").expanduser()
@@ -70,7 +70,7 @@ os.makedirs(intermediate_data_path, exist_ok=True)
 def connected_component(arr: npt.NDArray[bool], order=0) -> npt.NDArray[bool]:
     """Return connected component of a given order in an array. order=0 returns the largest."""
     labels, num_labels = ndimage.label(arr)
-    num_elems = [(labels == l).sum() for l in range(num_labels)]
+    num_elems = [(labels == i).sum() for i in range(num_labels)]
     idx = np.argsort(num_elems)[-1 - order]
     return labels == idx
 
@@ -89,9 +89,7 @@ def nii_to_STIR(image_nii: Reg.ImageData, filename_prefix: str) -> STIR.ImageDat
     return image
 
 
-def STIR_to_nii(
-    image: STIR.ImageData, filename_nii: str, filename_hv: str | None = None
-) -> Reg.ImageData:
+def STIR_to_nii(image: STIR.ImageData, filename_nii: str, filename_hv: str | None = None) -> Reg.ImageData:
     """Write STIR.ImageData object as Nifti and read as Reg.ImageData"""
     image.write_par(
         filename_nii,
@@ -113,9 +111,8 @@ def STIR_to_nii_hv(image: STIR.ImageData, filename_prefix: str) -> Reg.ImageData
 
 
 # %% Function to do rigid registration and return resampler
-def register_it(
-    reference_image: Reg.ImageData, floating_image: Reg.ImageData
-) -> typing.Tuple[Reg.ImageData, Reg.NiftyResampler]:
+def register_it(reference_image: Reg.ImageData,
+                floating_image: Reg.ImageData) -> typing.Tuple[Reg.ImageData, Reg.NiftyResampler]:
     """
     Use rigid registration of floating to reference image
     Return both the registered image and the resampler.
@@ -137,9 +134,7 @@ def register_it(
 
 
 # %% resample Reg.ImageData and write to file
-def resample_STIR(
-    resampler: Reg.NiftyResampler, image_nii: Reg.ImageData, filename_prefix: str
-) -> STIR.ImageData:
+def resample_STIR(resampler: Reg.NiftyResampler, image_nii: Reg.ImageData, filename_prefix: str) -> STIR.ImageData:
     res_nii = resampler.forward(image_nii)
     return nii_to_STIR(res_nii, filename_prefix)
 
@@ -180,9 +175,7 @@ def read_and_downsample_Hoffman(downloaddir: Path) -> STIR.ImageData:
 
 
 # %%
-def create_Hoffman_VOIs(
-    Hoffman: STIR.ImageData,
-) -> typing.Tuple[typing.List[STIR.ImageData], typing.List[str]]:
+def create_Hoffman_VOIs(Hoffman: STIR.ImageData,) -> typing.Tuple[typing.List[STIR.ImageData], typing.List[str]]:
     """Create VOIs using thresholding etc. Requires that 5 slices were combined to get averages"""
     Hoffman_arr = Hoffman.as_array()
     # Find whole object
@@ -201,13 +194,8 @@ def create_Hoffman_VOIs(
     inner_arr = ndimage.binary_erosion(whole_object_arr, iterations=4)
     VOI_GM = Hoffman.allocate(0).fill(Hoffman_arr > 0.85)
     VOI_WM = Hoffman.allocate(0).fill(
-        np.logical_and(
-            np.logical_and(Hoffman_arr <= 0.85, Hoffman_arr >= 0.15), inner_arr
-        )
-    )
-    VOI_ventricles_arr = connected_component(
-        np.logical_and(Hoffman_arr <= 0.01, whole_object_arr), order=1
-    )
+        np.logical_and(np.logical_and(Hoffman_arr <= 0.85, Hoffman_arr >= 0.15), inner_arr))
+    VOI_ventricles_arr = connected_component(np.logical_and(Hoffman_arr <= 0.01, whole_object_arr), order=1)
     VOI_ventricles = Hoffman.allocate(0).fill(VOI_ventricles_arr)
     # Construct "WM background" region by eroding WM
     VOI_background = VOI_whole_object.clone()
@@ -230,9 +218,7 @@ for VOI, n in zip(VOIs, VOInames):
 
 # %% Save
 print(f"Writing VOIs to {Hoffman_outdir}")
-VOIs_nii = [
-    STIR_to_nii_hv(VOI, str(Hoffman_outdir / n)) for VOI, n in zip(VOIs, VOInames)
-]
+VOIs_nii = [STIR_to_nii_hv(VOI, str(Hoffman_outdir / n)) for VOI, n in zip(VOIs, VOInames)]
 
 # %% Give names that make sense (TODO: use dataclass as opposed to list)
 VOI_GM = VOIs[2]
@@ -246,20 +232,16 @@ plt.show()
 # %% Now register this to the reconstructed image
 srcdir = SRCDIR / scanID
 OSEM_image = STIR.ImageData(str(srcdir / "OSEM_image.hv"))
-OSEM_image_nii = STIR_to_nii(
-    OSEM_image, os.path.join(intermediate_data_path, "OSEM_image.nii")
-)
+OSEM_image_nii = STIR_to_nii(OSEM_image, os.path.join(intermediate_data_path, "OSEM_image.nii"))
 
 # %% Construct ground-truth image and register
 # The PET image is obtained by filling the phantom which has plastic slices giving "apparent" contrast.
 # Should be 4:1, but from this phantom, it seems 5:1 (doesn't matter for the registration)
-orgGT = VOI_GM * 5 + VOI_WM * 1
+orgGT = VOI_GM*5 + VOI_WM*1
 orgGT_nii = STIR_to_nii_hv(orgGT, os.path.join(intermediate_data_path, "orgGT"))
 
 regGT_nii, resampler = register_it(OSEM_image_nii, orgGT_nii)
-regGT = resample_STIR(
-    resampler, orgGT_nii, os.path.join(intermediate_data_path, "regGT")
-)
+regGT = resample_STIR(resampler, orgGT_nii, os.path.join(intermediate_data_path, "regGT"))
 
 # %% check registration
 plt.figure()
@@ -269,10 +251,7 @@ plot_image(OSEM_image)
 # %% get registered VOIs
 datadir = Path(intermediate_data_path)
 print(f"Creating and writing registered VOIs to {datadir}")
-regVOIs = [
-    resample_STIR(resampler, VOI, str(datadir / ("reg" + n)))
-    for VOI, n in zip(VOIs_nii, VOInames)
-]
+regVOIs = [resample_STIR(resampler, VOI, str(datadir / ("reg"+n))) for VOI, n in zip(VOIs_nii, VOInames)]
 # display registered VOIs
 for VOI, n in zip(regVOIs, VOInames):
     plt.figure()
