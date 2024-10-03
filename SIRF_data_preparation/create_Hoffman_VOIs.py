@@ -30,7 +30,6 @@ from docopt import docopt
 
 import sirf.Reg as Reg
 import sirf.STIR as STIR
-from petric import OUTDIR, SRCDIR
 from SIRF_data_preparation.data_QC import plot_image
 from SIRF_data_preparation.data_utilities import the_orgdata_path
 
@@ -47,18 +46,15 @@ if "ipykernel" not in sys.argv[0]: # clunky way to be able to set variables from
     if scanID is None:
         print("Need to set the --dataset argument")
         exit(1)
-    if args["--skip_write_PETRIC_VOIs"] is not None:
+    if args["--skip_write_PETRIC_VOIs"]:
         write_PETRIC_VOIs = False
 else:
     # set it by hand, e.g.
     scanID = "NeuroLF_Hoffman_Dataset"
     write_PETRIC_VOIs = False
 
-# %% standard PETRIC directories
-if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
-    PETRICDIR = Path("~/devel/PETRIC").expanduser()
-    SRCDIR = PETRICDIR / "data"
-    OUTDIR = PETRICDIR / "output"
+SRCDIR = Path(os.path.dirname(__file__))
+srcdir = SRCDIR / scanID
 
 downloaddir = Path(the_orgdata_path("downloads"))
 intermediate_data_path = the_orgdata_path(scanID, "processing")
@@ -208,6 +204,7 @@ def create_Hoffman_VOIs(Hoffman: STIR.ImageData,) -> typing.Tuple[typing.List[ST
 
 # %% Create VOIs
 Hoffman_outdir = Path(the_orgdata_path("Hoffman"))
+
 os.makedirs(Hoffman_outdir, exist_ok=True)
 Hoffman = read_and_downsample_Hoffman(downloaddir)
 plot_image(Hoffman, save_name=str(Hoffman_outdir / "Hoffman"))
