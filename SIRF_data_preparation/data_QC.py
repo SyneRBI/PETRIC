@@ -178,7 +178,9 @@ def main(argv=None):
         acquired_data = STIR.AcquisitionData(os.path.join(srcdir, 'prompts.hs'))
         additive_term = STIR.AcquisitionData(os.path.join(srcdir, 'additive_term.hs'))
         mult_factors = STIR.AcquisitionData(os.path.join(srcdir, 'mult_factors.hs'))
-        background = additive_term * mult_factors
+        sensitivity_factors = STIR.AcquisitionSensitivityModel(mult_factors)
+        sensitivity_factors.set_up(acquired_data)
+        background = sensitivity_factors.forward(additive_term)
         plot_sinogram_profile(acquired_data, background, srcdir=srcdir)
 
     OSEM_image = plot_image_if_exists(os.path.join(srcdir, 'OSEM_image'), **slices)
