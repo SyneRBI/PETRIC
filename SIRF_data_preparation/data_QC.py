@@ -186,7 +186,7 @@ def main(argv=None):
     reference_image = plot_image_if_exists(os.path.join(srcdir, 'PETRIC/reference_image'), **slices)
 
     VOIdir = os.path.join(srcdir, 'PETRIC')
-    allVOInames = [os.path.basename(str(voi)[:-3]) for voi in Path(VOIdir).glob("VOI_*.hv")]
+    allVOInames = [os.path.basename(str(voi)[:-3]) for voi in Path(VOIdir).glob("*.hv")]
     VOI_checks(allVOInames, OSEM_image, reference_image, srcdir=VOIdir, **slices)
     plt.show()
 
