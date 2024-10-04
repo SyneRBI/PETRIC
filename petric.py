@@ -248,14 +248,15 @@ class Dataset:
 def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
     """
     Load data from `srcdir`, constructs prior and return as a `Dataset`.
-    Also redirects sirf.STIR log output to `outdir`.
+    Also redirects sirf.STIR log output to `outdir`, unless that's set to None
     """
     srcdir = Path(srcdir)
-    outdir = Path(outdir)
     STIR.set_verbosity(sirf_verbosity)                # set to higher value to diagnose problems
     STIR.AcquisitionData.set_storage_scheme('memory') # needed for get_subsets()
 
-    _ = STIR.MessageRedirector(str(outdir / 'info.txt'), str(outdir / 'warnings.txt'), str(outdir / 'errors.txt'))
+    if outdir is not None:
+        outdir = Path(outdir)
+        _ = STIR.MessageRedirector(str(outdir / 'info.txt'), str(outdir / 'warnings.txt'), str(outdir / 'errors.txt'))
     acquired_data = STIR.AcquisitionData(str(srcdir / 'prompts.hs'))
     additive_term = STIR.AcquisitionData(str(srcdir / 'additive_term.hs'))
     mult_factors = STIR.AcquisitionData(str(srcdir / 'mult_factors.hs'))
