@@ -47,7 +47,7 @@ if "ipykernel" not in sys.argv[0]: # clunky way to be able to set variables from
     if scanID is None:
         print("Need to set the --dataset argument")
         exit(1)
-    if (args["--skip_write_PETRIC_VOIs"] is not None) and args["--skip_write_PETRIC_VOIs"]:
+    if args["--skip_write_PETRIC_VOIs"]:
         write_PETRIC_VOIs = False
 else:
     # set it by hand, e.g.

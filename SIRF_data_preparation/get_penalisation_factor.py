@@ -39,8 +39,7 @@ if "ipykernel" not in sys.argv[0]: # clunky way to be able to set variables from
     if dataset is None or ref_dataset is None:
         print("Need to set the --dataset arguments")
         exit(1)
-    if args["--write_penalisation_factor"] is not None:
-        write_penalisation_factor = args["--write_penalisation_factor"]
+    write_penalisation_factor = args["--write_penalisation_factor"]
 
 else:         # set it by hand, e.g.
     ref_dataset = "NeuroLF_Hoffman_Dataset"

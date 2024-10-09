@@ -31,7 +31,7 @@ args = docopt(__doc__, argv=None, version=__version__)
 # logging.basicConfig(level=logging.INFO)
 
 scanID = args['<data_set>']
-num_updates = args['--updates']
+num_updates = int(args['--updates'])
 print(f"num_updates {num_updates}")
 
 if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
