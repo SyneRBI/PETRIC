@@ -8,6 +8,7 @@ Usage:
 Options:
   -h, --help
   --dataset=<name>              dataset name (required)
+  --srcdir=<path>               pathname. Will default to current directory unless dataset is set
   -s, --skip_write_PETRIC_VOIs  do not write in data/<dataset>/PETRIC
 """
 
@@ -30,9 +31,8 @@ from docopt import docopt
 
 import sirf.Reg as Reg
 import sirf.STIR as STIR
-from petric import OUTDIR, SRCDIR
 from SIRF_data_preparation.data_QC import plot_image
-from SIRF_data_preparation.data_utilities import the_orgdata_path
+from SIRF_data_preparation.data_utilities import the_data_path, the_orgdata_path
 
 # %%
 __version__ = "0.1.0"
@@ -54,12 +54,12 @@ else:
     scanID = "NeuroLF_Hoffman_Dataset"
     write_PETRIC_VOIs = False
 
-# %% standard PETRIC directories
-if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
-    PETRICDIR = Path("~/devel/PETRIC").expanduser()
-    SRCDIR = PETRICDIR / "data"
-    OUTDIR = PETRICDIR / "output"
+srcdir = args['--srcdir']
 
+# %% standard PETRIC directories
+if srcdir is None:
+    srcdir = the_data_path(scanID)
+srcdir = Path(srcdir)
 downloaddir = Path(the_orgdata_path("downloads"))
 intermediate_data_path = the_orgdata_path(scanID, "processing")
 os.makedirs(downloaddir, exist_ok=True)
@@ -230,7 +230,6 @@ plt.show()
 # %%%%%%%%%%%%% Register VOIs to OSEM_image
 
 # %% Now register this to the reconstructed image
-srcdir = SRCDIR / scanID
 OSEM_image = STIR.ImageData(str(srcdir / "OSEM_image.hv"))
 OSEM_image_nii = STIR_to_nii(OSEM_image, os.path.join(intermediate_data_path, "OSEM_image.nii"))
 
