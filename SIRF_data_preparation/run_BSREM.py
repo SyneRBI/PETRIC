@@ -4,7 +4,10 @@ Usage:
   run_BSREM.py <data_set> [--help | options]
 
 Arguments:
-  <data_set>  path to data files as well as prefix to use (e.g. Siemens_mMR_NEMA_EQ)
+  <data_set>     path to data files as well as prefix to use (e.g. Siemens_mMR_NEMA_EQ)
+
+Options:
+  --updates=<u>  number of updates to run [default: 15000]
 
 """
 # Copyright 2024 Rutherford Appleton Laboratory STFC
@@ -28,6 +31,8 @@ args = docopt(__doc__, argv=None, version=__version__)
 # logging.basicConfig(level=logging.INFO)
 
 scanID = args['<data_set>']
+num_updates = args['--updates']
+print(f"num_updates {num_updates}")
 
 if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
     PETRICDIR = Path('~/devel/PETRIC').expanduser()
@@ -53,7 +58,7 @@ for f in obj_funs: # add prior evenly to every objective function
 algo = BSREM1(data_sub, obj_funs, initial=data.OSEM_image, initial_step_size=.3, relaxation_eta=.01,
               update_objective_interval=80)
 # %%
-algo.run(15000, callbacks=[MetricsWithTimeout(**settings.slices, outdir=outdir, seconds=3600 * 100)])
+algo.run(num_updates, callbacks=[MetricsWithTimeout(**settings.slices, outdir=outdir, seconds=3600 * 100)])
 # %%
 fig = plt.figure()
 data_QC.plot_image(algo.get_output(), **settings.slices)
