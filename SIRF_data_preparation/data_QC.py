@@ -111,6 +111,7 @@ def plot_image_if_exists(prefix, **kwargs):
         print(f"Image {prefix}.hv does not exist")
         return None
 
+
 def check_and_plot_image_if_exists(prefix, **kwargs):
     im = plot_image_if_exists(prefix, **kwargs)
     if im is not None:
