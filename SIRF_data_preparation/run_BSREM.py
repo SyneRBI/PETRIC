@@ -60,7 +60,7 @@ for f in obj_funs: # add prior evenly to every objective function
 algo = BSREM1(data_sub, obj_funs, initial=data.OSEM_image, initial_step_size=.3, relaxation_eta=.01,
               update_objective_interval=80)
 # %%
-algo.run(num_updates, callbacks=[MetricsWithTimeout(**settings.slices, outdir=outdir, seconds=3600 * 100)])
+algo.run(num_updates, callbacks=[MetricsWithTimeout(**settings.slices, interval=80, outdir=outdir, seconds=3600 * 100)])
 # %%
 fig = plt.figure()
 data_QC.plot_image(algo.get_output(), **settings.slices)

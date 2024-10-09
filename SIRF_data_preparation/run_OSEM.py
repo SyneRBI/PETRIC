@@ -46,7 +46,7 @@ print("num_subsets:", settings.num_subsets)
 print("num_updates:", num_updates)
 # %%
 algo = main_OSEM.Submission(data, settings.num_subsets, update_objective_interval=20)
-algo.run(num_updates, callbacks=[MetricsWithTimeout(**settings.slices, seconds=5000, outdir=outdir)])
+algo.run(num_updates, callbacks=[MetricsWithTimeout(**settings.slices, seconds=5000, interval=20, outdir=outdir)])
 # %%
 fig = plt.figure()
 data_QC.plot_image(algo.get_output(), **settings.slices)
