@@ -101,16 +101,21 @@ def plot_image(image, save_name=None, transverse_slice=-1, coronal_slice=-1, sag
         plt.suptitle(os.path.basename(save_name))
 
 
-def check_and_plot_image_if_exists(prefix, **kwargs):
+def plot_image_if_exists(prefix, **kwargs):
     if os.path.isfile(prefix + '.hv'):
         im = STIR.ImageData(prefix + '.hv')
-        check_values_non_negative(im.as_array(), prefix)
         plt.figure()
         plot_image(im, prefix, **kwargs)
         return im
     else:
         print(f"Image {prefix}.hv does not exist")
         return None
+
+def check_and_plot_image_if_exists(prefix, **kwargs):
+    im = plot_image_if_exists(prefix, **kwargs)
+    if im is not None:
+        check_values_non_negative(im.as_array(), prefix)
+    return im
 
 
 def VOI_mean(image, VOI):
