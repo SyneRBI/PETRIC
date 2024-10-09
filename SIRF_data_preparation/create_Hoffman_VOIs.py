@@ -47,7 +47,7 @@ if "ipykernel" not in sys.argv[0]: # clunky way to be able to set variables from
     if scanID is None:
         print("Need to set the --dataset argument")
         exit(1)
-    if args["--skip_write_PETRIC_VOIs"] is not None:
+    if (args["--skip_write_PETRIC_VOIs"] is not None) and args["--skip_write_PETRIC_VOIs"]:
         write_PETRIC_VOIs = False
 else:
     # set it by hand, e.g.
@@ -64,6 +64,10 @@ downloaddir = Path(the_orgdata_path("downloads"))
 intermediate_data_path = the_orgdata_path(scanID, "processing")
 os.makedirs(downloaddir, exist_ok=True)
 os.makedirs(intermediate_data_path, exist_ok=True)
+
+print(
+    f"srcdir: {srcdir}\ndownloaddir: {downloaddir}\nprocessingdir: {intermediate_data_path}\nwrite_VOIs: {write_PETRIC_VOIs}"
+)
 
 
 # %% Function to find the n-th connected component (counting by size)
@@ -262,6 +266,6 @@ if write_PETRIC_VOIs:
     print(f"Writing registered VOIs to {datadir}")
     os.makedirs(datadir, exist_ok=True)
     for VOI, n in zip(regVOIs, VOInames):
-        VOI.write(str(datadir / n))
+        VOI.write(str(datadir / ("VOI_"+n)))
 # %%
 plt.show()
