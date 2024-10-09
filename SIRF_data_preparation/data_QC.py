@@ -26,6 +26,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.typing as npt
 from docopt import docopt
 from scipy import ndimage
 
@@ -34,6 +35,15 @@ from SIRF_data_preparation.data_utilities import the_data_path
 from SIRF_data_preparation.dataset_settings import get_settings
 
 STIR.AcquisitionData.set_storage_scheme('memory')
+
+
+def check_values_non_negative(arr: npt.NDArray[np.float32], desc: str):
+    min = np.min(arr)
+    max = np.max(arr)
+    if np.isnan(min) or min < 0:
+        raise ValueError(f"{desc}: minimum should be non-negative but is {min} (max={max})")
+    if not np.isfinite(max):
+        raise ValueError(f"{desc}: maximum should be finite")
 
 
 def plot_sinogram_profile(prompts, background, sumaxis=(0, 1), select=0, srcdir='./'):
@@ -91,9 +101,10 @@ def plot_image(image, save_name=None, transverse_slice=-1, coronal_slice=-1, sag
         plt.suptitle(os.path.basename(save_name))
 
 
-def plot_image_if_exists(prefix, **kwargs):
+def check_and_plot_image_if_exists(prefix, **kwargs):
     if os.path.isfile(prefix + '.hv'):
         im = STIR.ImageData(prefix + '.hv')
+        check_values_non_negative(im.as_array(), prefix)
         plt.figure()
         plot_image(im, prefix, **kwargs)
         return im
@@ -123,6 +134,7 @@ def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', *
             continue
         VOI = STIR.ImageData(filename)
         VOI_arr = VOI.as_array()
+        check_values_non_negative(VOI_arr, VOIname)
         COM = np.rint(ndimage.center_of_mass(VOI_arr))
         num_voxels = VOI_arr.sum()
         print(f"VOI: {VOIname}: COM (in indices): {COM} voxels {num_voxels} = {num_voxels * np.prod(VOI.spacing)} mm^3")
@@ -180,10 +192,14 @@ def main(argv=None):
         mult_factors = STIR.AcquisitionData(os.path.join(srcdir, 'mult_factors.hs'))
         background = additive_term * mult_factors
         plot_sinogram_profile(acquired_data, background, srcdir=srcdir)
+        check_values_non_negative(acquired_data.as_array(), "prompts")
+        check_values_non_negative(additive_term.as_array(), "additive_term")
+        check_values_non_negative(mult_factors.as_array(), "mult_factors")
+        check_values_non_negative(background.as_array(), "background")
 
-    OSEM_image = plot_image_if_exists(os.path.join(srcdir, 'OSEM_image'), **slices)
-    plot_image_if_exists(os.path.join(srcdir, 'kappa'), **slices)
-    reference_image = plot_image_if_exists(os.path.join(srcdir, 'PETRIC/reference_image'), **slices)
+    OSEM_image = check_and_plot_image_if_exists(os.path.join(srcdir, 'OSEM_image'), **slices)
+    check_and_plot_image_if_exists(os.path.join(srcdir, 'kappa'), **slices)
+    reference_image = check_and_plot_image_if_exists(os.path.join(srcdir, 'PETRIC/reference_image'), **slices)
 
     VOIdir = os.path.join(srcdir, 'PETRIC')
     allVOInames = [os.path.basename(str(voi)[:-3]) for voi in Path(VOIdir).glob("VOI_*.hv")]
