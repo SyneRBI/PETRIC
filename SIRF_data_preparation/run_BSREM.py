@@ -32,7 +32,6 @@ args = docopt(__doc__, argv=None, version=__version__)
 
 scanID = args['<data_set>']
 num_updates = int(args['--updates'])
-print(f"num_updates {num_updates}")
 
 if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
     PETRICDIR = Path('~/devel/PETRIC').expanduser()
@@ -46,6 +45,9 @@ srcdir = SRCDIR / scanID
 settings = get_settings(scanID)
 
 data = get_data(srcdir=srcdir, outdir=outdir)
+print("Penalisation factor:", data.prior.get_penalisation_factor())
+print("num_subsets:", settings.num_subsets)
+print("num_updates:", num_updates)
 data_sub, acq_models, obj_funs = partitioner.data_partition(data.acquired_data, data.additive_term, data.mult_factors,
                                                             settings.num_subsets, mode="staggered",
                                                             initial_image=data.OSEM_image)

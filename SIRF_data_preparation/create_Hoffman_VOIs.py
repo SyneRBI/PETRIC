@@ -65,9 +65,10 @@ intermediate_data_path = the_orgdata_path(scanID, "processing")
 os.makedirs(downloaddir, exist_ok=True)
 os.makedirs(intermediate_data_path, exist_ok=True)
 
-print(
-    f"srcdir: {srcdir}\ndownloaddir: {downloaddir}\nprocessingdir: {intermediate_data_path}\nwrite_VOIs: {write_PETRIC_VOIs}"
-)
+print("srcdir:", srcdir)
+print("downloaddir:", downloaddir)
+print("processingdir:", intermediate_data_path)
+print("write_VOIs:", write_PETRIC_VOIs)
 
 
 # %% Function to find the n-th connected component (counting by size)
