@@ -6,12 +6,13 @@ Usage:
 Arguments:
   <data_set>  path to data files as well as prefix to use
 
+Options:
+  --updates=<u>  number of updates to run [default: 400]
 """
 # Copyright 2024 Rutherford Appleton Laboratory STFC
 # Copyright 2024 University College London
 # Licence: Apache-2.0
-__version__ = '0.1.0'
-
+__version__ = '0.2.0'
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -27,6 +28,7 @@ args = docopt(__doc__, argv=None, version=__version__)
 # logging.basicConfig(level=logging.INFO)
 
 scanID = args['<data_set>']
+num_updates = int(args['--updates'])
 
 if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
     PETRICDIR = Path('~/devel/PETRIC').expanduser()
@@ -40,9 +42,11 @@ srcdir = SRCDIR / scanID
 settings = get_settings(scanID)
 
 data = get_data(srcdir=srcdir, outdir=outdir)
+print("num_subsets:", settings.num_subsets)
+print("num_updates:", num_updates)
 # %%
 algo = main_OSEM.Submission(data, settings.num_subsets, update_objective_interval=20)
-algo.run(400, callbacks=[MetricsWithTimeout(**settings.slices, seconds=5000, outdir=outdir)])
+algo.run(num_updates, callbacks=[MetricsWithTimeout(**settings.slices, seconds=5000, interval=20, outdir=outdir)])
 # %%
 fig = plt.figure()
 data_QC.plot_image(algo.get_output(), **settings.slices)
