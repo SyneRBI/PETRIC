@@ -10,12 +10,12 @@ import numpy
 import sirf.STIR as STIR
 from petric import OUTDIR, SRCDIR, QualityMetrics, get_data
 from SIRF_data_preparation import data_QC
+from SIRF_data_preparation.data_utilities import the_data_path
 from SIRF_data_preparation.dataset_settings import get_settings
 from SIRF_data_preparation.evaluation_utilities import get_metrics, plot_metrics, read_objectives
 
 if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
     PETRICDIR = Path('~/devel/PETRIC').expanduser()
-    SRCDIR = PETRICDIR / 'data'
     OUTDIR = PETRICDIR / 'output'
 STIR.AcquisitionData.set_storage_scheme('memory')
 STIR.set_verbosity(0)
@@ -23,9 +23,10 @@ STIR.set_verbosity(0)
 # scanID = 'Siemens_Vision600_thorax'
 # scanID = 'NeuroLF_Hoffman_Dataset'
 # scanID = 'Siemens_mMR_NEMA_IQ'
-scanID = 'Mediso_NEMA_IQ'
+# scanID = 'Mediso_NEMA_IQ'
+scanID = 'Siemens_Vision600_Hoffman'
 
-srcdir = SRCDIR / scanID
+srcdir = the_data_path(scanID)
 outdir = OUTDIR / scanID
 OSEMdir = outdir / 'OSEM'
 datadir = outdir / 'BSREM'
@@ -38,14 +39,15 @@ settings = get_settings(scanID)
 slices = settings.slices
 
 cmax = OSEM_image.max()
-
+# %%
 image = data_QC.plot_image_if_exists(str(datadir / 'iter_final'), **slices, vmax=cmax)
 # image2=STIR.ImageData(datadir+'iter_14000.hv')
+# %%
 image2 = OSEM_image
 diff = image2 - image
-print("norm diff:", diff.abs().max() / image.max())
+print("relative l1-norm diff final-OSEM:", diff.abs().max() / image.max())
 data_QC.plot_image(diff, **slices, vmin=-cmax / 100, vmax=cmax / 100)
-
+# %%
 objs = read_objectives(datadir)
 if datadir1.is_dir():
     objs0 = objs.copy()
@@ -64,7 +66,7 @@ plt.plot(objs[50:, 0], objs[50:, 1])
 fig.savefig(outdir / f'{scanID}_BSREM_objectives_last.png')
 
 # %%
-data = get_data(srcdir=srcdir, outdir=outdir / 'test')
+data = get_data(srcdir=srcdir, outdir=None)
 if datadir1.is_dir():
     reference_image = STIR.ImageData(str(datadir1 / 'iter_final.hv'))
 else:
@@ -108,8 +110,11 @@ if datadir1.is_dir():
 # %%
 if m1 is not None:
     fig = plt.figure()
+    plot_metrics(iters, m, qm.keys(), '_BSREM')
     plot_metrics(objs0[-1, 0] + iters1, m1, qm.keys(), '_BSREM_cont')
-    fig.savefig(outdir / f'{scanID}_metrics_BSREM.png')
+    fig.axes[0].set_ylim(0, .04)
+    fig.axes[1].set_ylim(0, .02)
+    fig.savefig(outdir / f'{scanID}_metrics_BSREM_cont.png')
 
 # %%
 idx = QualityMetrics.pass_index(m, numpy.array([.01, .01] + [.005 for i in range(len(data.voi_masks))]), 10)
@@ -126,3 +131,5 @@ plt.savefig(outdir / f'{scanID}_OSEM_diff_image_at_0.01_0.005.png')
 plt.figure()
 data_QC.plot_image(image - reference_image, **slices, vmin=-cmax / 100, vmax=cmax / 100)
 plt.savefig(outdir / f'{scanID}_ref_diff_image_at_0.01_0.005.png')
+
+# %%
