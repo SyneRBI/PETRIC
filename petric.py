@@ -320,7 +320,7 @@ else:
 if __name__ != "__main__":
     # load up first data-set for people to play with
     srcdir, outdir, metrics = data_dirs_metrics[0]
-    if srcdir is None:
+    if srcdir is None or os.getenv("PETRIC_SKIP_DATA", False):
         data = None
     else:
         data = get_data(srcdir=srcdir, outdir=outdir)
