@@ -1,14 +1,17 @@
 # Copyright 2024 University College London
 # Licence: Apache-2.0
 
+import os
+
 # %% imports
 import typing
+
 import sirf.Reg as Reg
 import sirf.STIR as STIR
-import os
 
 # %%
 __version__ = "0.1.0"
+
 
 # %% Functions to convert between STIR and Reg.ImageData (via writing to file)
 # converters directly via the objects are not all implemented, and we want them on file anyway
