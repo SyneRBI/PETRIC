@@ -5,7 +5,8 @@ from petric import DATA_SLICES
 
 DATA_SUBSETS = {
     'Siemens_mMR_NEMA_IQ': 7, 'Siemens_mMR_NEMA_IQ_lowcounts': 7, 'Siemens_mMR_ACR': 7, 'NeuroLF_Hoffman_Dataset': 16,
-    'Mediso_NEMA_IQ': 12, 'Siemens_Vision600_thorax': 5, 'GE_DMI3_Torso': 8, 'Siemens_Vision600_Hoffman': 5}
+    'Mediso_NEMA_IQ': 12, 'Siemens_Vision600_thorax': 5, 'GE_DMI3_Torso': 8, 'Siemens_Vision600_Hoffman': 5,
+    'NeuroLF_Esser_Dataset': 8}
 
 
 @dataclass
