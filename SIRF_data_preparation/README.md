@@ -56,12 +56,19 @@ PYTHONPATH=~/devel/PETRIC:$PYTHONPATH`
    python -m SIRF_data_preparation.data_QC --dataset=<datasetname>
    ```
 8. `cd ../..`
-9. `python -m SIRF_data_preparation.run_OSEM <datasetname>`
-10. `python -m SIRF_data_preparation.run_BSREM  <datasetname>`
-11. Adapt [plot_BSREM_metrics.py](plot_BSREM_metrics.py) (probably only the `<datasetname>`) and run interactively.
-12. Copy the BSREM ` iter_final` to `data/<datasetname>/PETRIC/reference_image`, e.g.
+9. Get penalisation factor by comparing to a dataset from the ***same*** scanner, e.g.
+   ```
+   python -m SIRF_data_preparation.get_penalisation_factor --dataset=NeuroLF_Esser_Dataset --ref_dataset=NeuroLF_Hoffman_Dataset -w
+   ```
+10. `python -m SIRF_data_preparation.run_OSEM <datasetname>`
+11. Run BSREM to generate reference solution. You probably want to monitor how these images look like as the recon will take a long time
+    ```
+    python -m SIRF_data_preparation.run_BSREM  <datasetname>`
+    ```
+12. Adapt [plot_BSREM_metrics.py](plot_BSREM_metrics.py) (probably only the `<datasetname>`) and run interactively.
+13. Copy the BSREM ` iter_final` to `data/<datasetname>/PETRIC/reference_image`, e.g.
     ```
     stir_math data/<datasetname>/PETRIC/reference_image.hv output/<datasetname>/iter_final.hv
     ```
-13. `cd data/<datasetname>; rm -f *ahv info.txt warnings.txt`, check its `README.md` etc
-14. Transfer to web-server
+14. `cd data/<datasetname>; rm -rf *ahv PETRIC/*ahv output info.txt warnings.txt`, check its `README.md` etc
+15. Transfer to web-server
