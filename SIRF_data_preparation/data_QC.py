@@ -73,10 +73,10 @@ def plot_image(image, save_name=None, transverse_slice=-1, coronal_slice=-1, sag
         coronal_slice = image.dimensions()[1] // 2
     if sagittal_slice < 0:
         sagittal_slice = image.dimensions()[2] // 2
-    if vmax is None:
-        vmax = image.max()
-
     arr = image.as_array()
+    if vmax is None:
+        vmax = np.percentile(arr, 99) / .99
+
     alpha_trans = None
     alpha_cor = None
     alpha_sag = None
@@ -147,6 +147,10 @@ def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', *
         plt.figure()
         plot_image(VOI, save_name=prefix, vmin=0, vmax=1, transverse_slice=int(COM[0]), coronal_slice=int(COM[1]),
                    sagittal_slice=int(COM[2]))
+        if OSEM_image is not None:
+            plt.figure()
+            plot_image(OSEM_image, alpha=(VOI+.5) / 1.5, save_name=prefix + "_and_OSEM", transverse_slice=int(COM[0]),
+                       coronal_slice=int(COM[1]), sagittal_slice=int(COM[2]))
 
         # construct transparency image
         if VOIname == 'VOI_whole_object':
