@@ -75,7 +75,7 @@ print("outdir:", outdir)
 print("initial_step_size:", initial_step_size)
 print("relaxation_eta:", relaxation_eta)
 print("interval:", interval)
-exit(0)
+
 data_sub, acq_models, obj_funs = partitioner.data_partition(data.acquired_data, data.additive_term, data.mult_factors,
                                                             num_subsets, mode="staggered",
                                                             initial_image=data.OSEM_image)
