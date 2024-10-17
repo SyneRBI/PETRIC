@@ -245,7 +245,7 @@ class Dataset:
     path: PurePath
 
 
-def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
+def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0, read_sinos=True):
     """
     Load data from `srcdir`, constructs prior and return as a `Dataset`.
     Also redirects sirf.STIR log output to `outdir`, unless that's set to None
@@ -257,9 +257,9 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
     if outdir is not None:
         outdir = Path(outdir)
         _ = STIR.MessageRedirector(str(outdir / 'info.txt'), str(outdir / 'warnings.txt'), str(outdir / 'errors.txt'))
-    acquired_data = STIR.AcquisitionData(str(srcdir / 'prompts.hs'))
-    additive_term = STIR.AcquisitionData(str(srcdir / 'additive_term.hs'))
-    mult_factors = STIR.AcquisitionData(str(srcdir / 'mult_factors.hs'))
+    acquired_data = STIR.AcquisitionData(str(srcdir / 'prompts.hs')) if read_sinos else None
+    additive_term = STIR.AcquisitionData(str(srcdir / 'additive_term.hs')) if read_sinos else None
+    mult_factors = STIR.AcquisitionData(str(srcdir / 'mult_factors.hs')) if read_sinos else None
     OSEM_image = STIR.ImageData(str(srcdir / 'OSEM_image.hv'))
     # Find FOV mask
     # WARNING: we are currently using Parralelproj with default settings, which uses a cylindrical FOV.
@@ -292,8 +292,9 @@ DATA_SLICES = {
     'Siemens_mMR_NEMA_IQ': {'transverse_slice': 72, 'coronal_slice': 109, 'sagittal_slice': 89},
     'Siemens_mMR_NEMA_IQ_lowcounts': {'transverse_slice': 72, 'coronal_slice': 109, 'sagittal_slice': 89},
     'Siemens_mMR_ACR': {'transverse_slice': 99}, 'NeuroLF_Hoffman_Dataset': {'transverse_slice': 72},
-    'Mediso_NEMA_IQ': {'transverse_slice': 22, 'coronal_slice': 89, 'sagittal_slice': 66},
-    'Siemens_Vision600_thorax': {}, 'GE_DMI3_Torso': {}, 'Siemens_Vision600_Hoffman': {}, 'NeuroLF_Esser_Dataset': {}}
+    'Mediso_NEMA_IQ': {'transverse_slice': 22, 'coronal_slice': 89, 'sagittal_slice': 66
+                       }, 'Siemens_Vision600_thorax': {}, 'GE_DMI3_Torso': {}, 'Siemens_Vision600_Hoffman': {},
+    'NeuroLF_Esser_Dataset': {}, 'Siemens_Vision600_ZrNEMAIQ': {'transverse_slice': 60}}
 
 if SRCDIR.is_dir():
     # create list of existing data
@@ -316,7 +317,9 @@ if SRCDIR.is_dir():
         (SRCDIR / "Siemens_Vision600_Hoffman", OUTDIR / "Vision600_Hoffman",
          [MetricsWithTimeout(outdir=OUTDIR / "Vision600_Hoffman", **DATA_SLICES['Siemens_Vision600_Hoffman'])]),
         (SRCDIR / "NeuroLF_Esser_Dataset", OUTDIR / "NeuroLF_Esser",
-         [MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Esser", **DATA_SLICES['NeuroLF_Esser_Dataset'])])]
+         [MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Esser", **DATA_SLICES['NeuroLF_Esser_Dataset'])]),
+        (SRCDIR / "Siemens_Vision600_ZrNEMAIQ", OUTDIR / "Vision600_ZrNEMAIQ",
+         [MetricsWithTimeout(outdir=OUTDIR / "Vision600_ZrNEMAIQ", **DATA_SLICES['Siemens_Vision600_ZrNEMAIQ'])])]
 else:
     log.warning("Source directory does not exist: %s", SRCDIR)
     data_dirs_metrics = [(None, None, [])] # type: ignore
