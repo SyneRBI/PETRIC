@@ -2,6 +2,7 @@
 # """Preliminary file to check evolution of metrics as well as pass_index"""
 # %load_ext autoreload
 # %autoreload 2
+# %%
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -14,6 +15,7 @@ from SIRF_data_preparation.data_utilities import the_data_path
 from SIRF_data_preparation.dataset_settings import get_settings
 from SIRF_data_preparation.evaluation_utilities import get_metrics, plot_metrics, read_objectives
 
+# %%
 if not all((SRCDIR.is_dir(), OUTDIR.is_dir())):
     PETRICDIR = Path('~/devel/PETRIC').expanduser()
     OUTDIR = PETRICDIR / 'output'
@@ -25,7 +27,8 @@ STIR.set_verbosity(0)
 # scanID = 'Siemens_mMR_NEMA_IQ'
 # scanID = 'Mediso_NEMA_IQ'
 scanID = 'Siemens_Vision600_Hoffman'
-
+# scanID = 'NeuroLF_Esser_Dataset'
+# scanID = 'Siemens_Vision600_ZrNEMAIQ'
 srcdir = the_data_path(scanID)
 outdir = OUTDIR / scanID
 OSEMdir = outdir / 'OSEM'
@@ -38,7 +41,7 @@ OSEM_image = STIR.ImageData(str(datadir / 'iter_0000.hv'))
 settings = get_settings(scanID)
 slices = settings.slices
 
-cmax = OSEM_image.max()
+cmax = numpy.percentile(OSEM_image.as_array(), 99) / .99
 # %%
 image = data_QC.plot_image_if_exists(str(datadir / 'iter_final'), **slices, vmax=cmax)
 # image2=STIR.ImageData(datadir+'iter_14000.hv')
@@ -66,8 +69,11 @@ plt.plot(objs[50:, 0], objs[50:, 1])
 fig.savefig(outdir / f'{scanID}_BSREM_objectives_last.png')
 
 # %%
-data = get_data(srcdir=srcdir, outdir=None)
-if datadir1.is_dir():
+data = get_data(srcdir=srcdir, outdir=None, read_sinos=False)
+# %%
+if data.reference_image is not None:
+    reference_image = data.reference_image
+elif datadir1.is_dir():
     reference_image = STIR.ImageData(str(datadir1 / 'iter_final.hv'))
 else:
     reference_image = STIR.ImageData(str(datadir / 'iter_final.hv'))
@@ -82,7 +88,9 @@ if datadir1.is_dir():
     iteration_interval = int(objs0[-1, 0] - objs0[-2, 0] + .5) * 2
 # %%
 iters = range(0, last_iteration, iteration_interval)
+print('GETMETRICS')
 m = get_metrics(qm, iters, srcdir=datadir)
+print('DONE')
 # %%
 OSEMobjs = read_objectives(OSEMdir)
 OSEMiters = OSEMobjs[:, 0].astype(int)
