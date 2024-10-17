@@ -55,10 +55,7 @@ srcdir = SRCDIR / scanID
 # log.info("Finding files in %s", srcdir)
 
 settings = get_settings(scanID)
-if num_subsets is None:
-    num_subsets = settings.num_subsets
-else:
-    num_subsets = int(num_subsets)
+num_subsets = settings.num_subsets if num_subsets is None else int(num_subsets)
 
 data = get_data(srcdir=srcdir, outdir=outdir)
 if initial_image is None:

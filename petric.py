@@ -319,8 +319,7 @@ if SRCDIR.is_dir():
         (SRCDIR / "NeuroLF_Esser_Dataset", OUTDIR / "NeuroLF_Esser",
          [MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Esser", **DATA_SLICES['NeuroLF_Esser_Dataset'])]),
         (SRCDIR / "Siemens_Vision600_ZrNEMAIQ", OUTDIR / "Vision600_ZrNEMAIQ", [
-            MetricsWithTimeout(outdir=OUTDIR / "Siemens_Vision600_ZrNEMAIQ",
-                               **DATA_SLICES['Siemens_Vision600_ZrNEMAIQ'])])]
+            MetricsWithTimeout(outdir=OUTDIR / "Vision600_ZrNEMAIQ", **DATA_SLICES['Siemens_Vision600_ZrNEMAIQ'])])]
 else:
     log.warning("Source directory does not exist: %s", SRCDIR)
     data_dirs_metrics = [(None, None, [])] # type: ignore

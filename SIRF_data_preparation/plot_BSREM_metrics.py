@@ -41,7 +41,7 @@ OSEM_image = STIR.ImageData(str(datadir / 'iter_0000.hv'))
 settings = get_settings(scanID)
 slices = settings.slices
 
-cmax = numpy.percentile(OSEM_image.as_array(), 99) / .99
+cmax = numpy.percentile(OSEM_image.as_array(), 99.995)
 # %%
 image = data_QC.plot_image_if_exists(str(datadir / 'iter_final'), **slices, vmax=cmax)
 # image2=STIR.ImageData(datadir+'iter_14000.hv')

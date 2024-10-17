@@ -75,7 +75,7 @@ def plot_image(image, save_name=None, transverse_slice=-1, coronal_slice=-1, sag
         sagittal_slice = image.dimensions()[2] // 2
     arr = image.as_array()
     if vmax is None:
-        vmax = np.percentile(arr, 99) / .99
+        vmax = np.percentile(arr, 99.995)
 
     alpha_trans = None
     alpha_cor = None
