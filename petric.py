@@ -245,7 +245,7 @@ class Dataset:
     path: PurePath
 
 
-def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
+def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0, read_sinos=True):
     """
     Load data from `srcdir`, constructs prior and return as a `Dataset`.
     Also redirects sirf.STIR log output to `outdir`, unless that's set to None
@@ -257,9 +257,9 @@ def get_data(srcdir=".", outdir=OUTDIR, sirf_verbosity=0):
     if outdir is not None:
         outdir = Path(outdir)
         _ = STIR.MessageRedirector(str(outdir / 'info.txt'), str(outdir / 'warnings.txt'), str(outdir / 'errors.txt'))
-    acquired_data = STIR.AcquisitionData(str(srcdir / 'prompts.hs'))
-    additive_term = STIR.AcquisitionData(str(srcdir / 'additive_term.hs'))
-    mult_factors = STIR.AcquisitionData(str(srcdir / 'mult_factors.hs'))
+    acquired_data = STIR.AcquisitionData(str(srcdir / 'prompts.hs')) if read_sinos else None
+    additive_term = STIR.AcquisitionData(str(srcdir / 'additive_term.hs')) if read_sinos else None
+    mult_factors = STIR.AcquisitionData(str(srcdir / 'mult_factors.hs')) if read_sinos else None
     OSEM_image = STIR.ImageData(str(srcdir / 'OSEM_image.hv'))
     # Find FOV mask
     # WARNING: we are currently using Parralelproj with default settings, which uses a cylindrical FOV.
