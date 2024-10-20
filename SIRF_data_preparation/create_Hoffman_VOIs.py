@@ -35,7 +35,7 @@ from SIRF_data_preparation.data_utilities import the_data_path, the_orgdata_path
 from SIRF_data_preparation.registration_utilities import STIR_to_nii, STIR_to_nii_hv, register_it, resample_STIR
 
 # %%
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 write_PETRIC_VOIs = True
 if "ipykernel" not in sys.argv[0]: # clunky way to be able to set variables from within jupyter/VScode without docopt
@@ -44,6 +44,7 @@ if "ipykernel" not in sys.argv[0]: # clunky way to be able to set variables from
     # logging.basicConfig(level=logging.INFO)
 
     scanID = args["--dataset"]
+    srcdir = args['--srcdir']
     if scanID is None:
         print("Need to set the --dataset argument")
         exit(1)
@@ -52,9 +53,8 @@ if "ipykernel" not in sys.argv[0]: # clunky way to be able to set variables from
 else:
     # set it by hand, e.g.
     scanID = "NeuroLF_Hoffman_Dataset"
+    srcdir = None
     write_PETRIC_VOIs = False
-
-srcdir = args['--srcdir']
 
 # %% standard PETRIC directories
 if srcdir is None:
