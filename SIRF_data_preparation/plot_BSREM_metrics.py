@@ -26,29 +26,37 @@ STIR.set_verbosity(0)
 # scanID = 'NeuroLF_Hoffman_Dataset'
 # scanID = 'Siemens_mMR_NEMA_IQ'
 # scanID = 'Mediso_NEMA_IQ'
-scanID = 'Siemens_Vision600_Hoffman'
+# scanID = 'Siemens_Vision600_Hoffman'
 # scanID = 'NeuroLF_Esser_Dataset'
 # scanID = 'Siemens_Vision600_ZrNEMAIQ'
+scanID = 'GE_D690_NEMA_IQ'
 srcdir = the_data_path(scanID)
 outdir = OUTDIR / scanID
 OSEMdir = outdir / 'OSEM'
 datadir = outdir / 'BSREM'
 # we will check for images obtained after restarting BSREM (with new settings)
 datadir1 = outdir / 'BSREM_cont'
-
+# datadir = Path('/opt/runner/logs/Casper/BSREM/') / scanID
 OSEM_image = STIR.ImageData(str(datadir / 'iter_0000.hv'))
 
 settings = get_settings(scanID)
 slices = settings.slices
 
-cmax = numpy.percentile(OSEM_image.as_array(), 99.995)
+cmax = numpy.percentile(OSEM_image.as_array(), 99.9)
 # %%
-image = data_QC.plot_image_if_exists(str(datadir / 'iter_final'), **slices, vmax=cmax)
+data = get_data(srcdir=srcdir, outdir=None, read_sinos=False)
+# %%
+if data.reference_image is not None:
+    reference_image = data.reference_image
+elif datadir1.is_dir():
+    reference_image = STIR.ImageData(str(datadir1 / 'iter_final.hv'))
+else:
+    reference_image = STIR.ImageData(str(datadir / 'iter_final.hv'))
 # image2=STIR.ImageData(datadir+'iter_14000.hv')
 # %%
 image2 = OSEM_image
-diff = image2 - image
-print("relative l1-norm diff final-OSEM:", diff.abs().max() / image.max())
+diff = image2 - reference_image
+print("relative l1-norm diff final-OSEM:", diff.abs().max() / reference_image.max())
 data_QC.plot_image(diff, **slices, vmin=-cmax / 100, vmax=cmax / 100)
 # %%
 objs = read_objectives(datadir)
@@ -69,14 +77,6 @@ plt.plot(objs[50:, 0], objs[50:, 1])
 fig.savefig(outdir / f'{scanID}_BSREM_objectives_last.png')
 
 # %%
-data = get_data(srcdir=srcdir, outdir=None, read_sinos=False)
-# %%
-if data.reference_image is not None:
-    reference_image = data.reference_image
-elif datadir1.is_dir():
-    reference_image = STIR.ImageData(str(datadir1 / 'iter_final.hv'))
-else:
-    reference_image = STIR.ImageData(str(datadir / 'iter_final.hv'))
 qm = QualityMetrics(reference_image, data.whole_object_mask, data.background_mask, tb_summary_writer=None,
                     voi_mask_dict=data.voi_masks)
 # %% get update ("iteration") numbers from objective functions
