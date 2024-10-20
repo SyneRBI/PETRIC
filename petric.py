@@ -292,9 +292,9 @@ DATA_SLICES = {
     'Siemens_mMR_NEMA_IQ': {'transverse_slice': 72, 'coronal_slice': 109, 'sagittal_slice': 89},
     'Siemens_mMR_NEMA_IQ_lowcounts': {'transverse_slice': 72, 'coronal_slice': 109, 'sagittal_slice': 89},
     'Siemens_mMR_ACR': {'transverse_slice': 99}, 'NeuroLF_Hoffman_Dataset': {'transverse_slice': 72},
-    'Mediso_NEMA_IQ': {'transverse_slice': 22, 'coronal_slice': 89, 'sagittal_slice': 66
-                       }, 'Siemens_Vision600_thorax': {}, 'GE_DMI3_Torso': {}, 'Siemens_Vision600_Hoffman': {},
-    'NeuroLF_Esser_Dataset': {}, 'Siemens_Vision600_ZrNEMAIQ': {'transverse_slice': 60}}
+    'Mediso_NEMA_IQ': {'transverse_slice': 22, 'coronal_slice': 89, 'sagittal_slice': 66},
+    'Siemens_Vision600_thorax': {}, 'GE_DMI3_Torso': {}, 'Siemens_Vision600_Hoffman': {}, 'NeuroLF_Esser_Dataset': {},
+    'Siemens_Vision600_ZrNEMAIQ': {'transverse_slice': 60}, 'GE_D690_NEMA_IQ': {'transverse_slice': 23}}
 
 if SRCDIR.is_dir():
     # create list of existing data
@@ -319,7 +319,9 @@ if SRCDIR.is_dir():
         (SRCDIR / "NeuroLF_Esser_Dataset", OUTDIR / "NeuroLF_Esser",
          [MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Esser", **DATA_SLICES['NeuroLF_Esser_Dataset'])]),
         (SRCDIR / "Siemens_Vision600_ZrNEMAIQ", OUTDIR / "Vision600_ZrNEMAIQ",
-         [MetricsWithTimeout(outdir=OUTDIR / "Vision600_ZrNEMAIQ", **DATA_SLICES['Siemens_Vision600_ZrNEMAIQ'])])]
+         [MetricsWithTimeout(outdir=OUTDIR / "Vision600_ZrNEMAIQ", **DATA_SLICES['Siemens_Vision600_ZrNEMAIQ'])]),
+        (SRCDIR / "GE_D690_NEMA_IQ", OUTDIR / "D690_NEMA",
+         [MetricsWithTimeout(outdir=OUTDIR / "D690_NEMA", **DATA_SLICES['GE_D690_NEMA_IQ'])])]
 else:
     log.warning("Source directory does not exist: %s", SRCDIR)
     data_dirs_metrics = [(None, None, [])] # type: ignore
