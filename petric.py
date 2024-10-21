@@ -318,8 +318,8 @@ if SRCDIR.is_dir():
          [MetricsWithTimeout(outdir=OUTDIR / "Vision600_Hoffman", **DATA_SLICES['Siemens_Vision600_Hoffman'])]),
         (SRCDIR / "NeuroLF_Esser_Dataset", OUTDIR / "NeuroLF_Esser",
          [MetricsWithTimeout(outdir=OUTDIR / "NeuroLF_Esser", **DATA_SLICES['NeuroLF_Esser_Dataset'])]),
-        (SRCDIR / "Siemens_Vision600_ZrNEMAIQ", OUTDIR / "Vision600_ZrNEMAIQ",
-         [MetricsWithTimeout(outdir=OUTDIR / "Vision600_ZrNEMAIQ", **DATA_SLICES['Siemens_Vision600_ZrNEMAIQ'])]),
+        (SRCDIR / "Siemens_Vision600_ZrNEMAIQ", OUTDIR / "Vision600_ZrNEMA",
+         [MetricsWithTimeout(outdir=OUTDIR / "Vision600_ZrNEMA", **DATA_SLICES['Siemens_Vision600_ZrNEMAIQ'])]),
         (SRCDIR / "GE_D690_NEMA_IQ", OUTDIR / "D690_NEMA",
          [MetricsWithTimeout(outdir=OUTDIR / "D690_NEMA", **DATA_SLICES['GE_D690_NEMA_IQ'])])]
 else:
