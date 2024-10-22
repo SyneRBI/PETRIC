@@ -167,7 +167,7 @@ def VOI_checks(allVOInames, OSEM_image=None, reference_image=None, srcdir='.', *
 
     if OSEM_image is not None:
         plt.figure()
-        plot_image(OSEM_image, alpha=allVOIs, save_name=prefix + "OSEM_image_and_VOIs", **kwargs)
+        plot_image(OSEM_image, alpha=allVOIs, save_name=os.path.join(srcdir, "OSEM_image_and_VOIs"), **kwargs)
 
     # unformatted print of VOI values for now
     print(allVOInames)
