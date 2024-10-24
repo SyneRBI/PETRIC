@@ -296,7 +296,7 @@ DATA_SLICES = {
     'Siemens_Vision600_thorax': {}, 'GE_DMI3_Torso': {}, 'Siemens_Vision600_Hoffman': {}, 'NeuroLF_Esser_Dataset': {},
     'Siemens_Vision600_ZrNEMAIQ': {'transverse_slice': 60}, 'GE_D690_NEMA_IQ': {'transverse_slice': 23},
     'Mediso_NEMA_IQ_lowcounts': {'transverse_slice': 22, 'coronal_slice': 74, 'sagittal_slice': 70},
-    'GE_DMI4_NEMA_IQ':  {'transverse_slice': 27, 'coronal_slice': 109, 'sagittal_slice': 78}}
+    'GE_DMI4_NEMA_IQ': {'transverse_slice': 27, 'coronal_slice': 109, 'sagittal_slice': 78}}
 
 if SRCDIR.is_dir():
     # create list of existing data
