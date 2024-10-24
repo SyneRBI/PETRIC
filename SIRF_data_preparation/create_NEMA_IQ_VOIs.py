@@ -47,14 +47,13 @@ if "ipykernel" not in sys.argv[0]: # clunky way to be able to set variables from
     args = docopt(__doc__, argv=None, version=__version__)
 
     # logging.basicConfig(level=logging.INFO)
-
     scanID = args["--dataset"]
     srcdir = args['--srcdir']
     if scanID is None:
         print("Need to set the --dataset argument")
         exit(1)
-    angle_smallest_sphere = args["--angle_smallest_sphere"]
-    central_VOI = args["--central_VOI"]
+    angle_smallest_sphere = float(args["--angle_smallest_sphere"])
+    central_VOI = ast.literal_eval(args["--central_VOI"])
     spheres = ast.literal_eval(args["--spheres"])
 else:
     # set it by hand, e.g.
