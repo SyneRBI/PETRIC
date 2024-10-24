@@ -295,7 +295,8 @@ DATA_SLICES = {
     'Mediso_NEMA_IQ': {'transverse_slice': 22, 'coronal_slice': 89, 'sagittal_slice': 66},
     'Siemens_Vision600_thorax': {}, 'GE_DMI3_Torso': {}, 'Siemens_Vision600_Hoffman': {}, 'NeuroLF_Esser_Dataset': {},
     'Siemens_Vision600_ZrNEMAIQ': {'transverse_slice': 60}, 'GE_D690_NEMA_IQ': {'transverse_slice': 23},
-    'Mediso_NEMA_IQ_lowcounts': {'transverse_slice': 22, 'coronal_slice': 74, 'sagittal_slice': 70}}
+    'Mediso_NEMA_IQ_lowcounts': {'transverse_slice': 22, 'coronal_slice': 74, 'sagittal_slice': 70},
+    'GE_DMI4_NEMA_IQ':  {'transverse_slice': 27, 'coronal_slice': 109, 'sagittal_slice': 78}}
 
 if SRCDIR.is_dir():
     # create list of existing data
@@ -324,7 +325,9 @@ if SRCDIR.is_dir():
         (SRCDIR / "GE_D690_NEMA_IQ", OUTDIR / "D690_NEMA",
          [MetricsWithTimeout(outdir=OUTDIR / "D690_NEMA", **DATA_SLICES['GE_D690_NEMA_IQ'])]),
         (SRCDIR / "Mediso_NEMA_IQ_lowcounts", OUTDIR / "Mediso_NEMA_lowcounts",
-         [MetricsWithTimeout(outdir=OUTDIR / "Mediso_NEMA_lowcounts", **DATA_SLICES['Mediso_NEMA_IQ_lowcounts'])])]
+         [MetricsWithTimeout(outdir=OUTDIR / "Mediso_NEMA_lowcounts", **DATA_SLICES['Mediso_NEMA_IQ_lowcounts'])]),
+        (SRCDIR / "GE_DMI4_NEMA_IQ", OUTDIR / "DMI4_NEMA",
+         [MetricsWithTimeout(outdir=OUTDIR / "DMI4_NEMA", **DATA_SLICES['GE_DMI4_NEMA_IQ'])])]
 else:
     log.warning("Source directory does not exist: %s", SRCDIR)
     data_dirs_metrics = [(None, None, [])] # type: ignore
