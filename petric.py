@@ -298,7 +298,7 @@ DATA_SLICES = {
     'Mediso_NEMA_IQ_lowcounts': {'transverse_slice': 22, 'coronal_slice': 74, 'sagittal_slice': 70},
     'GE_DMI4_NEMA_IQ': {'transverse_slice': 27, 'coronal_slice': 109, 'sagittal_slice': 78}}
 
-if SRCDIR.is_dir():
+if SRCDIR.is_dir() and not os.getenv("PETRIC_SKIP_DATA", False):
     # create list of existing data
     # NB: `MetricsWithTimeout` initialises `SaveIters` which creates `outdir`
     data_dirs_metrics = [
@@ -335,7 +335,7 @@ else:
 if __name__ != "__main__":
     # load up first data-set for people to play with
     srcdir, outdir, metrics = data_dirs_metrics[0]
-    if srcdir is None or os.getenv("PETRIC_SKIP_DATA", False):
+    if srcdir is None:
         data = None
     else:
         data = get_data(srcdir=srcdir, outdir=outdir)
