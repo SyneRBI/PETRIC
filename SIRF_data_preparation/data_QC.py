@@ -200,7 +200,9 @@ def main(argv=None):
         acquired_data = STIR.AcquisitionData(os.path.join(srcdir, 'prompts.hs'))
         additive_term = STIR.AcquisitionData(os.path.join(srcdir, 'additive_term.hs'))
         mult_factors = STIR.AcquisitionData(os.path.join(srcdir, 'mult_factors.hs'))
-        background = additive_term * mult_factors
+        sensitivity_factors = STIR.AcquisitionSensitivityModel(mult_factors)
+        sensitivity_factors.set_up(acquired_data)
+        background = sensitivity_factors.forward(additive_term)
         plot_sinogram_profile(acquired_data, background, srcdir=srcdir)
         check_values_non_negative(acquired_data.as_array(), "prompts")
         check_values_non_negative(additive_term.as_array(), "additive_term")
