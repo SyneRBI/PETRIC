@@ -1,4 +1,4 @@
-# PETRIC: PET Rapid Image reconstruction Challenge
+# PETRIC: PET Rapid Image Reconstruction Challenge
 
 [![website](https://img.shields.io/badge/announcement-website-purple?logo=workplace&logoColor=white)](https://www.ccpsynerbi.ac.uk/events/petric/)
 [![wiki](https://img.shields.io/badge/details-wiki-blue?logo=googledocs&logoColor=white)][wiki]
@@ -52,7 +52,7 @@ Additional dependencies may be specified via `apt.txt`, `environment.yml`, and/o
 You can also find some example notebooks here which should help you with your development:
 - https://github.com/SyneRBI/SIRF-Contribs/blob/master/src/notebooks/BSREM_illustration.ipynb
 
-## Organiser setup
+## Organiser Setup
 
 The organisers will execute (after installing [nvidia-docker](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) & downloading <https://petric.tomography.stfc.ac.uk/data/> to `/path/to/data`):
 
